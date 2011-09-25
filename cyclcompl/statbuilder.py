@@ -147,3 +147,16 @@ def measure_file_complexity(filename):
         code = f.read() + '\n' #this trailing newline is important... le sigh.
     return measure_complexity(code, module_name=utils.splitpath_root_file_ext(filename)[1])
 
+def measure_cyclcompl(files):
+    """Returns 2 items: A collection of (filename, FlatStat instance for file) tuples, and a collection of files that
+    failed to parse.
+    """
+    result = []
+    failures = []
+    for f in files:
+        try:
+            stats = measure_file_complexity(f)
+            result.append((f, stats))
+        except SyntaxError:
+            failures.append(f)
+    return result, failures

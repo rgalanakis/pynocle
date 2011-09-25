@@ -11,7 +11,7 @@ class IRenderer(object):
     def dotexe(self):
         """Returns the path to the dot (or other graphviz) exe to invoke."""
         return 'dot'
-    
+
     @abc.abstractmethod
     def savedot(self, filename):
         """Saves a dot file to filename."""
@@ -40,9 +40,6 @@ class IRenderer(object):
             raise
         if wait:
             p.communicate()
-
-def getlabel(filename):
-    return utils.splitpath_root_file_ext(filename)[1]
 
 DEFAULT_STYLING = {
     'failed': r'shape=polygon,sides=8,style=filled,fontcolor=white,color=red,peripheries=2',

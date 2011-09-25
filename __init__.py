@@ -5,6 +5,15 @@ your testing function (like nose.run) and pass it into Monocle.makeawesome, alon
 to analyze.
 """
 
+__author__ = "Rob Galanakis"
+__copyright__ = "Copyright 2011, Rob Galanakis"
+__credits__ = ["Rob Galanakis"]
+__license__ = "LGPL"
+__version__ = "0.0.1"
+__maintainer__ = "Rob Galanakis"
+__email__ = "rob.galanakis@gmail.com"
+__status__ = "Pre-Alpha"
+
 import utils
 
 try:
@@ -67,31 +76,37 @@ def generate_cover_report(cov, filename):
     with open(filename, 'w') as f:
         cov.report(file=f)
 
-def generate_cyclomatic_complexity(codefilenames, reportfilename, threshold=None):
+def generate_cyclomatic_complexity(codefilenames, reportfilename, formatter_factory=None):
     """Generates a cyclomatic complexity report based on all the files in codefilenames, output to reportfilename.
 
-    threshold: If provided, override the amount of complexity at which data is reported.
+    formatter_factory: Callable that takes the filestream of reportfilename and return the cyclcompl.CCFormatter
+        to use to format the report.
     """
     ccdata, failures = cyclcompl.measure_cyclcompl(codefilenames)
+    formatter_factory = formatter_factory or (lambda f: cyclcompl.CCTextFormatter(out=f))
     with open(reportfilename, 'w') as f:
-        cyclcompl.format_cyclcompl(cyclcompl.formatting.CCTextFormatter(threshold, f), ccdata, failures=failures)
+        cyclcompl.format_cyclcompl(formatter_factory(f), ccdata, failures=failures)
 
-def generate_sloc(codefilenames, reportfilename):
+def generate_sloc(codefilenames, reportfilename, formatter_factory=None):
     """Generates a Source Lines of Code report for files in codefilenames, output to reportfilename.
-    """
-    slocgrp = sloc.create_slocgroup(codefilenames)
-    with open(reportfilename, 'w') as f:
-        sloc.format_slocgroup(slocgrp, sloc.formatting.SlocTextFormatter(f))
 
-def generate_dependency_graph(codefilenames, reportfilename, rendererFactory=None):
+    formatter_factory: Callable that takes the filestream of reportfilename returns the sloc.ISlocFormatter to use
+        to format the report.
+    """
+    slocgrp = sloc.SlocGroup(codefilenames)
+    formatter_factory = formatter_factory or sloc.SlocTextFormatter
+    with open(reportfilename, 'w') as f:
+        sloc.format_slocgroup(slocgrp, formatter_factory(f))
+
+def generate_dependency_graph(codefilenames, reportfilename, renderer_factory=None):
     """Generates a dependency graph image to reportfilename for the files in codefilenames.
 
     renderer: A callable that returns an depgraph.IRenderer instance and takes a collection of depgraph.Dependency
         instances and a collection of filenames that failed to parse as its args.  Defaults to depgraph.DefaultRenderer
     """
     depb = depgraph.DepBuilder(utils.find_all(codefilenames))
-    rendererFactory = rendererFactory or depgraph.DefaultRenderer
-    renderer = rendererFactory(depb.dependencies, depb.failed)
+    renderer_factory = renderer_factory or depgraph.DefaultRenderer
+    renderer = renderer_factory(depb.dependencies, depb.failed)
     renderer.render(reportfilename)
     
 def _generate_html_jump_str(htmlfilename, paths):
@@ -157,17 +172,18 @@ class Monocle(object):
         self._filesforjump.append(self.coverreport_filename)
         return generate_cover_report(cov, self.coverreport_filename)
 
-    def generate_cyclomatic_complexity(self, threshold=None):
+    def generate_cyclomatic_complexity(self, formatter_factory=None):
         self._filesforjump.append(self.cyclcompl_filename)
-        return generate_cyclomatic_complexity(self.filenames, self.cyclcompl_filename, threshold=threshold)
+        return generate_cyclomatic_complexity(self.filenames, self.cyclcompl_filename,
+                                              formatter_factory=formatter_factory)
 
-    def generate_sloc(self):
+    def generate_sloc(self, formatter_factory=None):
         self._filesforjump.append(self.sloc_filename)
-        return generate_sloc(self.filenames, self.sloc_filename)
+        return generate_sloc(self.filenames, self.sloc_filename, formatter_factory=formatter_factory)
 
-    def generate_dependency_graph(self, rendererFactory=None):
+    def generate_dependency_graph(self, renderer_factory=None):
         self._filesforjump.append(self.depgraph_filename)
-        return generate_dependency_graph(self.filenames, self.depgraph_filename, rendererFactory)
+        return generate_dependency_graph(self.filenames, self.depgraph_filename, renderer_factory)
 
     def generate_html_jump(self):
         """Generates an html page that links to any generated reports."""
