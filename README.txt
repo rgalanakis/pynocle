@@ -20,6 +20,8 @@ http://en.wikipedia.org/wiki/Dependency_graph
 http://en.wikipedia.org/wiki/Code_coverage
 
 And NDepend, a fantastic code analysis tool for .NET, has a lot of good info: http://www.ndepend.com/Metrics.aspx
+I owe a large number of the ideas and metrics to the wonderful team responsible for NDepend,
+including Patrick Smacchia.
 
 
 Usage
@@ -56,12 +58,14 @@ To Do
 - Add support for coupling metrics
   - http://codebetter.com/patricksmacchia/2008/02/15/code-metrics-on-coupling-dead-code-design-flaws-and-re-engineering/
   - Determine how to represent these conditions in the dependency graph.
-  - Set up PageRank algorithm for weighing Ce.
   - Done
+    - 9/25 Set up PageRank algorithm for weighing Ce.
     - 9/25 Add Afferent Coupling (modules using it) and Efferent Coupling (modules it uses) support
     - 9/25 Create another report for coupling.
     
 - Measure Number of Children (NOC) and Depth of Inheritance Tree (DIT)
+
+- Start using some markup and ideally sortable tables, rather than crappy plain text!
 
 Support
 =======
