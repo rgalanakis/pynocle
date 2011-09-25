@@ -5,27 +5,6 @@ Showing items with a CC greater than or equal to 5
 WARNING: The following files failed to parse:
 	C:\PythonDev\pynocle\bogus.py
 
-C:\PythonDev\pynocle\tableprint.py
-No items with a CC >= 5
-
-C:\PythonDev\pynocle\test_init.py
-No items with a CC >= 5
-
-C:\PythonDev\pynocle\utils.py
-No items with a CC >= 5
-
-C:\PythonDev\pynocle\__init__.py
-No items with a CC >= 5
-
-C:\PythonDev\pynocle\cyclcompl\formatting.py
-No items with a CC >= 5
-
-C:\PythonDev\pynocle\cyclcompl\statbuilder.py
-No items with a CC >= 5
-
-C:\PythonDev\pynocle\cyclcompl\__init__.py
-No items with a CC >= 5
-
 C:\PythonDev\pynocle\depgraph\depbuilder.py
 ---------------------------------------
 Type      Name                       CC
@@ -33,16 +12,13 @@ Type      Name                       CC
 Method    DepBuilder.process_file    7 
 ---------------------------------------
 
-C:\PythonDev\pynocle\depgraph\formatting.py
-No items with a CC >= 5
-
 C:\PythonDev\pynocle\depgraph\pagerank.py
--------------------------------------
-Type        Name                   CC
--------------------------------------
-Function    transposeLinkMatrix    7 
-Function    pageRankGenerator      6 
--------------------------------------
+--------------------------------------
+Type        Name                    CC
+--------------------------------------
+Function    _transposeLinkMatrix    7 
+Function    _pageRankGenerator      6 
+--------------------------------------
 
 C:\PythonDev\pynocle\depgraph\rendering.py
 --------------------------------
@@ -51,18 +27,12 @@ Type      Name                CC
 Method    IRenderer.render    5 
 --------------------------------
 
-C:\PythonDev\pynocle\depgraph\test_pagerank.py
-No items with a CC >= 5
-
-C:\PythonDev\pynocle\depgraph\__init__.py
-No items with a CC >= 5
-
-C:\PythonDev\pynocle\sloc\formatting.py
-No items with a CC >= 5
-
-C:\PythonDev\pynocle\sloc\slocing.py
-No items with a CC >= 5
-
-C:\PythonDev\pynocle\sloc\__init__.py
-No items with a CC >= 5
+All results, sorted by CC:----------------------------------------------------------------------------------------
+Filename                                       Type        Name                       CC
+----------------------------------------------------------------------------------------
+C:\PythonDev\pynocle\depgraph\depbuilder.py    Method      DepBuilder.process_file    7 
+C:\PythonDev\pynocle\depgraph\pagerank.py      Function    _transposeLinkMatrix       7 
+C:\PythonDev\pynocle\depgraph\pagerank.py      Function    _pageRankGenerator         6 
+C:\PythonDev\pynocle\depgraph\rendering.py     Method      IRenderer.render           5 
+----------------------------------------------------------------------------------------
 
