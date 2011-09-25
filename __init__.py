@@ -119,6 +119,13 @@ def generate_coupling_report(codefilenames, reportfilename, formatter_factory=No
     with open(reportfilename, 'w') as f:
         depgraph.format_coupling(depgroup, formatter_factory(f))
 
+def generate_couplingrank_report(codefilenames, reportfilename, formatter_factory=None):
+    """Generates a PageRank report for all modules in codefilenames, saved to reportfilename.
+
+    formatter_factory: Callable that returns an ICouplingFormatter instance.
+    """
+    factory = formatter_factory or depgraph.formatting.RankTextFormatter
+    generate_coupling_report(codefilenames, reportfilename, formatter_factory=factory)
 
 def _generate_html_jump_str(htmlfilename, paths):
     """Generates the html contents for the jump page."""
@@ -156,7 +163,7 @@ class Monocle(object):
     def __init__(self, outputdir='output', coveragedata_filename='.coverage', coverhtml_dir='report_covhtml',
                  coverreport_filename='report_coverage.txt', cyclcompl_filename='report_cyclcompl.txt',
                  sloc_filename='report_sloc.txt', depgraph_filename='depgraph.png',
-                 coupling_filename='report_coupling.txt',
+                 coupling_filename='report_coupling.txt', couplingrank_filename='report_couplingrank.txt',
                  htmljump_filename='index.html', files_and_folders=(os.getcwd(),)):
         self.outputdir = outputdir
         join = lambda x: os.path.join(self.outputdir, x)
@@ -167,6 +174,7 @@ class Monocle(object):
         self.sloc_filename = join(sloc_filename)
         self.depgraph_filename = join(depgraph_filename)
         self.coupling_filename = join(coupling_filename)
+        self.couplingrank_filename = join(couplingrank_filename)
         self.htmljump_filename = join(htmljump_filename)
         self.filenames = utils.find_all(files_and_folders)
         self._filesforjump = []
@@ -201,6 +209,10 @@ class Monocle(object):
     def generate_coupling_report(self, formatter_factory=None):
         self._filesforjump.append(self.coupling_filename)
         return generate_coupling_report(self.filenames, self.coupling_filename, formatter_factory)
+
+    def generate_couplingrank_report(self, formatter_factory=None):
+        self._filesforjump.append(self.couplingrank_filename)
+        return generate_couplingrank_report(self.filenames, self.couplingrank_filename, formatter_factory)
     
     def generate_html_jump(self):
         """Generates an html page that links to any generated reports."""
@@ -220,5 +232,6 @@ class Monocle(object):
         self.generate_sloc()
         self.generate_dependency_graph()
         self.generate_coupling_report()
+        self.generate_couplingrank_report()
         self.generate_html_jump()
 
