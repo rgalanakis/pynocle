@@ -2,7 +2,7 @@ import abc
 import sys
 
 import pagerank
-import tableprint
+import pynocle.tableprint as tableprint
 
 def format_coupling(dependencygroup, couplingformatter):
     couplingformatter.format_report_header()

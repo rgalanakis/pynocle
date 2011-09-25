@@ -14,7 +14,7 @@ __maintainer__ = "Rob Galanakis"
 __email__ = "rob.galanakis@gmail.com"
 __status__ = "Pre-Alpha"
 
-import utils
+import pynocle.utils as utils
 
 try:
     import coverage
@@ -26,6 +26,7 @@ import shutil
 
 import cyclcompl
 import depgraph
+import inheritance
 import sloc
 
 def ensure_clean_output(outputdir, _ran=False):
@@ -41,12 +42,16 @@ def ensure_clean_output(outputdir, _ran=False):
         shutil.rmtree(outputdir)
     except WindowsError:
         pass
+    if os.path.exists(outputdir):
+        raise IOError, '%s was not deleted.' % outputdir
     try:
         os.makedirs(outputdir)
     except WindowsError:
         if not _ran:
             ensure_clean_output(outputdir, _ran=True)
-        pass
+        if not os.path.isdir(outputdir):
+            raise
+
 
 def run_with_coverage(func, filename):
     """Runs func (parameterless callable) with coverage on.  Saves coverage to filename.  Returns a tuple
@@ -127,6 +132,12 @@ def generate_couplingrank_report(codefilenames, reportfilename, formatter_factor
     factory = formatter_factory or depgraph.formatting.RankTextFormatter
     generate_coupling_report(codefilenames, reportfilename, formatter_factory=factory)
 
+def generate_inheritance_report(codefilenames, reportfilename, formatter_factory=None):
+    classgroup = inheritance.ClassGraph(inheritance.InheritanceBuilder(codefilenames).classinfos())
+    with open(reportfilename, 'w') as f:
+        f.write('Functionality not yet supported!\n\n')
+        f.write(repr(classgroup))
+
 def _generate_html_jump_str(htmlfilename, paths):
     """Generates the html contents for the jump page."""
     htmltemplate = '\n'.join(
@@ -164,6 +175,7 @@ class Monocle(object):
                  coverreport_filename='report_coverage.txt', cyclcompl_filename='report_cyclcompl.txt',
                  sloc_filename='report_sloc.txt', depgraph_filename='depgraph.png',
                  coupling_filename='report_coupling.txt', couplingrank_filename='report_couplingrank.txt',
+                 inheritance_filename='report_inheritance.txt',
                  htmljump_filename='index.html', files_and_folders=(os.getcwd(),)):
         self.outputdir = outputdir
         join = lambda x: os.path.join(self.outputdir, x)
@@ -175,6 +187,7 @@ class Monocle(object):
         self.depgraph_filename = join(depgraph_filename)
         self.coupling_filename = join(coupling_filename)
         self.couplingrank_filename = join(couplingrank_filename)
+        self.inheritance_filename = join(inheritance_filename)
         self.htmljump_filename = join(htmljump_filename)
         self.filenames = utils.find_all(files_and_folders)
         self._filesforjump = []
@@ -213,6 +226,10 @@ class Monocle(object):
     def generate_couplingrank_report(self, formatter_factory=None):
         self._filesforjump.append(self.couplingrank_filename)
         return generate_couplingrank_report(self.filenames, self.couplingrank_filename, formatter_factory)
+
+    def generate_inheritance_report(self, formatter_factory=None):
+        self._filesforjump.append(self.inheritance_filename)
+        return generate_inheritance_report(self.filenames, self.inheritance_filename, formatter_factory)
     
     def generate_html_jump(self):
         """Generates an html page that links to any generated reports."""
@@ -228,6 +245,7 @@ class Monocle(object):
         return result
 
     def makeawesome_nocover(self):
+        self.generate_inheritance_report()
         self.generate_cyclomatic_complexity()
         self.generate_sloc()
         self.generate_dependency_graph()

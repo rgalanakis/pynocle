@@ -62,8 +62,13 @@ To Do
     - 9/25 Set up PageRank algorithm for weighing Ce.
     - 9/25 Add Afferent Coupling (modules using it) and Efferent Coupling (modules it uses) support
     - 9/25 Create another report for coupling.
-    
-- Measure Number of Children (NOC) and Depth of Inheritance Tree (DIT)
+
+- Additional metrics to support (http://www.ndepend.com/Metrics.aspx)
+  - Number of subclasses
+  - Depth of baseclasses
+  - Number of baseclasses
+  - Function parameter count
+  - Function variables
 
 - Start using some markup and ideally sortable tables, rather than crappy plain text!
 
