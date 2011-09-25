@@ -32,7 +32,12 @@ class IRenderer(object):
             format = os.path.splitext(outputfilename)[1][1:] #Skip the period on the extension
         clargs = [self.dotexe(), '-T' + format, dotpath, '-o', outputfilename]
         clargs.extend(moreargs)
-        p = subprocess.Popen(clargs, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            p = subprocess.Popen(clargs, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        except WindowsError as exc:
+            if exc.errno == 2:
+                raise utils.MissingDependencyError, repr(exc)
+            raise
         if wait:
             p.communicate()
 
