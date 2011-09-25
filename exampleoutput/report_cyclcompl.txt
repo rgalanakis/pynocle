@@ -27,7 +27,8 @@ Type      Name                CC
 Method    IRenderer.render    5 
 --------------------------------
 
-All results, sorted by CC:----------------------------------------------------------------------------------------
+All results, sorted by CC:
+----------------------------------------------------------------------------------------
 Filename                                       Type        Name                       CC
 ----------------------------------------------------------------------------------------
 C:\PythonDev\pynocle\depgraph\depbuilder.py    Method      DepBuilder.process_file    7 
