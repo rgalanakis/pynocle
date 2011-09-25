@@ -2,7 +2,17 @@
 import fnmatch
 import os
 
-class MissingDependencyError(Exception):
+class PynocleError(Exception):
+    """Base class for custom exception hierarchy."""
+    pass
+
+class AggregateError(PynocleError):
+    """Error that holds a group of other errors.  Argument will be a collection
+    of tuples (error instance, error traceback).
+    """
+    pass
+
+class MissingDependencyError(PynocleError):
     """If you hit this exception, it means you tried to use a feature in pynocle that required a dependency you
     weren't set up with!
     """

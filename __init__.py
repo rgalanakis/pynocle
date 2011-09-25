@@ -170,14 +170,35 @@ def generate_html_jump(filename, *paths):
 class Monocle(object):
     """Class that manages the filenames and default paths for the monocle methods.  Methods are the same as
     top-level module functions.
+
+    outputdir: Directory relative to cwd to write files.
+    files_and_folders: All files and files recursively under directories in this collection will be reported on.
+
+    Other arguments are filenames relative to outputdir that reports will be written to,
+    and factory methods that are used to output those reports.
     """
-    def __init__(self, outputdir='output', coveragedata_filename='.coverage', coverhtml_dir='report_covhtml',
-                 coverreport_filename='report_coverage.txt', cyclcompl_filename='report_cyclcompl.txt',
-                 sloc_filename='report_sloc.txt', depgraph_filename='depgraph.png',
-                 coupling_filename='report_coupling.txt', couplingrank_filename='report_couplingrank.txt',
+    def __init__(self, outputdir='output',
+                 files_and_folders=(os.getcwd(),),
+                 coveragedata_filename='.coverage',
+                 coverhtml_dir='report_covhtml',
+                 coverreport_filename='report_coverage.txt',
+                 cyclcompl_filename='report_cyclcompl.txt',
+                 cyclcompl_fmtfactory=None,
+                 sloc_filename='report_sloc.txt',
+                 sloc_fmtfactory=None,
+                 depgraph_filename='depgraph.png',
+                 depgraph_renderfactory=None,
+                 coupling_filename='report_coupling.txt',
+                 coupling_fmtfactory=None,
+                 couplingrank_filename='report_couplingrank.txt',
+                 couplingrank_fmtfactory=None,
                  inheritance_filename='report_inheritance.txt',
-                 htmljump_filename='index.html', files_and_folders=(os.getcwd(),)):
+                 inheritance_fmtfactory=None,
+                 htmljump_filename='index.html',
+                 ):
         self.outputdir = outputdir
+        self.filenames = utils.find_all(files_and_folders)
+
         join = lambda x: os.path.join(self.outputdir, x)
         self.coveragedata_filename = join(coveragedata_filename)
         self.coverhtml_dir = join(coverhtml_dir)
@@ -189,47 +210,53 @@ class Monocle(object):
         self.couplingrank_filename = join(couplingrank_filename)
         self.inheritance_filename = join(inheritance_filename)
         self.htmljump_filename = join(htmljump_filename)
-        self.filenames = utils.find_all(files_and_folders)
+
+        self.cyclcompl_fmtfactory = cyclcompl_fmtfactory
+        self.sloc_fmtfactory = sloc_fmtfactory
+        self.depgraph_renderfactory = depgraph_renderfactory
+        self.coupling_fmtfactory = coupling_fmtfactory
+        self.couplingrank_fmtfactory = couplingrank_fmtfactory
+        self.inheritance_fmtfactory = inheritance_fmtfactory
+
         self._filesforjump = []
 
     def ensure_clean_output(self):
-        return ensure_clean_output(self.outputdir)
+        ensure_clean_output(self.outputdir)
 
     def run_with_coverage(self, func):
         return run_with_coverage(func, self.coveragedata_filename)
 
     def generate_cover_html(self, cov):
+        generate_cover_html(cov, self.coverhtml_dir)
         self._filesforjump.append(os.path.join(self.coverhtml_dir, 'index.html'))
-        return generate_cover_html(cov, self.coverhtml_dir)
 
     def generate_cover_report(self, cov):
+        generate_cover_report(cov, self.coverreport_filename)
         self._filesforjump.append(self.coverreport_filename)
-        return generate_cover_report(cov, self.coverreport_filename)
 
-    def generate_cyclomatic_complexity(self, formatter_factory=None):
+    def generate_cyclomatic_complexity(self):
+        generate_cyclomatic_complexity(self.filenames, self.cyclcompl_filename, self.cyclcompl_fmtfactory)
         self._filesforjump.append(self.cyclcompl_filename)
-        return generate_cyclomatic_complexity(self.filenames, self.cyclcompl_filename,
-                                              formatter_factory=formatter_factory)
 
-    def generate_sloc(self, formatter_factory=None):
+    def generate_sloc(self):
+        generate_sloc(self.filenames, self.sloc_filename, self.sloc_fmtfactory)
         self._filesforjump.append(self.sloc_filename)
-        return generate_sloc(self.filenames, self.sloc_filename, formatter_factory=formatter_factory)
 
-    def generate_dependency_graph(self, renderer_factory=None):
+    def generate_dependency_graph(self):
+        generate_dependency_graph(self.filenames, self.depgraph_filename, self.depgraph_renderfactory)
         self._filesforjump.append(self.depgraph_filename)
-        return generate_dependency_graph(self.filenames, self.depgraph_filename, renderer_factory)
 
-    def generate_coupling_report(self, formatter_factory=None):
+    def generate_coupling_report(self):
+        generate_coupling_report(self.filenames, self.coupling_filename, self.coupling_fmtfactory)
         self._filesforjump.append(self.coupling_filename)
-        return generate_coupling_report(self.filenames, self.coupling_filename, formatter_factory)
 
-    def generate_couplingrank_report(self, formatter_factory=None):
+    def generate_couplingrank_report(self):
+        generate_couplingrank_report(self.filenames, self.couplingrank_filename, self.couplingrank_fmtfactory)
         self._filesforjump.append(self.couplingrank_filename)
-        return generate_couplingrank_report(self.filenames, self.couplingrank_filename, formatter_factory)
 
-    def generate_inheritance_report(self, formatter_factory=None):
+    def generate_inheritance_report(self):
+        generate_inheritance_report(self.filenames, self.inheritance_filename, self.inheritance_fmtfactory)
         self._filesforjump.append(self.inheritance_filename)
-        return generate_inheritance_report(self.filenames, self.inheritance_filename, formatter_factory)
     
     def generate_html_jump(self):
         """Generates an html page that links to any generated reports."""
@@ -245,11 +272,22 @@ class Monocle(object):
         return result
 
     def makeawesome_nocover(self):
-        self.generate_inheritance_report()
-        self.generate_cyclomatic_complexity()
-        self.generate_sloc()
-        self.generate_dependency_graph()
-        self.generate_coupling_report()
-        self.generate_couplingrank_report()
-        self.generate_html_jump()
-
+        """Runs all metrics excluding coverage.  Raises an AggregateError after all functions run if any function
+        raises.
+        """
+        excs = []
+        for func in (self.generate_inheritance_report,
+                     self.generate_cyclomatic_complexity,
+                     self.generate_sloc,
+                     self.generate_dependency_graph,
+                     self.generate_coupling_report,
+                     self.generate_couplingrank_report,
+                     self.generate_html_jump):
+            try:
+                func()
+            except Exception as exc:
+                import traceback
+                excs.append((exc, traceback.format_exc()))
+        if excs:
+            raise utils.AggregateError, excs
+        
