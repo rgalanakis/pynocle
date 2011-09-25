@@ -50,6 +50,19 @@ You can download the source from http://code.google.com/p/pynocle/, and just 'im
 Make sure you have GraphViz's 'dot' in your application path, and the coverage module installed, to use all features.
 
 
+To Do
+=====
+
+- Add support for coupling metrics
+  - http://codebetter.com/patricksmacchia/2008/02/15/code-metrics-on-coupling-dead-code-design-flaws-and-re-engineering/
+  - Determine how to represent these conditions in the dependency graph.
+  - Set up PageRank algorithm for weighing Ce.
+  - Done
+    - 9/25 Add Afferent Coupling (modules using it) and Efferent Coupling (modules it uses) support
+    - 9/25 Create another report for coupling.
+    
+- Measure Number of Children (NOC) and Depth of Inheritance Tree (DIT)
+
 Support
 =======
 
@@ -57,7 +70,7 @@ Please email rob.galanakis@gmail.com if you have any questions, bugs, or want to
 
 
 License and Contributions
-=====================
+=========================
 Licensed under LGPL.  Copyright 2011 Robert Galanakis, rob.galanakis@gmail.com
 
 This project uses a few pieces of code originally developed in pygenie, which measured cyclomatic complexity only.

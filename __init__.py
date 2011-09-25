@@ -104,11 +104,22 @@ def generate_dependency_graph(codefilenames, reportfilename, renderer_factory=No
     renderer: A callable that returns an depgraph.IRenderer instance and takes a collection of depgraph.Dependency
         instances and a collection of filenames that failed to parse as its args.  Defaults to depgraph.DefaultRenderer
     """
-    depb = depgraph.DepBuilder(utils.find_all(codefilenames))
+    depb = depgraph.DepBuilder(codefilenames)
     renderer_factory = renderer_factory or depgraph.DefaultRenderer
     renderer = renderer_factory(depb.dependencies, depb.failed)
     renderer.render(reportfilename)
-    
+
+def generate_coupling_report(codefilenames, reportfilename, formatter_factory=None):
+    """Generates a report for Afferent and Efferent Coupling between all modules in codefilenames, saved to
+    reportfilename.
+    """
+    depb = depgraph.DepBuilder(codefilenames)
+    depgroup = depgraph.DependencyGroup(depb.dependencies, depb.failed)
+    formatter_factory = formatter_factory or depgraph.CouplingTextFormatter
+    with open(reportfilename, 'w') as f:
+        depgraph.format_coupling(depgroup, formatter_factory(f))
+
+
 def _generate_html_jump_str(htmlfilename, paths):
     """Generates the html contents for the jump page."""
     htmltemplate = '\n'.join(
@@ -136,7 +147,7 @@ def generate_html_jump(filename, *paths):
     paths: Paths to all files the resultant file should display links to.
     """
     with open(filename, 'w') as f:
-        f.write(_generate_html_jump_str(filename, paths))
+        f.write(_generate_html_jump_str(filename, sorted(paths)))
 
 class Monocle(object):
     """Class that manages the filenames and default paths for the monocle methods.  Methods are the same as
@@ -144,8 +155,9 @@ class Monocle(object):
     """
     def __init__(self, outputdir='output', coveragedata_filename='.coverage', coverhtml_dir='report_covhtml',
                  coverreport_filename='report_coverage.txt', cyclcompl_filename='report_cyclcompl.txt',
-                 sloc_filename='report_sloc.txt', depgraph_filename='depgraph.png', htmljump_filename='index.html',
-                 files_and_folders=(os.getcwd(),)):
+                 sloc_filename='report_sloc.txt', depgraph_filename='depgraph.png',
+                 coupling_filename='report_coupling.txt',
+                 htmljump_filename='index.html', files_and_folders=(os.getcwd(),)):
         self.outputdir = outputdir
         join = lambda x: os.path.join(self.outputdir, x)
         self.coveragedata_filename = join(coveragedata_filename)
@@ -154,6 +166,7 @@ class Monocle(object):
         self.cyclcompl_filename = join(cyclcompl_filename)
         self.sloc_filename = join(sloc_filename)
         self.depgraph_filename = join(depgraph_filename)
+        self.coupling_filename = join(coupling_filename)
         self.htmljump_filename = join(htmljump_filename)
         self.filenames = utils.find_all(files_and_folders)
         self._filesforjump = []
@@ -185,6 +198,10 @@ class Monocle(object):
         self._filesforjump.append(self.depgraph_filename)
         return generate_dependency_graph(self.filenames, self.depgraph_filename, renderer_factory)
 
+    def generate_coupling_report(self, formatter_factory=None):
+        self._filesforjump.append(self.coupling_filename)
+        return generate_coupling_report(self.filenames, self.coupling_filename, formatter_factory)
+    
     def generate_html_jump(self):
         """Generates an html page that links to any generated reports."""
         return generate_html_jump(self.htmljump_filename, *self._filesforjump)
@@ -202,5 +219,6 @@ class Monocle(object):
         self.generate_cyclomatic_complexity()
         self.generate_sloc()
         self.generate_dependency_graph()
+        self.generate_coupling_report()
         self.generate_html_jump()
 
