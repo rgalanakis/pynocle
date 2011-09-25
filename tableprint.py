@@ -60,6 +60,7 @@ class Table(object):
             out.write(rowstr)
             out.write('\n')
         out.write(tablesep)
+        out.write('\n')
 
     def __repr__(self):
         with StringIO.StringIO() as sio:

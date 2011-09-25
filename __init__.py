@@ -1,56 +1,33 @@
-"""Module for reporting of code metrics and other inspection/reporting features.  The main public usage is through
-monocle_chain.
-"""
+"""Module for reporting of code metrics and other inspection/reporting features."""
 
 import coverage
-import nose
 import os
 import shutil
 
-import pygenie
+import cyclcompl
+import depgraph
 import sloc
+import utils
 
-class NoseArgs(object):
-    """Encapsulates arguments that can be send to nose.run/nose.main."""
-    def __init__(self, included_dirs, with_doctest=True, verbose=False):
-        self.with_doctest = with_doctest
-        #self.excludedDirs = excludedDirs
-        self.included_dirs = included_dirs
-        self.verbose = verbose
+def ensure_clean_output(outputdir, _ran=False):
+    """rmtree and makedirs outputdir to ensure a clean output directory.
 
-    def to_nose_argv(self):
-        """Returns a list of arguments to send to nose.run/nose.main."""
-        args = []
-#        if self.excludedDirs:
-#            args.append('--exclude')
-#            regstrs = map(lambda s: '(%s)' % s, self.excludedDirs)
-#            args.append('|'.join(regstrs))
-        if self.included_dirs:
-            for incl in self.included_dirs:
-                #args.append('--where')
-                args.append(incl)
-        #make sure this is last- if it's first, it seems to not work
-        if self.with_doctest:
-            args.append('--with-doctest')
-        if self.verbose:
-            args.append('--verbose')
-        return args
-
-def ensure_clean_output(outputdir):
-    """rmtree's outputdir and creates a new empty directory."""
+    outputdir: The folder to create.
+    _ran: For internal use only.
+    """
+    #There is a potential race condition where rmtree seems to succeed and makedirs fails so
+    #the directory doesn't exist.  So for the time being, if makedirs fails, we re-invoke the function once.
+    #TODO: Figure out race condition.
     try:
         shutil.rmtree(outputdir)
     except WindowsError:
         pass
     try:
-        os.mkdir(outputdir)
+        os.makedirs(outputdir)
     except WindowsError:
+        if not _ran:
+            ensure_clean_output(outputdir, _ran=True)
         pass
-
-def run_nose(noseargs):
-    """Invoke nose.run with noseargs and returns its result."""
-    result = nose.run(argv=noseargs.to_nose_argv())
-    return result
 
 def run_with_coverage(func, filename):
     """Runs func (parameterless callable) with coverage on.  Saves coverage to filename.  Returns a tuple
@@ -68,7 +45,7 @@ def generate_cover_html(cov, directory):
     """Outputs a coverage html report from cov into directory.
 
     cov: An instance of coverage.coverage.
-    directory: The directory all the html files will be output to.
+    directory: The directory all the html files will be output to.  Directory must exist.
     """
     cov.html_report(directory=directory)
 
@@ -83,24 +60,24 @@ def generate_cyclomatic_complexity(files_and_folders, filename, threshold=None):
 
     threshold: If provided, override the amount of complexity at which data is reported.
     """
-    args = ['--outfile', filename, '--complexity', '--recurs']
-    if threshold is not None:
-        args.extend(['--threshold', str(threshold)])
-    #else: args.extend(['--threshold', '0'])
-    args += list(files_and_folders)
-    pygenie.main(args)
+    ccdata, failures = cyclcompl.measure_cyclcompl(utils.find_all(files_and_folders))
+    with open(filename, 'w') as f:
+        cyclcompl.format_cyclcompl(cyclcompl.formatting.CCTextFormatter(threshold, f), ccdata, failures=failures)
 
 def generate_sloc(files_and_folders, filename):
     """Generates a Source Lines of Code report for files in and recursively under directories in files_and_folders,
     output to filename.
     """
-    result = sloc.countall(files_and_folders)
+    slocgrp = sloc.create_slocgroup(utils.find_all(files_and_folders))
     with open(filename, 'w') as f:
-        s = sloc.SlocFormatter(result, f)
-        s.print_sloc_header()
-        s.print_sloc_perfile()
+        sloc.format_slocgroup(slocgrp, sloc.formatting.SlocTextFormatter(f))
 
-def _generate_html_jump_str(paths):
+def generate_dependency_graph(files_and_folders, filename):
+    depb = depgraph.DepBuilder(utils.find_all(files_and_folders))
+    ren = depgraph.DefaultRenderer(depb.dependencies, depb.failed)
+    ren.render(filename)
+    
+def _generate_html_jump_str(htmlfilename, paths):
     """Generates the html contents for the jump page."""
     htmltemplate = '\n'.join(
         ['<html>',
@@ -112,7 +89,12 @@ def _generate_html_jump_str(paths):
         '  </body>',
         '</html>'])
     row = '      <a href="{0}">{0}</a>'
-    lines = [row.format(p) for p in paths]
+    absdir = os.path.dirname(os.path.abspath(htmlfilename)) + os.sep
+    def hrefpath(p):
+        absp = os.path.abspath(p)
+        relp = absp.replace(absdir, '')
+        return relp
+    lines = [row.format(hrefpath(p)) for p in paths]
     return htmltemplate % '\n      <br />\n'.join(lines)
 
 def generate_html_jump(filename, *paths):
@@ -122,7 +104,7 @@ def generate_html_jump(filename, *paths):
     paths: Paths to all files the resultant file should display links to.
     """
     with open(filename, 'w') as f:
-        f.write(_generate_html_jump_str(paths))
+        f.write(_generate_html_jump_str(filename, paths))
 
 class Monocle(object):
     """Class that manages the filenames and default paths for the monocle methods.  Methods are the same as
@@ -130,14 +112,17 @@ class Monocle(object):
     """
     def __init__(self, outputdir='output', coveragedata_filename='.coverage', coverhtml_dir='report_covhtml',
                  coverreport_filename='report_coverage.txt', cyclcompl_filename='report_cyclcompl.txt',
-                 sloc_filename='report_sloc.txt', htmljump_filename='index.html'):
+                 sloc_filename='report_sloc.txt', depgraph_filename='depgraph.png', htmljump_filename='index.html'):
         self.outputdir = outputdir
-        self.coveragedata_filename = os.path.join(self.outputdir, coveragedata_filename)
-        self.coverhtml_dir = os.path.join(self.outputdir, coverhtml_dir)
-        self.coverreport_filename = os.path.join(self.outputdir, coverreport_filename)
-        self.cyclcompl_filename = os.path.join(self.outputdir, cyclcompl_filename)
-        self.sloc_filename = os.path.join(self.outputdir, sloc_filename)
-        self.htmljump_filename = os.path.join(self.outputdir, htmljump_filename)
+        join = lambda x: os.path.join(self.outputdir, x)
+        self.coveragedata_filename = join(coveragedata_filename)
+        self.coverhtml_dir = join(coverhtml_dir)
+        self.coverreport_filename = join(coverreport_filename)
+        self.cyclcompl_filename = join(cyclcompl_filename)
+        self.sloc_filename = join(sloc_filename)
+        self.depgraph_filename = join(depgraph_filename)
+        self.htmljump_filename = join(htmljump_filename)
+        self._filesforjump = []
 
     def ensure_clean_output(self):
         return ensure_clean_output(self.outputdir)
@@ -146,19 +131,37 @@ class Monocle(object):
         return run_with_coverage(func, self.coveragedata_filename)
 
     def generate_cover_html(self, cov):
+        self._filesforjump.append(os.path.join(self.coverhtml_dir, 'index.html'))
         return generate_cover_html(cov, self.coverhtml_dir)
 
     def generate_cover_report(self, cov):
+        self._filesforjump.append(self.coverreport_filename)
         return generate_cover_report(cov, self.coverreport_filename)
 
     def generate_cyclomatic_complexity(self, files_and_folders, threshold=None):
+        self._filesforjump.append(self.cyclcompl_filename)
         return generate_cyclomatic_complexity(files_and_folders, self.cyclcompl_filename, threshold=threshold)
 
     def generate_sloc(self, files_and_folders):
+        self._filesforjump.append(self.sloc_filename)
         return generate_sloc(files_and_folders, self.sloc_filename)
+
+    def generate_dependency_graph(self, files_and_folders):
+        self._filesforjump.append(self.depgraph_filename)
+        return generate_dependency_graph(files_and_folders, self.depgraph_filename)
 
     def generate_html_jump(self):
         """Generates an html page that links to any generated reports."""
-        covhtmlindex = os.path.join(self.coverhtml_dir, 'index.html')
-        return generate_html_jump(self.htmljump_filename,
-                          covhtmlindex, self.coverreport_filename, self.cyclcompl_filename, self.sloc_filename)
+        return generate_html_jump(self.htmljump_filename, *self._filesforjump)
+
+    def makeawesome(self, func, files_and_folders=(os.getcwd(),)):
+        """Run ALL pynocle methods."""
+        self.ensure_clean_output()
+        result, cov = self.run_with_coverage(func)
+        self.generate_cover_html(cov)
+        self.generate_cover_report(cov)
+        self.generate_cyclomatic_complexity(files_and_folders)
+        self.generate_sloc(files_and_folders)
+        self.generate_dependency_graph(files_and_folders)
+        self.generate_html_jump()
+        return result

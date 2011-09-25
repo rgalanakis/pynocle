@@ -1,0 +1,3 @@
+Name        Stmts   Miss  Cover   Missing
+-----------------------------------------
+test_init       6      2    67%   7-8
