@@ -67,28 +67,32 @@ def generate_cover_report(cov, filename):
     with open(filename, 'w') as f:
         cov.report(file=f)
 
-def generate_cyclomatic_complexity(files_and_folders, filename, threshold=None):
-    """Generates a cyclomatic complexity report based on all the files in and recursively under directories in
-    files_and_folders, output to filename.
+def generate_cyclomatic_complexity(codefilenames, reportfilename, threshold=None):
+    """Generates a cyclomatic complexity report based on all the files in codefilenames, output to reportfilename.
 
     threshold: If provided, override the amount of complexity at which data is reported.
     """
-    ccdata, failures = cyclcompl.measure_cyclcompl(utils.find_all(files_and_folders))
-    with open(filename, 'w') as f:
+    ccdata, failures = cyclcompl.measure_cyclcompl(codefilenames)
+    with open(reportfilename, 'w') as f:
         cyclcompl.format_cyclcompl(cyclcompl.formatting.CCTextFormatter(threshold, f), ccdata, failures=failures)
 
-def generate_sloc(files_and_folders, filename):
-    """Generates a Source Lines of Code report for files in and recursively under directories in files_and_folders,
-    output to filename.
+def generate_sloc(codefilenames, reportfilename):
+    """Generates a Source Lines of Code report for files in codefilenames, output to reportfilename.
     """
-    slocgrp = sloc.create_slocgroup(utils.find_all(files_and_folders))
-    with open(filename, 'w') as f:
+    slocgrp = sloc.create_slocgroup(codefilenames)
+    with open(reportfilename, 'w') as f:
         sloc.format_slocgroup(slocgrp, sloc.formatting.SlocTextFormatter(f))
 
-def generate_dependency_graph(files_and_folders, filename):
-    depb = depgraph.DepBuilder(utils.find_all(files_and_folders))
-    ren = depgraph.DefaultRenderer(depb.dependencies, depb.failed)
-    ren.render(filename)
+def generate_dependency_graph(codefilenames, reportfilename, rendererFactory=None):
+    """Generates a dependency graph image to reportfilename for the files in codefilenames.
+
+    renderer: A callable that returns an depgraph.IRenderer instance and takes a collection of depgraph.Dependency
+        instances and a collection of filenames that failed to parse as its args.  Defaults to depgraph.DefaultRenderer
+    """
+    depb = depgraph.DepBuilder(utils.find_all(codefilenames))
+    rendererFactory = rendererFactory or depgraph.DefaultRenderer
+    renderer = rendererFactory(depb.dependencies, depb.failed)
+    renderer.render(reportfilename)
     
 def _generate_html_jump_str(htmlfilename, paths):
     """Generates the html contents for the jump page."""
@@ -125,7 +129,8 @@ class Monocle(object):
     """
     def __init__(self, outputdir='output', coveragedata_filename='.coverage', coverhtml_dir='report_covhtml',
                  coverreport_filename='report_coverage.txt', cyclcompl_filename='report_cyclcompl.txt',
-                 sloc_filename='report_sloc.txt', depgraph_filename='depgraph.png', htmljump_filename='index.html'):
+                 sloc_filename='report_sloc.txt', depgraph_filename='depgraph.png', htmljump_filename='index.html',
+                 files_and_folders=(os.getcwd(),)):
         self.outputdir = outputdir
         join = lambda x: os.path.join(self.outputdir, x)
         self.coveragedata_filename = join(coveragedata_filename)
@@ -135,6 +140,7 @@ class Monocle(object):
         self.sloc_filename = join(sloc_filename)
         self.depgraph_filename = join(depgraph_filename)
         self.htmljump_filename = join(htmljump_filename)
+        self.filenames = utils.find_all(files_and_folders)
         self._filesforjump = []
 
     def ensure_clean_output(self):
@@ -151,34 +157,34 @@ class Monocle(object):
         self._filesforjump.append(self.coverreport_filename)
         return generate_cover_report(cov, self.coverreport_filename)
 
-    def generate_cyclomatic_complexity(self, files_and_folders, threshold=None):
+    def generate_cyclomatic_complexity(self, threshold=None):
         self._filesforjump.append(self.cyclcompl_filename)
-        return generate_cyclomatic_complexity(files_and_folders, self.cyclcompl_filename, threshold=threshold)
+        return generate_cyclomatic_complexity(self.filenames, self.cyclcompl_filename, threshold=threshold)
 
-    def generate_sloc(self, files_and_folders):
+    def generate_sloc(self):
         self._filesforjump.append(self.sloc_filename)
-        return generate_sloc(files_and_folders, self.sloc_filename)
+        return generate_sloc(self.filenames, self.sloc_filename)
 
-    def generate_dependency_graph(self, files_and_folders):
+    def generate_dependency_graph(self, rendererFactory=None):
         self._filesforjump.append(self.depgraph_filename)
-        return generate_dependency_graph(files_and_folders, self.depgraph_filename)
+        return generate_dependency_graph(self.filenames, self.depgraph_filename, rendererFactory)
 
     def generate_html_jump(self):
         """Generates an html page that links to any generated reports."""
         return generate_html_jump(self.htmljump_filename, *self._filesforjump)
 
-    def makeawesome(self, func, files_and_folders=(os.getcwd(),)):
+    def makeawesome(self, func):
         """Run ALL pynocle methods."""
         self.ensure_clean_output()
         result, cov = self.run_with_coverage(func)
         self.generate_cover_html(cov)
         self.generate_cover_report(cov)
-        self.makeawesome_nocover(files_and_folders)
+        self.makeawesome_nocover()
         return result
 
-    def makeawesome_nocover(self, files_and_folders=(os.getcwd(),)):
-        self.generate_cyclomatic_complexity(files_and_folders)
-        self.generate_sloc(files_and_folders)
-        self.generate_dependency_graph(files_and_folders)
+    def makeawesome_nocover(self):
+        self.generate_cyclomatic_complexity()
+        self.generate_sloc()
+        self.generate_dependency_graph()
         self.generate_html_jump()
 

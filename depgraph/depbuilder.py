@@ -8,9 +8,19 @@ import utils
 
 PYTHON_EXE_DIR_FILTER = os.path.dirname(sys.executable) + '*'
 
+class Dependency(object):
+    """Data object that represents a single dependency with a startpoint and endpoint."""
+    def __init__(self, startpt, endpt):
+        self.startpt = startpt
+        self.endpt = endpt
+
+    def __iter__(self):
+        yield self.startpt
+        yield self.endpt
+
 class DepBuilder:
     """Builds dependencies between modules, starting from all modules in filenames.  Dependencies are available
-    as a list of 2-item tuples as DepBuilder.dependencies.  Modules that could not be parsed are available as
+    as a list of Dependency instances as DepBuilder.dependencies.  Modules that could not be parsed are available as
     DepBuilder.failed.
 
     exclude_paths: Collection of fnmatch patterns.  Any path that matches any pattern will not be considered for
@@ -69,7 +79,7 @@ class DepBuilder:
             else:
                 puremodulefilename = modulename
             if not self.is_excluded(puremodulefilename):
-                self.dependencies.append((purename, puremodulefilename))
+                self.dependencies.append(Dependency(purename, puremodulefilename))
             if modulefilename:
                 self.process_file(modulefilename)
 
