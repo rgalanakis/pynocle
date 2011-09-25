@@ -41,7 +41,7 @@ class CCTextFormatter(utils.IReportFormatter):
             allrows.extend(rows)
         sortby_cc_desc = lambda row: -(int(row[3]))
         tbl = tableprint.Table(['Filename', 'Type', 'Name', 'CC'], sorted(allrows, key=sortby_cc_desc))
-        self.outstream().write('All results, sorted by CC:')
+        self.outstream().write('All results, sorted by CC:\n')
         tbl.write(self.outstream())
 
     def _get_table_for_stats(self, stats):

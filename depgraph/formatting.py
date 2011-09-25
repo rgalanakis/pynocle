@@ -27,7 +27,7 @@ class CouplingTextFormatter(utils.IReportFormatter):
             instab = cef / (cef + caf)
         else:
             instab = 0
-        formatted = '%.1f' % instab
+        formatted = '%.3f' % instab
         return formatted
 
     def format_data(self, dependencygroup):
