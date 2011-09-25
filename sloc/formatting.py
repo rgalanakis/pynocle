@@ -1,34 +1,9 @@
-import abc
 import sys
 
 import pynocle.tableprint as tableprint
+import pynocle.utils as utils
 
-def format_slocgroup(slocgroup, slocformatter):
-    slocformatter.format_report_header()
-    slocformatter.format_slocgroup(slocgroup)
-    slocformatter.format_report_footer()
-
-    
-class ISlocFormatter(object):
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def outstream(self):
-        """Returna  file-like object that will be written to."""
-
-    @abc.abstractmethod
-    def format_report_header(self):
-        """Writes the data that should be at the beginning of the report file to self.outstream()."""
-
-    def format_report_footer(self):
-        """Writes the information that should be at the bottom of the report.  Usually a no-op."""
-
-    @abc.abstractmethod
-    def format_slocgroup(self, slocgroup):
-        """Writes all the data in slocgroup to self.outstream()."""
-
-
-class SlocTextFormatter(ISlocFormatter):
+class SlocTextFormatter(utils.IReportFormatter):
     """Functionality for formatting SLOC info into a readable file."""
     def __init__(self, out=sys.stdout):
         self.out = out
@@ -58,7 +33,7 @@ class SlocTextFormatter(ISlocFormatter):
                          tl('blank'), average('blankperc'),
                          tl('total'), self._fmtperc(tl('totalperc'))])
 
-    def format_slocgroup(self, slocgroup):
+    def format_data(self, slocgroup):
         header = 'Filename', 'Code', 'Code%', 'Comment', 'Comment%', 'Blank', 'Blank%', 'Total', 'Total%'
         c = tableprint.JUST_C
         justs = tableprint.JUST_L, c, c, c, c, c, c, c, c
