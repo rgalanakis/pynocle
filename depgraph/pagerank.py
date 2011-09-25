@@ -12,9 +12,14 @@ where the items in a row are indices to other rows in the containing list.  So:
 would return page ranks of [ 0.36723503  0.0375      0.33665007  0.25861487]
 See the site linked above for more explanation of the rankings.
 """
-import numpy
+import utils
 
-def transposeLinkMatrix(
+try:
+    import numpy
+except ImportError:
+    numpy = utils.MissingDependencyError, 'Could not import numpy, cannot generate page ranking.'
+
+def _transposeLinkMatrix(
         outGoingLinks = None
         ):
         """
@@ -51,7 +56,7 @@ def transposeLinkMatrix(
                                 
         return incomingLinks, numLinks, leafNodes
 
-def pageRankGenerator(
+def _pageRankGenerator(
         At = None,
         numLinks = None,
         ln = None,
@@ -127,14 +132,14 @@ def pageRank(
         convergence = 0.01,
         checkSteps = 10
         ):
-        """
-        Convenience wrap for the link matrix transpose and the generator.
-        """
+        """Convenience wrap for the link matrix transpose and the generator."""
+        if type(numpy) == utils.MissingDependencyError:
+            raise numpy
         linkMatrix = linkMatrix or [[]]
-        incomingLinks, numLinks, leafNodes = transposeLinkMatrix(linkMatrix)
+        incomingLinks, numLinks, leafNodes = _transposeLinkMatrix(linkMatrix)
 
         final = 0
-        for gr in pageRankGenerator(incomingLinks, numLinks, leafNodes,
+        for gr in _pageRankGenerator(incomingLinks, numLinks, leafNodes,
                                                                         alpha = alpha,
                                                                         convergence = convergence,
                                                                         checkSteps = checkSteps):
@@ -143,6 +148,7 @@ def pageRank(
         return final
 
 class _SortedDict(object):
+    """Simple functionality for treating two parallel lists as a dictionary."""
     def __init__(self):
         self._keys = []
         self._values = []
@@ -159,14 +165,20 @@ class _SortedDict(object):
             self._values.append(default)
             return default
 
-def reversedict(d):
-    return dict(zip(d.values(), d.keys()))
-
 class DependenciesToLinkMatrix(object):
+    """Converts a collection of Dependency objects to a link matrix that can be passed into pageRank.  Call
+    create_matrix() to generate the matrix.
+
+    dependencies: A collection of Dependency instances of two-item tuples.
+    
+    node_to_outgoing_map: Sorted mapping of {dependencynode: set(dependencynodes)}.
+    node_to_id_map: Mapping of dependencynode to an ID (their row index in the result matrix).
+    id_to_node_map: node_to_id_map with keys as values and values as keys.
+    """
     def __init__(self, dependencies):
         self.node_to_outgoing_map = self._create_node_to_outgoing(dependencies)
         self.node_to_id_map = self._create_node_to_id(self.node_to_outgoing_map.keys())
-        self.id_to_node_map = reversedict(self.node_to_id_map)
+        self.id_to_node_map = utils.swap_keys_and_values(self.node_to_id_map)
 
     def _create_node_to_outgoing(self, dependencies):
         nodemap = _SortedDict()
@@ -184,14 +196,9 @@ class DependenciesToLinkMatrix(object):
             lastid += 1
         return str_to_id
 
-    def _stub_matrix(self, length):
-        matrix = []
-        for i in range(length):
-            matrix.append([])
-        return matrix
-
     def create_matrix(self):
-        matrix = self._stub_matrix(len(self.node_to_id_map))
+        """Convert the dependencies into a link matrix that can be used in pageRank."""
+        matrix = [[] for i in range(len(self.node_to_id_map))]
         for k, v in self.node_to_outgoing_map.items():
             rowid = self.node_to_id_map[k]
             row = matrix[rowid]

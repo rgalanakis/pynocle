@@ -58,3 +58,7 @@ def flatten(node, getchildren):
     for child in getchildren(node):
         for gc in flatten(child, getchildren):
             yield gc
+
+def swap_keys_and_values(d):
+    """Returns a new dictionary where keys are d.values() and values are d.keys()."""
+    return dict(zip(d.values(), d.keys()))
