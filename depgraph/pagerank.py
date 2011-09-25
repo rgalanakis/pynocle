@@ -12,12 +12,12 @@ where the items in a row are indices to other rows in the containing list.  So:
 would return page ranks of [ 0.36723503  0.0375      0.33665007  0.25861487]
 See the site linked above for more explanation of the rankings.
 """
-import utils
+import pynocle.utils as utils
 
 try:
     import numpy
 except ImportError:
-    numpy = utils.MissingDependencyError, 'Could not import numpy, cannot generate page ranking.'
+    numpy = utils.MissingDependencyError('Could not import numpy, cannot generate page ranking.')
 
 def _transposeLinkMatrix(
         outGoingLinks = None

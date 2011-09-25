@@ -5,7 +5,7 @@ find a reliable home base for it), but significantly refactored for clarity and 
 import compiler
 from compiler.visitor import ASTVisitor
 
-import utils
+import pynocle.utils as utils
 
 class Stats(object):
     """The base class for other types of statistics.
@@ -143,9 +143,8 @@ def measure_complexity(codefile_contents, module_name=None):
 
 def measure_file_complexity(filename):
     """Returns a FlatStats object for the contents of the file at filename."""
-    with open(filename) as f:
-        code = f.read() + '\n' #this trailing newline is important... le sigh.
-    return measure_complexity(code, module_name=utils.splitpath_root_file_ext(filename)[1])
+    ast = compiler.parseFile(filename)
+    return measure_complexity(ast, module_name=utils.splitpath_root_file_ext(filename)[1])
 
 def measure_cyclcompl(files):
     """Returns 2 items: A collection of (filename, FlatStat instance for file) tuples, and a collection of files that

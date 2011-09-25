@@ -1,7 +1,7 @@
 import abc
 import sys
 
-import tableprint
+import pynocle.tableprint as tableprint
 
 #Anything under 7 is considered fine.
 DEFAULT_THRESHOLD = 5

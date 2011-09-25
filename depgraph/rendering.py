@@ -3,7 +3,7 @@ import os
 import subprocess
 import tempfile
 
-import utils
+import pynocle.utils as utils
 
 class IRenderer(object):
     __metaclass__ = abc.ABCMeta
@@ -36,7 +36,7 @@ class IRenderer(object):
             p = subprocess.Popen(clargs, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except WindowsError as exc:
             if exc.errno == 2:
-                raise utils.MissingDependencyError, repr(exc)
+                raise utils.MissingDependencyError, 'Could not start %s: %s' % (self.dotexe(), repr(exc))
             raise
         if wait:
             p.communicate()

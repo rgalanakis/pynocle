@@ -1,7 +1,7 @@
 import abc
 import sys
 
-import tableprint
+import pynocle.tableprint as tableprint
 
 def format_slocgroup(slocgroup, slocformatter):
     slocformatter.format_report_header()

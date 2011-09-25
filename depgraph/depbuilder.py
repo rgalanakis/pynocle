@@ -4,7 +4,7 @@ import fnmatch
 import os
 import sys
 
-import utils
+import pynocle.utils as utils
 
 PYTHON_EXE_DIR_FILTER = os.path.dirname(sys.executable) + '*'
 
@@ -102,12 +102,11 @@ class DepBuilder:
             filename = filename[:-3] + 'py'
         if not os.path.exists(filename):
             return []
-        with open(filename) as f:
-            try:
-                astnode = compiler.parse(f.read())
-            except SyntaxError:
-                self.failed.append(self._extless(filename))
-                return []
+        try:
+            astnode = compiler.parseFile(filename)
+        except SyntaxError:
+            self.failed.append(self._extless(filename))
+            return []
         importnodes = filter(lambda node: isinstance(node, compiler.ast.Import),
                              utils.flatten(astnode, lambda node: node.getChildNodes()))
         return importnodes
@@ -138,11 +137,16 @@ class DepBuilder:
             module = __import__(modulename)
         except ImportError:
             #We need to support relative imports.
-            possiblepath = modulename.replace('.', os.sep) + '.py'
-            possiblepath = os.path.join(os.path.dirname(importing_module_filename), possiblepath)
+            impdir = os.path.dirname(importing_module_filename)
+            modulenameslashes = modulename.replace('.', os.sep)
+            possiblepath = os.path.join(impdir, modulenameslashes + '.py')
             if os.path.exists(possiblepath):
                 return possiblepath
-            raise
+            possiblepath = os.path.join(impdir, modulenameslashes, '__init__.py')
+            if os.path.exists(possiblepath):
+                return possiblepath
+            #raise
+            return None
         if hasattr(module, '__file__'): #some modules don't have a __file__ attribute, like sys
             return os.path.abspath(module.__file__)
         return
