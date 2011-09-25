@@ -29,14 +29,18 @@ class Dependency(object):
             return True
         return not result
 
+    def __str__(self):
+        return 'Dependency(%s -> %s)' % (self.startpt, self.endpt)
+    __repr__ = __str__
+
 
 class DependencyGroup(object):
     def __init__(self, dependencies, failed=()):
         self.failed = failed
         self.dependencies = dependencies
         self.allstartpts, self.allendpts = zip(*dependencies)
-        self.depnode_to_ca = self._calc_coupling(self.allstartpts)
-        self.depnode_to_ce = self._calc_coupling(self.allendpts)
+        self.depnode_to_ca = self._calc_coupling(self.allendpts)
+        self.depnode_to_ce = self._calc_coupling(self.allstartpts)
         #allstartpts and allendpts will be of equal size, but not equal contents- we want to make sure our coupling
         #dicts have the same keys so we have all metrics for all modules!
         for d in self.depnode_to_ca, self.depnode_to_ce:
