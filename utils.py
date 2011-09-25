@@ -36,15 +36,24 @@ class _FindAll:
             self.findall(paths)
 
 def find_all(files_and_folders, pattern='*.py'):
+    """Given a collection of files and folders, return all files in the collection and recursively under any folders
+    in the collection that fnmatch pattern.
+    """
     fa = _FindAll(files_and_folders, pattern)
     return fa.processed_files
 
 def splitpath_root_file_ext(path):
+    """Returns a tuple of path, pure filename, and extension."""
     head, tail = os.path.split(path)
     filename, ext = os.path.splitext(tail)
     return head, filename, ext
 
 def flatten(node, getchildren):
+    """Return a generator that walks node and children recursively.
+
+    node: Any node that has children.
+    getchildren: A callable that takes node and returns a collection of children that will be walked recursively.
+    """
     yield node
     for child in getchildren(node):
         for gc in flatten(child, getchildren):
