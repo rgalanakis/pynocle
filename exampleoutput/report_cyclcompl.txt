@@ -5,9 +5,6 @@ Showing items with a CC greater than or equal to 5
 WARNING: The following files failed to parse:
 	C:\PythonDev\pynocle\bogus.py
 
-C:\PythonDev\pynocle\covershim.py
-No items with a CC >= 5
-
 C:\PythonDev\pynocle\tableprint.py
 No items with a CC >= 5
 
@@ -37,7 +34,11 @@ Method    DepBuilder.process_file    7
 ---------------------------------------
 
 C:\PythonDev\pynocle\depgraph\rendering.py
-No items with a CC >= 5
+--------------------------------
+Type      Name                CC
+--------------------------------
+Method    IRenderer.render    5 
+--------------------------------
 
 C:\PythonDev\pynocle\depgraph\__init__.py
 No items with a CC >= 5

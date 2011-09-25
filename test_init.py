@@ -1,6 +1,4 @@
 import nose
-import os
-
 import pynocle
 
 if __name__ == '__main__':
