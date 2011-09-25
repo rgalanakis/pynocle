@@ -2,6 +2,12 @@
 import fnmatch
 import os
 
+class MissingDependencyError(Exception):
+    """If you hit this exception, it means you tried to use a feature in pynocle that required a dependency you
+    weren't set up with!
+    """
+    pass
+
 class _FindAll:
     """Helper state class for counting lines of groups of files."""
     def __init__(self, files_and_folders, pattern):

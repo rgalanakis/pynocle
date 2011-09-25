@@ -1,13 +1,23 @@
-"""Module for reporting of code metrics and other inspection/reporting features."""
+"""pynocle is a module for reporting of code metrics and other inspection/reporting features.
 
-import coverage
+It is meant to be used as a very simple API, usually as part of the the testing/build process.  Simply set up
+your testing function (like nose.run) and pass it into Monocle.makeawesome, along with the directories you want
+to analyze.
+"""
+
+import utils
+
+try:
+    import coverage
+except ImportError as exc:
+    coverage = utils.MissingDependencyError(repr(exc))
+    pass
 import os
 import shutil
 
 import cyclcompl
 import depgraph
 import sloc
-import utils
 
 def ensure_clean_output(outputdir, _ran=False):
     """rmtree and makedirs outputdir to ensure a clean output directory.
@@ -33,6 +43,9 @@ def run_with_coverage(func, filename):
     """Runs func (parameterless callable) with coverage on.  Saves coverage to filename.  Returns a tuple
     of the return value of func, and the coverage object created.
     """
+    #isinstance causes scope problems so use exact type checking here.
+    if type(coverage) == utils.MissingDependencyError:
+        raise coverage
     cov = coverage.coverage(data_file=filename)
     cov.erase()
     cov.start()
@@ -160,8 +173,12 @@ class Monocle(object):
         result, cov = self.run_with_coverage(func)
         self.generate_cover_html(cov)
         self.generate_cover_report(cov)
+        self.makeawesome_nocover(files_and_folders)
+        return result
+
+    def makeawesome_nocover(self, files_and_folders=(os.getcwd(),)):
         self.generate_cyclomatic_complexity(files_and_folders)
         self.generate_sloc(files_and_folders)
         self.generate_dependency_graph(files_and_folders)
         self.generate_html_jump()
-        return result
+
