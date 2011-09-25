@@ -47,10 +47,11 @@ class CouplingTextFormatter(ICouplingFormatter):
 
     def _calc_instability(self, ca, ce):
         """Calculate the instability ratio between ca and ce and returns it as a string."""
-        if not ca + ce:
-            return str(0)
-        caf, cef = float(ca), float(ce)
-        instab = cef / (cef + caf)
+        if ca or ce:
+            caf, cef = float(ca), float(ce)
+            instab = cef / (cef + caf)
+        else:
+            instab = 0
         formatted = '%.1f' % instab
         return formatted
 

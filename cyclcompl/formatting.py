@@ -1,8 +1,10 @@
 import abc
 import sys
 
-import cyclcompl
 import tableprint
+
+#Anything under 7 is considered fine.
+DEFAULT_THRESHOLD = 5
 
 def format_cyclcompl(ccformatter, files_and_stats, failures=()):
     """Invokes the proper methods on ccformatter with files_and_stats, which should be the result of measure_cyclcompl
@@ -54,7 +56,7 @@ class ICCFormatter(object):
 class CCTextFormatter(ICCFormatter):
     def __init__(self, threshold=None, out=sys.stdout):
         if threshold is None:
-            threshold = cyclcompl.DEFAULT_THRESHOLD
+            threshold = DEFAULT_THRESHOLD
         elif threshold < 1:
             raise ValueError, 'threshold must be greater than 0, got ' + str(threshold)
         self.threshold = threshold
