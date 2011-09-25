@@ -33,6 +33,9 @@ Type      Name                       CC
 Method    DepBuilder.process_file    7 
 ---------------------------------------
 
+C:\PythonDev\pynocle\depgraph\formatting.py
+No items with a CC >= 5
+
 C:\PythonDev\pynocle\depgraph\rendering.py
 --------------------------------
 Type      Name                CC

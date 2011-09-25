@@ -18,6 +18,49 @@ class Dependency(object):
         yield self.startpt
         yield self.endpt
 
+    def __eq__(self, other):
+        if isinstance(other, Dependency):
+            return other.startpt == self.startpt and other.endpt == self.endpt
+        return NotImplemented
+
+    def __ne__(self, other):
+        result = self.__eq__(other)
+        if result is NotImplemented:
+            return True
+        return not result
+
+
+class DependencyGroup(object):
+    def __init__(self, dependencies, failed=()):
+        self.failed = failed
+        self.dependencies = dependencies
+        self.allstartpts, self.allendpts = zip(*dependencies)
+        self.depnode_to_ca = self._calc_coupling(self.allstartpts)
+        self.depnode_to_ce = self._calc_coupling(self.allendpts)
+        #allstartpts and allendpts will be of equal size, but not equal contents- we want to make sure our coupling
+        #dicts have the same keys so we have all metrics for all modules!
+        for d in self.depnode_to_ca, self.depnode_to_ce:
+            for key in self.allstartpts + self.allendpts:
+                d.setdefault(key, 0)
+
+    def _calc_coupling(self, depnodes):
+        """Return a dict where keys are all unique items in depnodes and values are the number of times
+        those items occur.
+        """
+        #This method can be optimized if it ever becomes a bottleneck
+        result = {}
+        depnodecopy = list(depnodes)
+        unique = set(depnodes)
+        for item in unique:
+            count = 0
+            for i in range(len(depnodecopy) - 1, 0, -1): #we're modifying depnodecopy inside loop
+                if depnodecopy[i] == item: #Increment and remove the item so we don't have to reiterate it
+                    depnodecopy.pop(i)
+                    count += 1
+            result[item] = count
+        return result
+
+
 class DepBuilder:
     """Builds dependencies between modules, starting from all modules in filenames.  Dependencies are available
     as a list of Dependency instances as DepBuilder.dependencies.  Modules that could not be parsed are available as

@@ -1,0 +1,27 @@
+Afferent and Efferent Coupling
+Measures the coupling between modules.
+Afferent coupling (Ca) is the number of modules that use a given module.  0 can indicate dead code.
+Efferent coupling (Ce)is the number of modules a given module imports.  A high value can indicate a
+brittle module.
+Instability (I) is the ratio of Ce to total coupling. I = Ce / (Ce + Ca). Indicates the
+module's resilience to change between 0 (completely stable) and 1 (unstable).
+
+-------------------------------------------------------------
+Filename                                      Ca    Ce     I 
+-------------------------------------------------------------
+C:\PythonDev\pynocle\__init__                 4     0     0.0
+C:\PythonDev\pynocle\cyclcompl\__init__       2     2     0.5
+C:\PythonDev\pynocle\cyclcompl\formatting     2     1     0.3
+C:\PythonDev\pynocle\cyclcompl\statbuilder    1     1     0.5
+C:\PythonDev\pynocle\depgraph\__init__        3     1     0.3
+C:\PythonDev\pynocle\depgraph\depbuilder      1     1     0.5
+C:\PythonDev\pynocle\depgraph\formatting      1     1     0.5
+C:\PythonDev\pynocle\depgraph\rendering       1     1     0.5
+C:\PythonDev\pynocle\sloc\__init__            2     1     0.3
+C:\PythonDev\pynocle\sloc\formatting          1     1     0.5
+C:\PythonDev\pynocle\sloc\slocing             0     1     1.0
+C:\PythonDev\pynocle\tableprint               0     3     1.0
+C:\PythonDev\pynocle\test_init                0     0      0 
+C:\PythonDev\pynocle\utils                    0     4     1.0
+-------------------------------------------------------------
+
