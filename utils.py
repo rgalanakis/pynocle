@@ -1,4 +1,5 @@
 """Utilities for pynocle project."""
+import abc
 import fnmatch
 import os
 
@@ -18,6 +19,46 @@ class MissingDependencyError(PynocleError):
     """
     pass
 
+
+class IReportFormatter(object):
+    """General abc for all report formatters."""
+    __metaclass__ = abc.ABCMeta
+
+    def outstream(self):
+        """Returns a file-like object to write to.
+
+        If subclasses provide a _outstream attribute, this method will return that, otherwise override it.
+        """
+        #noinspection PyUnresolvedReferences
+        return self._outstream
+
+
+    @abc.abstractmethod
+    def format_report_header(self):
+        """Writes the information that should be at the top of the report to self.outstream()."""
+
+    def format_report_footer(self):
+        """Writes the information that should be at the bottom of the report.  Usually a no-op."""
+
+    @abc.abstractmethod
+    def format_data(self, data):
+        """Writes data to self.outstream()"""
+
+
+def write_report(filename, data, formatter_factory):
+    """Opens a stream for the file at filename and writes the header/data/footer using the provided formatter.
+
+    filename: Filename of the report.
+    data: Data to write into the report.
+    formatter_factory: Callable that takes the filestream at filename and returns an IReportFormatter.
+    """
+    with open(filename, 'w') as f:
+        fmt = formatter_factory(f)
+        fmt.format_report_header()
+        fmt.format_data(data)
+        fmt.format_report_footer()
+
+        
 class _FindAll:
     """Helper state class for counting lines of groups of files."""
     def __init__(self, files_and_folders, pattern):

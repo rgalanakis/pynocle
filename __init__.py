@@ -88,9 +88,8 @@ def generate_cyclomatic_complexity(codefilenames, reportfilename, formatter_fact
         to use to format the report.
     """
     ccdata, failures = cyclcompl.measure_cyclcompl(codefilenames)
-    formatter_factory = formatter_factory or (lambda f: cyclcompl.CCTextFormatter(out=f))
-    with open(reportfilename, 'w') as f:
-        cyclcompl.format_cyclcompl(formatter_factory(f), ccdata, failures=failures)
+    factory = formatter_factory or cyclcompl.CCTextFormatter
+    utils.write_report(reportfilename, (ccdata, failures), factory)
 
 def generate_sloc(codefilenames, reportfilename, formatter_factory=None):
     """Generates a Source Lines of Code report for files in codefilenames, output to reportfilename.
@@ -100,8 +99,7 @@ def generate_sloc(codefilenames, reportfilename, formatter_factory=None):
     """
     slocgrp = sloc.SlocGroup(codefilenames)
     formatter_factory = formatter_factory or sloc.SlocTextFormatter
-    with open(reportfilename, 'w') as f:
-        sloc.format_slocgroup(slocgrp, formatter_factory(f))
+    utils.write_report(reportfilename, slocgrp, formatter_factory)
 
 def generate_dependency_graph(codefilenames, reportfilename, renderer_factory=None):
     """Generates a dependency graph image to reportfilename for the files in codefilenames.
@@ -121,8 +119,7 @@ def generate_coupling_report(codefilenames, reportfilename, formatter_factory=No
     depb = depgraph.DepBuilder(codefilenames)
     depgroup = depgraph.DependencyGroup(depb.dependencies, depb.failed)
     formatter_factory = formatter_factory or depgraph.CouplingTextFormatter
-    with open(reportfilename, 'w') as f:
-        depgraph.format_coupling(depgroup, formatter_factory(f))
+    utils.write_report(reportfilename, depgroup, formatter_factory)
 
 def generate_couplingrank_report(codefilenames, reportfilename, formatter_factory=None):
     """Generates a PageRank report for all modules in codefilenames, saved to reportfilename.
