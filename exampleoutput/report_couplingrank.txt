@@ -1,0 +1,24 @@
+Google's PageRank algorithm applied to Coupling
+High vaules are more "important" in the same way highly ranked webpages are.
+
+-----------------------------------------------------------------------------------
+Filename                                       PageRank    PageID    Outgoing Links
+-----------------------------------------------------------------------------------
+C:\PythonDev\pynocle\utils                     0.16809     2         []            
+C:\PythonDev\pynocle\tableprint                0.14121     5         []            
+C:\PythonDev\pynocle\depgraph\pagerank         0.08025     10        []            
+C:\PythonDev\pynocle\__init__                  0.06078     1         [2, 3, 7, 12] 
+C:\PythonDev\pynocle\sloc\slocing              0.05231     14        []            
+C:\PythonDev\pynocle\sloc\formatting           0.05231     13        [5]           
+C:\PythonDev\pynocle\cyclcompl\statbuilder     0.05231     6         [2]           
+C:\PythonDev\pynocle\cyclcompl\formatting      0.05231     4         [5]           
+C:\PythonDev\pynocle\depgraph\rendering        0.04582     11        [2]           
+C:\PythonDev\pynocle\depgraph\formatting       0.04582     9         [5, 10]       
+C:\PythonDev\pynocle\depgraph\depbuilder       0.04582     8         [2]           
+C:\PythonDev\pynocle\sloc\__init__             0.04576     12        [13, 14]      
+C:\PythonDev\pynocle\depgraph\__init__         0.04576     7         [8, 9, 11]    
+C:\PythonDev\pynocle\cyclcompl\__init__        0.04576     3         [4, 6]        
+C:\PythonDev\pynocle\depgraph\test_pagerank    0.03285     15        [10]          
+C:\PythonDev\pynocle\test_init                 0.03285     0         [1]           
+-----------------------------------------------------------------------------------
+

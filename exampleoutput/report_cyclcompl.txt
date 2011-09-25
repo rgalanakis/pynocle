@@ -36,12 +36,23 @@ Method    DepBuilder.process_file    7
 C:\PythonDev\pynocle\depgraph\formatting.py
 No items with a CC >= 5
 
+C:\PythonDev\pynocle\depgraph\pagerank.py
+-------------------------------------
+Type        Name                   CC
+-------------------------------------
+Function    transposeLinkMatrix    7 
+Function    pageRankGenerator      6 
+-------------------------------------
+
 C:\PythonDev\pynocle\depgraph\rendering.py
 --------------------------------
 Type      Name                CC
 --------------------------------
 Method    IRenderer.render    5 
 --------------------------------
+
+C:\PythonDev\pynocle\depgraph\test_pagerank.py
+No items with a CC >= 5
 
 C:\PythonDev\pynocle\depgraph\__init__.py
 No items with a CC >= 5
