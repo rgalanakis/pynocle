@@ -1,0 +1,26 @@
+SLOC (Source Lines of Code)
+Measures physical lines of code, lines of comments, and blank lines, in number and
+percentage of file.  Also measures total line count as percentage of total codebase lines
+
+---------------------------------------------------------------------------------------------------------------------------
+Filename                                         Code    Code%    Comment    Comment%    Blank    Blank%    Total    Total%
+---------------------------------------------------------------------------------------------------------------------------
+C:\PythonDev\pynocle\__init__.py                 139     83.2%       3         1.8%        25     15.0%      167     17.5% 
+C:\PythonDev\pynocle\bogus.py                     5      71.4%       0         0.0%        2      28.6%       7       0.7% 
+C:\PythonDev\pynocle\covershim.py                 6      75.0%       0         0.0%        2      25.0%       8       0.8% 
+C:\PythonDev\pynocle\cyclcompl\__init__.py        52     78.8%       1         1.5%        13     19.7%       66      6.9% 
+C:\PythonDev\pynocle\cyclcompl\formatting.py      39     83.0%       1         2.1%        7      14.9%       47      4.9% 
+C:\PythonDev\pynocle\cyclcompl\statbuilder.py    115     77.2%       0         0.0%        34     22.8%      149     15.6% 
+C:\PythonDev\pynocle\depgraph\__init__.py         5      83.3%       0         0.0%        1      16.7%       6       0.6% 
+C:\PythonDev\pynocle\depgraph\depbuilder.py       80     87.0%       2         2.2%        10     10.9%       92      9.7% 
+C:\PythonDev\pynocle\depgraph\rendering.py        82     82.8%       2         2.0%        15     15.2%       99     10.4% 
+C:\PythonDev\pynocle\sloc\__init__.py             22     71.0%       0         0.0%        9      29.0%       31      3.3% 
+C:\PythonDev\pynocle\sloc\formatting.py           45     86.5%       0         0.0%        7      13.5%       52      5.5% 
+C:\PythonDev\pynocle\sloc\slocing.py              92     85.2%       1         0.9%        15     13.9%      108     11.3% 
+C:\PythonDev\pynocle\tableprint.py                59     86.8%       1         1.5%        8      11.8%       68      7.1% 
+C:\PythonDev\pynocle\test_init.py                 6      75.0%       0         0.0%        2      25.0%       8       0.8% 
+C:\PythonDev\pynocle\utils.py                     38     84.4%       0         0.0%        7      15.6%       45      4.7% 
+                                                                                                                           
+TOTALS                                           785     80.7%       11        0.8%       157     18.5%      953     100.0%
+---------------------------------------------------------------------------------------------------------------------------
+

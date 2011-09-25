@@ -1,0 +1,53 @@
+Cyclomatic Complexity is a measure of decisions that can be made in a procedure.
+See http://en.wikipedia.org/wiki/Cyclomatic_complexity
+Showing items with a CC greater than or equal to 5
+
+WARNING: The following files failed to parse:
+	C:\PythonDev\pynocle\bogus.py
+
+C:\PythonDev\pynocle\covershim.py
+No items with a CC >= 5
+
+C:\PythonDev\pynocle\tableprint.py
+No items with a CC >= 5
+
+C:\PythonDev\pynocle\test_init.py
+No items with a CC >= 5
+
+C:\PythonDev\pynocle\utils.py
+No items with a CC >= 5
+
+C:\PythonDev\pynocle\__init__.py
+No items with a CC >= 5
+
+C:\PythonDev\pynocle\cyclcompl\formatting.py
+No items with a CC >= 5
+
+C:\PythonDev\pynocle\cyclcompl\statbuilder.py
+No items with a CC >= 5
+
+C:\PythonDev\pynocle\cyclcompl\__init__.py
+No items with a CC >= 5
+
+C:\PythonDev\pynocle\depgraph\depbuilder.py
+---------------------------------------
+Type      Name                       CC
+---------------------------------------
+Method    DepBuilder.process_file    7 
+---------------------------------------
+
+C:\PythonDev\pynocle\depgraph\rendering.py
+No items with a CC >= 5
+
+C:\PythonDev\pynocle\depgraph\__init__.py
+No items with a CC >= 5
+
+C:\PythonDev\pynocle\sloc\formatting.py
+No items with a CC >= 5
+
+C:\PythonDev\pynocle\sloc\slocing.py
+No items with a CC >= 5
+
+C:\PythonDev\pynocle\sloc\__init__.py
+No items with a CC >= 5
+
