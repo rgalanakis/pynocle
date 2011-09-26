@@ -16,6 +16,21 @@ class IRenderer(object):
     def savedot(self, filename):
         """Saves a dot file to filename."""
 
+    def savetempdot(self):
+        """Saves a dot file to a temp file and returns the filename."""
+        fd, dotpath = tempfile.mkstemp('.dot')
+        self.savedot(dotpath)
+        return dotpath
+
+    def getformat(self, outputfilename, overrideformat=None):
+        """Returns the format string based on the arguments (use overrideformat if provided, otherwise use
+        outputfilename's extension).
+        """
+        result = overrideformat
+        if not result:
+            result = os.path.splitext(outputfilename)[1][1:] #Skip the period on the extension
+        return result
+    
     def render(self, outputfilename, dotpath=None, overrideformat=None, wait=True, moreargs=()):
         """Renders the dot file at dotpath to outputfilename.
 
@@ -25,11 +40,8 @@ class IRenderer(object):
         moreargs: Additional args to invoke the exe with.
         """
         if not dotpath:
-            fd, dotpath = tempfile.mkstemp('.dot')
-            self.savedot(dotpath)
-        format = overrideformat
-        if not format:
-            format = os.path.splitext(outputfilename)[1][1:] #Skip the period on the extension
+            self.savetempdot()
+        format = self.getformat(outputfilename, overrideformat)
         clargs = [self.dotexe(), '-T' + format, dotpath, '-o', outputfilename]
         clargs.extend(moreargs)
         try:
@@ -87,6 +99,7 @@ class DefaultRenderer(IRenderer):
             for node, stylename in nodes_to_styles.items():
                 f.write('    "%s" [%s];\n' % (node, self.styling[stylename]))
             f.write('}')
+
 
 def strip_roots(depgraphdata, root):
     for startpt, endpt in depgraphdata:
