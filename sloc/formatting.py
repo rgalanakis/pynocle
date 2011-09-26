@@ -14,8 +14,9 @@ class SlocTextFormatter(utils.IReportFormatter):
     def format_report_header(self):
         """Prints out a SLOC explanation and header to self.out."""
         self.out.write('SLOC (Source Lines of Code)\n')
-        self.out.write('Measures physical lines of code, lines of comments, and blank lines, in number and\n')
-        self.out.write('percentage of file.  Also measures total line count as percentage of total codebase lines\n\n')
+        self.out.write('Measures physical lines of source code (SLOC), lines of comments, and blank lines, in\n'
+            'number and percentage of file.  Also measures total line count (TLOC) and as percentage of\n'
+            'total codebase lines.\n\n')
 
     def _fmtperc(self, i):
         """Format number i as a percentage."""
