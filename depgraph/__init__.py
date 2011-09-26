@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import depbuilder
 from depbuilder import DepBuilder
 from depbuilder import DependencyGroup

@@ -1,4 +1,6 @@
-"""pynocle is a module for reporting of code metrics and other inspection/reporting features.
+#!/usr/bin/env python
+"""
+pynocle is a module for reporting of code metrics and other inspection/reporting features.
 
 It is meant to be used as a very simple API, usually as part of the the testing/build process.  Simply
 create a new Monocle object with the directories and files you want to analyze

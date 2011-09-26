@@ -1,4 +1,7 @@
-"""Module that handles the formatting of table information."""
+#!/usr/bin/env python
+"""
+Module that handles the formatting of table information.
+"""
 
 import StringIO
 import sys

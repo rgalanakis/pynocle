@@ -1,4 +1,6 @@
-"""Small module that contains the 'run_with_coverage' method so that pynocle test coverage doesn't import it before
+#!/usr/bin/env python
+"""
+Small module that contains the 'run_with_coverage' method so that pynocle test coverage doesn't import it before
 it starts coverage.
 """
 import coverage

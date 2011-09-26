@@ -1,4 +1,6 @@
-"""Module that defines the client class (XmlRpcRenderer) and service (XmlRpcRendererService), and can be run to
+#!/usr/bin/env python
+"""
+Module that defines the client class (XmlRpcRenderer) and service (XmlRpcRendererService), and can be run to
 run the xmlrpc service itself.
 
 Useful when you have a central machine you can install graphviz on, and then anyone can use it (and the dot machine

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import formatting
 from formatting import CCTextFormatter, DEFAULT_THRESHOLD
 

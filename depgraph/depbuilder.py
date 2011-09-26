@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import compiler
 import compiler.ast
 import fnmatch

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import compiler
 
 import pynocle.utils as utils

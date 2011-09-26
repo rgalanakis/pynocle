@@ -1,4 +1,6 @@
-"""Contains functionality for calculating the Cyclomatic Complexity of python code.  Originally from pygenie (I cannot
+#!/usr/bin/env python
+"""
+Contains functionality for calculating the Cyclomatic Complexity of python code.  Originally from pygenie (I cannot
 find a reliable home base for it), but significantly refactored for clarity and documentation.
 """
 
