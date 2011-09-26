@@ -18,8 +18,9 @@ class CCTextFormatter(utils.IReportFormatter):
         self._outstream = out
 
     def format_report_header(self):
-        self._outstream.write('Cyclomatic Complexity is a measure of decisions that can be made in a procedure.\n')
-        self._outstream.write('See http://en.wikipedia.org/wiki/Cyclomatic_complexity\n')
+        self._outstream.write('Cyclomatic Complexity is a measure of decisions that can be made in a procedure.\n'
+            'Values <= 10 are fine, between 11 and 20 should be refactored, and values above 20 are usually\n'
+            'considered unacceptable and should be refactored.\n\n')
         self._outstream.write('Showing items with a CC greater than or equal to %s\n\n' % self.threshold)
 
     def format_failures(self, failures):
