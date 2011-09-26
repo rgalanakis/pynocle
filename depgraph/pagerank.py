@@ -1,4 +1,6 @@
-"""Functionality ripped off from http://kraeutler.net/vincent/essays/google%20page%20rank%20in%20python and left
+#!/usr/bin/env python
+"""
+Functionality ripped off from http://kraeutler.net/vincent/essays/google%20page%20rank%20in%20python and left
 intact other than using 'import numpy' rather than 'from numpy import *', and fix fixing up references.
 
 The 'link matrices' used by transposeLineMatrix and pageRank can be described as a list of lists (rows),

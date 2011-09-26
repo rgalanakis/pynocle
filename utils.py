@@ -1,4 +1,8 @@
-"""Utilities for pynocle project."""
+#!/usr/bin/env python
+"""
+Utilities for pynocle project.
+"""
+
 import abc
 import fnmatch
 import os

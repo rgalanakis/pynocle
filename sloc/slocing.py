@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 class SlocInfo(object):
     """Simple data wrapper for SLOC info that can be accessed by attribute, key, or index.  Index order is code,
     comment, blank.
