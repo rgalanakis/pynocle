@@ -9,7 +9,7 @@ __author__ = "Rob Galanakis"
 __copyright__ = "Copyright 2011, Rob Galanakis"
 __credits__ = ["Rob Galanakis"]
 __license__ = "LGPL"
-__version__ = "0.0.1"
+__version__ = "0.1.1"
 __maintainer__ = "Rob Galanakis"
 __email__ = "rob.galanakis@gmail.com"
 __status__ = "Pre-Alpha"
@@ -276,9 +276,9 @@ class Monocle(object):
         for func in (self.generate_inheritance_report,
                      self.generate_cyclomatic_complexity,
                      self.generate_sloc,
-                     self.generate_dependency_graph,
                      self.generate_coupling_report,
                      self.generate_couplingrank_report,
+                     self.generate_dependency_graph,
                      self.generate_html_jump):
             try:
                 func()
