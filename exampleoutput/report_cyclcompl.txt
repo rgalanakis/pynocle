@@ -1,5 +1,7 @@
 Cyclomatic Complexity is a measure of decisions that can be made in a procedure.
-See http://en.wikipedia.org/wiki/Cyclomatic_complexity
+Values <= 10 are fine, between 11 and 20 should be refactored, and values above 20 are usually
+considered unacceptable and should be refactored.
+
 Showing items with a CC greater than or equal to 5
 
 WARNING: The following files failed to parse:
@@ -20,13 +22,6 @@ Function    _transposeLinkMatrix    7
 Function    _pageRankGenerator      6 
 --------------------------------------
 
-C:\PythonDev\pynocle\depgraph\rendering.py
---------------------------------
-Type      Name                CC
---------------------------------
-Method    IRenderer.render    5 
---------------------------------
-
 All results, sorted by CC:
 ----------------------------------------------------------------------------------------
 Filename                                       Type        Name                       CC
@@ -34,6 +29,5 @@ Filename                                       Type        Name                 
 C:\PythonDev\pynocle\depgraph\depbuilder.py    Method      DepBuilder.process_file    7 
 C:\PythonDev\pynocle\depgraph\pagerank.py      Function    _transposeLinkMatrix       7 
 C:\PythonDev\pynocle\depgraph\pagerank.py      Function    _pageRankGenerator         6 
-C:\PythonDev\pynocle\depgraph\rendering.py     Method      IRenderer.render           5 
 ----------------------------------------------------------------------------------------
 

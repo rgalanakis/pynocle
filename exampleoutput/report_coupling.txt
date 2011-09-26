@@ -6,23 +6,27 @@ brittle module.
 Instability (I) is the ratio of Ce to total coupling. I = Ce / (Ce + Ca). Indicates the
 module's resilience to change between 0 (completely stable) and 1 (unstable).
 
-----------------------------------------------------------------
-Filename                                       Ca    Ce      I  
-----------------------------------------------------------------
-C:\PythonDev\pynocle\__init__                  12    5     0.294
-C:\PythonDev\pynocle\cyclcompl\__init__        1     2     0.667
-C:\PythonDev\pynocle\cyclcompl\formatting      1     2     0.667
-C:\PythonDev\pynocle\cyclcompl\statbuilder     1     1     0.500
-C:\PythonDev\pynocle\depgraph\__init__         1     3     0.750
-C:\PythonDev\pynocle\depgraph\depbuilder       1     1     0.500
-C:\PythonDev\pynocle\depgraph\formatting       1     3     0.750
-C:\PythonDev\pynocle\depgraph\pagerank         2     1     0.333
-C:\PythonDev\pynocle\depgraph\rendering        1     1     0.500
-C:\PythonDev\pynocle\depgraph\test_pagerank    0     1     1.000
-C:\PythonDev\pynocle\inheritance\__init__      1     1     0.500
-C:\PythonDev\pynocle\sloc\__init__             1     2     0.667
-C:\PythonDev\pynocle\sloc\formatting           1     2     0.667
-C:\PythonDev\pynocle\sloc\slocing              1     0     0.000
-C:\PythonDev\pynocle\test_init                 0     0     0.000
-----------------------------------------------------------------
+----------------------------------------------------------------------
+Filename                                             Ca    Ce      I  
+----------------------------------------------------------------------
+C:\PythonDev\pynocle\__init__                        0     5     1.000
+C:\PythonDev\pynocle\cyclcompl\__init__              1     2     0.667
+C:\PythonDev\pynocle\cyclcompl\formatting            1     2     0.667
+C:\PythonDev\pynocle\cyclcompl\statbuilder           1     1     0.500
+C:\PythonDev\pynocle\depgraph\__init__               1     3     0.750
+C:\PythonDev\pynocle\depgraph\depbuilder             1     1     0.500
+C:\PythonDev\pynocle\depgraph\formatting             1     3     0.750
+C:\PythonDev\pynocle\depgraph\pagerank               2     1     0.333
+C:\PythonDev\pynocle\depgraph\rendering              3     1     0.250
+C:\PythonDev\pynocle\depgraph\test_pagerank          0     1     1.000
+C:\PythonDev\pynocle\depgraph\test_xmlrpcrenderer    0     2     1.000
+C:\PythonDev\pynocle\depgraph\xmlrpcrenderer         1     1     0.500
+C:\PythonDev\pynocle\inheritance\__init__            1     1     0.500
+C:\PythonDev\pynocle\sloc\__init__                   1     2     0.667
+C:\PythonDev\pynocle\sloc\formatting                 1     2     0.667
+C:\PythonDev\pynocle\sloc\slocing                    1     0     0.000
+C:\PythonDev\pynocle\tableprint                      3     0     0.000
+C:\PythonDev\pynocle\test_init                       0     0     0.000
+C:\PythonDev\pynocle\utils                           9     0     0.000
+----------------------------------------------------------------------
 

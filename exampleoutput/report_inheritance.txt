@@ -1,3 +1,3 @@
 Functionality not yet supported!
 
-<pynocle.inheritance.ClassGraph object at 0x02F45A70>
+<pynocle.inheritance.ClassGraph object at 0x02FF4870>
