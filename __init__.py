@@ -1,15 +1,15 @@
 """pynocle is a module for reporting of code metrics and other inspection/reporting features.
 
-It is meant to be used as a very simple API, usually as part of the the testing/build process.  Simply set up
-your testing function (like nose.run) and pass it into Monocle.makeawesome, along with the directories you want
-to analyze.
+It is meant to be used as a very simple API, usually as part of the the testing/build process.  Simply
+create a new Monocle object with the directories and files you want to analyze
+(along with coverage data if you have it), and call generate_all.
 """
 
 __author__ = "Rob Galanakis"
 __copyright__ = "Copyright 2011, Rob Galanakis"
 __credits__ = ["Rob Galanakis"]
 __license__ = "LGPL"
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 __maintainer__ = "Rob Galanakis"
 __email__ = "rob.galanakis@gmail.com"
 __status__ = "Pre-Alpha"
