@@ -6,7 +6,7 @@ total codebase lines.
 -----------------------------------------------------------------------------------------------------------------------------------
 Filename                                                Code    Code%     Comment    Comment%    Blank    Blank%    Total    Total%
 -----------------------------------------------------------------------------------------------------------------------------------
-C:\PythonDev\pynocle\__init__.py                        241     83.1%        4         1.4%        45     15.5%      290     17.3% 
+C:\PythonDev\pynocle\__init__.py                        241     83.4%        5         1.7%        43     14.9%      289     17.2% 
 C:\PythonDev\pynocle\bogus.py                            5      71.4%        0         0.0%        2      28.6%       7       0.4% 
 C:\PythonDev\pynocle\cyclcompl\__init__.py               4      57.1%        0         0.0%        3      42.9%       7       0.4% 
 C:\PythonDev\pynocle\cyclcompl\formatting.py             54     83.1%        1         1.5%        10     15.4%       65      3.9% 
@@ -24,9 +24,9 @@ C:\PythonDev\pynocle\sloc\__init__.py                    4      100.0%       0  
 C:\PythonDev\pynocle\sloc\formatting.py                  46     86.8%        0         0.0%        7      13.2%       53      3.2% 
 C:\PythonDev\pynocle\sloc\slocing.py                     92     85.2%        1         0.9%        15     13.9%      108      6.4% 
 C:\PythonDev\pynocle\tableprint.py                       59     86.8%        1         1.5%        8      11.8%       68      4.0% 
-C:\PythonDev\pynocle\test_init.py                        11     84.6%        1         7.7%        1       7.7%       13      0.8% 
+C:\PythonDev\pynocle\test_init.py                        12     85.7%        1         7.1%        1       7.1%       14      0.8% 
 C:\PythonDev\pynocle\utils.py                            90     78.3%        1         0.9%        24     20.9%      115      6.8% 
                                                                                                                                    
-TOTALS                                                  1367    79.5%        48        4.8%       266     15.6%      1681    100.0%
+TOTALS                                                  1368    79.6%        49        4.8%       264     15.6%      1681    100.0%
 -----------------------------------------------------------------------------------------------------------------------------------
 

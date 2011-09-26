@@ -7,6 +7,13 @@ Showing items with a CC greater than or equal to 5
 WARNING: The following files failed to parse:
 	C:\PythonDev\pynocle\bogus.py
 
+C:\PythonDev\pynocle\__init__.py
+------------------------------------
+Type      Name                    CC
+------------------------------------
+Method    Monocle.generate_all    5 
+------------------------------------
+
 C:\PythonDev\pynocle\depgraph\depbuilder.py
 ---------------------------------------
 Type      Name                       CC
@@ -29,5 +36,6 @@ Filename                                       Type        Name                 
 C:\PythonDev\pynocle\depgraph\depbuilder.py    Method      DepBuilder.process_file    7 
 C:\PythonDev\pynocle\depgraph\pagerank.py      Function    _transposeLinkMatrix       7 
 C:\PythonDev\pynocle\depgraph\pagerank.py      Function    _pageRankGenerator         6 
+C:\PythonDev\pynocle\__init__.py               Method      Monocle.generate_all       5 
 ----------------------------------------------------------------------------------------
 
