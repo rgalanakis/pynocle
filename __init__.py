@@ -29,6 +29,19 @@ import depgraph
 import inheritance
 import sloc
 
+def _check_coverage():
+    if type(coverage) == utils.MissingDependencyError:
+        raise coverage
+
+def run_with_coverage(func, **coveragekwargs):
+    _check_coverage()
+    cov = coverage.coverage(**coveragekwargs)
+    cov.start()
+    result = func()
+    cov.stop()
+    cov.save()
+    return result, cov
+
 def ensure_clean_output(outputdir, _ran=False):
     """rmtree and makedirs outputdir to ensure a clean output directory.
 
@@ -52,32 +65,20 @@ def ensure_clean_output(outputdir, _ran=False):
         if not os.path.isdir(outputdir):
             raise
 
-
-def run_with_coverage(func, filename):
-    """Runs func (parameterless callable) with coverage on.  Saves coverage to filename.  Returns a tuple
-    of the return value of func, and the coverage object created.
-    """
-    #isinstance causes scope problems so use exact type checking here.
-    if type(coverage) == utils.MissingDependencyError:
-        raise coverage
-    cov = coverage.coverage(data_file=filename)
-    cov.erase()
-    cov.start()
-    result = func()
-    cov.stop()
-    cov.save()
-    return result, cov
-
 def generate_cover_html(cov, directory):
     """Outputs a coverage html report from cov into directory.
 
     cov: An instance of coverage.coverage.
     directory: The directory all the html files will be output to.  Directory must exist.
     """
+    #isinstance causes scope problems so use exact type checking here.
+    _check_coverage()
     cov.html_report(directory=directory)
 
 def generate_cover_report(cov, filename):
     """Generates a coverage report for cov to filename."""
+    #isinstance causes scope problems so use exact type checking here.
+    _check_coverage()
     with open(filename, 'w') as f:
         cov.report(file=f)
 
@@ -170,13 +171,15 @@ class Monocle(object):
 
     outputdir: Directory relative to cwd to write files.
     files_and_folders: All files and files recursively under directories in this collection will be reported on.
+    coveragedata: A coverage.coverage instance.  You can get this from running coverage, or loading a coverage data
+        file.
 
     Other arguments are filenames relative to outputdir that reports will be written to,
     and factory methods that are used to output those reports.
     """
     def __init__(self, outputdir='output',
                  files_and_folders=(os.getcwd(),),
-                 coveragedata_filename='.coverage',
+                 coveragedata=None,
                  coverhtml_dir='report_covhtml',
                  coverreport_filename='report_coverage.txt',
                  cyclcompl_filename='report_cyclcompl.txt',
@@ -195,9 +198,9 @@ class Monocle(object):
                  ):
         self.outputdir = outputdir
         self.filenames = utils.find_all(files_and_folders)
+        self.coveragedata = coveragedata
 
         join = lambda x: os.path.join(self.outputdir, x)
-        self.coveragedata_filename = join(coveragedata_filename)
         self.coverhtml_dir = join(coverhtml_dir)
         self.coverreport_filename = join(coverreport_filename)
         self.cyclcompl_filename = join(cyclcompl_filename)
@@ -220,15 +223,12 @@ class Monocle(object):
     def ensure_clean_output(self):
         ensure_clean_output(self.outputdir)
 
-    def run_with_coverage(self, func):
-        return run_with_coverage(func, self.coveragedata_filename)
-
-    def generate_cover_html(self, cov):
-        generate_cover_html(cov, self.coverhtml_dir)
+    def generate_cover_html(self):
+        generate_cover_html(self.coveragedata, self.coverhtml_dir)
         self._filesforjump.append(os.path.join(self.coverhtml_dir, 'index.html'))
 
-    def generate_cover_report(self, cov):
-        generate_cover_report(cov, self.coverreport_filename)
+    def generate_cover_report(self):
+        generate_cover_report(self.coveragedata, self.coverreport_filename)
         self._filesforjump.append(self.coverreport_filename)
 
     def generate_cyclomatic_complexity(self):
@@ -259,27 +259,27 @@ class Monocle(object):
         """Generates an html page that links to any generated reports."""
         return generate_html_jump(self.htmljump_filename, *self._filesforjump)
 
-    def makeawesome(self, func):
-        """Run ALL pynocle methods."""
-        self.ensure_clean_output()
-        result, cov = self.run_with_coverage(func)
-        self.generate_cover_html(cov)
-        self.generate_cover_report(cov)
-        self.makeawesome_nocover()
-        return result
+    def generate_all(self, cleanoutput=True):
+        """Run all report generation functions.
 
-    def makeawesome_nocover(self):
-        """Runs all metrics excluding coverage.  Raises an AggregateError after all functions run if any function
-        raises.
+        If coveragedata is not set, skip the coverage functions.
+        Raises an AggregateError after all functions run if any function raises.
+        cleanoutput: If True, run ensure_clean_output to clear the output directory.
         """
-        excs = []
-        for func in (self.generate_inheritance_report,
+        if cleanoutput:
+            self.ensure_clean_output()
+        funcs = [self.generate_inheritance_report,
                      self.generate_cyclomatic_complexity,
                      self.generate_sloc,
                      self.generate_coupling_report,
                      self.generate_couplingrank_report,
                      self.generate_dependency_graph,
-                     self.generate_html_jump):
+                     self.generate_html_jump]
+        if self.coveragedata:
+            funcs.insert(0, self.generate_cover_html)
+            funcs.insert(0, self.generate_cover_report)
+        excs = []
+        for func in funcs:
             try:
                 func()
             except Exception as exc:
@@ -287,4 +287,3 @@ class Monocle(object):
                 excs.append((exc, traceback.format_exc()))
         if excs:
             raise utils.AggregateError, excs
-        
