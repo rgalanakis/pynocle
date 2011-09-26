@@ -40,7 +40,7 @@ class CouplingTextFormatter(utils.IReportFormatter):
             f = sortedfilenames[i]
             ca = dependencygroup.depnode_to_ca[f]
             ce = dependencygroup.depnode_to_ce[f]
-            rows.append([f, str(ca), str(ce), self._calc_instability(ca, ce)])
+            rows.append([utils.prettify_path(f), str(ca), str(ce), self._calc_instability(ca, ce)])
         tbl = tableprint.Table(header, rows, just=justs)
         tbl.write(self._outstream)
 
@@ -65,7 +65,7 @@ class RankTextFormatter(utils.IReportFormatter):
         matrix = converter.create_matrix()
         ranking = pagerank.pageRank(matrix)
         ids = [idx for idx in range(len(matrix))]
-        filenames = [converter.id_to_node_map[nid] for nid in ids]
+        filenames = [utils.prettify_path(converter.id_to_node_map[nid]) for nid in ids]
 
         rowinfos = zip(filenames, ranking, ids, matrix)
         rowinfos.sort(key=lambda item: item[1]) #sort by ranking

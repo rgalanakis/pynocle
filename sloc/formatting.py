@@ -41,7 +41,7 @@ class SlocTextFormatter(utils.IReportFormatter):
         rows = []
         sortedbyfilename = sorted(slocgroup.filenamesToSlocInfos.items(), key=lambda kvp: kvp[0])
         for filename, d in sortedbyfilename:
-            row = (filename,
+            row = (utils.prettify_path(filename),
                    str(d['code']), self._fmtperc(d['codeperc']),
                    str(d['comment']), self._fmtperc(d['commentperc']),
                    str(d['blank']), self._fmtperc(d['blankperc']),

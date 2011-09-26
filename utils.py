@@ -7,11 +7,13 @@ class PynocleError(Exception):
     """Base class for custom exception hierarchy."""
     pass
 
+
 class AggregateError(PynocleError):
     """Error that holds a group of other errors.  Argument will be a collection
     of tuples (error instance, error traceback).
     """
     pass
+
 
 class MissingDependencyError(PynocleError):
     """If you hit this exception, it means you tried to use a feature in pynocle that required a dependency you
@@ -58,7 +60,6 @@ def write_report(filename, data, formatter_factory):
         fmt.format_data(data)
         fmt.format_report_footer()
 
-        
 class _FindAll:
     """Helper state class for counting lines of groups of files."""
     def __init__(self, files_and_folders, pattern):
@@ -85,6 +86,7 @@ class _FindAll:
         for d in filter(os.path.isdir, files_and_folders):
             paths = map(lambda x: os.path.join(d, x), os.listdir(d))
             self.findall(paths)
+
 
 def find_all(files_and_folders, pattern='*.py'):
     """Given a collection of files and folders, return all files in the collection and recursively under any folders
@@ -113,3 +115,12 @@ def flatten(node, getchildren):
 def swap_keys_and_values(d):
     """Returns a new dictionary where keys are d.values() and values are d.keys()."""
     return dict(zip(d.values(), d.keys()))
+
+def prettify_path(path, strs=(os.getcwd(),)):
+    """Replaces any occurance of strs in path with an empty string, removes any leading
+    slash, and removes extension.  Returns a generator of strings.
+    """
+    s = os.path.splitext(path)[0]
+    for st in strs:
+        s = s.replace(st, '')
+    return s.strip('\\/')
