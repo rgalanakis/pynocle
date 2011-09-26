@@ -113,14 +113,18 @@ def flatten(node, getchildren):
             yield gc
 
 def swap_keys_and_values(d):
-    """Returns a new dictionary where keys are d.values() and values are d.keys()."""
-    return dict(zip(d.values(), d.keys()))
+    """Returns a new dictionary where keys are d.values() and values are d.keys().  If there are duplicate values,
+    raises a KeyError.
+    """
+    result = dict(zip(d.values(), d.keys()))
+    if len(d) != len(result):
+        raise KeyError, 'There were duplicate values in argument.  Values: %s' % d.values()
+    return result
 
-def prettify_path(path, strs=(os.getcwd(),)):
-    """Replaces any occurance of strs in path with an empty string, removes any leading
-    slash, and removes extension.  Returns a generator of strings.
+def prettify_path(path, leading=os.getcwd()):
+    """If path begins with leading, strip it and remove any new leading slashes.  Also removes the extension.
     """
     s = os.path.splitext(path)[0]
-    for st in strs:
-        s = s.replace(st, '')
+    if s.startswith(leading):
+        s = s.replace(leading, '')
     return s.strip('\\/')

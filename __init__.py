@@ -24,6 +24,7 @@ except ImportError as exc:
 import os
 import shutil
 
+import _pynoclecover
 import cyclcompl
 import depgraph
 import inheritance
@@ -35,12 +36,7 @@ def _check_coverage():
 
 def run_with_coverage(func, **coveragekwargs):
     _check_coverage()
-    cov = coverage.coverage(**coveragekwargs)
-    cov.start()
-    result = func()
-    cov.stop()
-    cov.save()
-    return result, cov
+    return _pynoclecover.run_with_coverage(func, **coveragekwargs)
 
 def ensure_clean_output(outputdir, _ran=False):
     """rmtree and makedirs outputdir to ensure a clean output directory.
