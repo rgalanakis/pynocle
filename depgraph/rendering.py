@@ -40,7 +40,7 @@ class IRenderer(object):
         moreargs: Additional args to invoke the exe with.
         """
         if not dotpath:
-            self.savetempdot()
+            dotpath = self.savetempdot()
         format = self.getformat(outputfilename, overrideformat)
         clargs = [self.dotexe(), '-T' + format, dotpath, '-o', outputfilename]
         clargs.extend(moreargs)
