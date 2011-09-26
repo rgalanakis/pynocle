@@ -1,23 +1,27 @@
 Google's PageRank algorithm applied to Coupling
 High vaules are more "important" in the same way highly ranked webpages are.
 
---------------------------------------------------------------------------------------
-Filename                                       PageRank    PageID    Outgoing Links   
---------------------------------------------------------------------------------------
-C:\PythonDev\pynocle\__init__                  0.36401     1         [1, 2, 5, 10, 11]
-C:\PythonDev\pynocle\sloc\__init__             0.07401     11        [12, 13]         
-C:\PythonDev\pynocle\inheritance\__init__      0.07401     10        [1]              
-C:\PythonDev\pynocle\depgraph\__init__         0.07401     5         [6, 7, 9]        
-C:\PythonDev\pynocle\cyclcompl\__init__        0.07401     2         [3, 4]           
-C:\PythonDev\pynocle\sloc\slocing              0.04417     13        []               
-C:\PythonDev\pynocle\sloc\formatting           0.04417     12        [1]              
-C:\PythonDev\pynocle\cyclcompl\statbuilder     0.04417     4         [1]              
-C:\PythonDev\pynocle\cyclcompl\formatting      0.04417     3         [1]              
-C:\PythonDev\pynocle\depgraph\pagerank         0.03741     8         [1]              
-C:\PythonDev\pynocle\depgraph\rendering        0.03361     9         [1]              
-C:\PythonDev\pynocle\depgraph\formatting       0.03361     7         [1, 8]           
-C:\PythonDev\pynocle\depgraph\depbuilder       0.03361     6         [1]              
-C:\PythonDev\pynocle\depgraph\test_pagerank    0.01251     14        [8]              
-C:\PythonDev\pynocle\test_init                 0.01251     0         [1]              
---------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+Filename                                             PageRank    PageID    Outgoing Links   
+--------------------------------------------------------------------------------------------
+C:\PythonDev\pynocle\utils                           0.28043     2         []               
+C:\PythonDev\pynocle\depgraph\rendering              0.07603     11        [2]              
+C:\PythonDev\pynocle\tableprint                      0.06857     5         []               
+C:\PythonDev\pynocle\depgraph\pagerank               0.05657     10        [2]              
+C:\PythonDev\pynocle\__init__                        0.04675     1         [2, 3, 7, 12, 13]
+C:\PythonDev\pynocle\sloc\slocing                    0.03939     15        []               
+C:\PythonDev\pynocle\sloc\formatting                 0.03939     14        [2, 5]           
+C:\PythonDev\pynocle\cyclcompl\statbuilder           0.03939     6         [2]              
+C:\PythonDev\pynocle\cyclcompl\formatting            0.03939     4         [2, 5]           
+C:\PythonDev\pynocle\depgraph\xmlrpcrenderer         0.03601     18        [11]             
+C:\PythonDev\pynocle\depgraph\formatting             0.03468     9         [2, 5, 10]       
+C:\PythonDev\pynocle\depgraph\depbuilder             0.03468     8         [2]              
+C:\PythonDev\pynocle\sloc\__init__                   0.03322     13        [14, 15]         
+C:\PythonDev\pynocle\inheritance\__init__            0.03322     12        [2]              
+C:\PythonDev\pynocle\depgraph\__init__               0.03322     7         [8, 9, 11]       
+C:\PythonDev\pynocle\cyclcompl\__init__              0.03322     3         [4, 6]           
+C:\PythonDev\pynocle\depgraph\test_xmlrpcrenderer    0.02527     17        [11, 18]         
+C:\PythonDev\pynocle\depgraph\test_pagerank          0.02527     16        [10]             
+C:\PythonDev\pynocle\test_init                       0.02527     0         [1]              
+--------------------------------------------------------------------------------------------
 

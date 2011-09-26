@@ -1,29 +1,32 @@
 SLOC (Source Lines of Code)
-Measures physical lines of code, lines of comments, and blank lines, in number and
-percentage of file.  Also measures total line count as percentage of total codebase lines
+Measures physical lines of source code (SLOC), lines of comments, and blank lines, in
+number and percentage of file.  Also measures total line count (TLOC) and as percentage of
+total codebase lines.
 
------------------------------------------------------------------------------------------------------------------------------
-Filename                                          Code    Code%     Comment    Comment%    Blank    Blank%    Total    Total%
------------------------------------------------------------------------------------------------------------------------------
-C:\PythonDev\pynocle\__init__.py                  241     83.1%        4         1.4%        45     15.5%      290     18.6% 
-C:\PythonDev\pynocle\bogus.py                      5      71.4%        0         0.0%        2      28.6%       7       0.4% 
-C:\PythonDev\pynocle\cyclcompl\__init__.py         4      57.1%        0         0.0%        3      42.9%       7       0.4% 
-C:\PythonDev\pynocle\cyclcompl\formatting.py       53     82.8%        1         1.6%        10     15.6%       64      4.1% 
-C:\PythonDev\pynocle\cyclcompl\statbuilder.py     127     78.9%        0         0.0%        34     21.1%      161     10.3% 
-C:\PythonDev\pynocle\depgraph\__init__.py          7      100.0%       0         0.0%        0       0.0%       7       0.4% 
-C:\PythonDev\pynocle\depgraph\depbuilder.py       128     83.7%        6         3.9%        19     12.4%      153      9.8% 
-C:\PythonDev\pynocle\depgraph\formatting.py        65     83.3%        0         0.0%        13     16.7%       78      5.0% 
-C:\PythonDev\pynocle\depgraph\pagerank.py         164     77.4%        14        6.6%        34     16.0%      212     13.6% 
-C:\PythonDev\pynocle\depgraph\rendering.py         85     84.2%        2         2.0%        14     13.9%      101      6.5% 
-C:\PythonDev\pynocle\depgraph\test_pagerank.py     50     86.2%        5         8.6%        3       5.2%       58      3.7% 
-C:\PythonDev\pynocle\inheritance\__init__.py       45     75.0%        0         0.0%        15     25.0%       60      3.9% 
-C:\PythonDev\pynocle\sloc\__init__.py              4      100.0%       0         0.0%        0       0.0%       4       0.3% 
-C:\PythonDev\pynocle\sloc\formatting.py            45     86.5%        0         0.0%        7      13.5%       52      3.3% 
-C:\PythonDev\pynocle\sloc\slocing.py               92     85.2%        1         0.9%        15     13.9%      108      6.9% 
-C:\PythonDev\pynocle\tableprint.py                 59     86.8%        1         1.5%        8      11.8%       68      4.4% 
-C:\PythonDev\pynocle\test_init.py                  11     84.6%        1         7.7%        1       7.7%       13      0.8% 
-C:\PythonDev\pynocle\utils.py                      90     78.3%        1         0.9%        24     20.9%      115      7.4% 
-                                                                                                                             
-TOTALS                                            1275    82.5%        36        1.9%       247     15.6%      1558    100.0%
------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------
+Filename                                                Code    Code%     Comment    Comment%    Blank    Blank%    Total    Total%
+-----------------------------------------------------------------------------------------------------------------------------------
+C:\PythonDev\pynocle\__init__.py                        241     83.1%        4         1.4%        45     15.5%      290     17.3% 
+C:\PythonDev\pynocle\bogus.py                            5      71.4%        0         0.0%        2      28.6%       7       0.4% 
+C:\PythonDev\pynocle\cyclcompl\__init__.py               4      57.1%        0         0.0%        3      42.9%       7       0.4% 
+C:\PythonDev\pynocle\cyclcompl\formatting.py             54     83.1%        1         1.5%        10     15.4%       65      3.9% 
+C:\PythonDev\pynocle\cyclcompl\statbuilder.py           127     78.9%        0         0.0%        34     21.1%      161      9.6% 
+C:\PythonDev\pynocle\depgraph\__init__.py                7      100.0%       0         0.0%        0       0.0%       7       0.4% 
+C:\PythonDev\pynocle\depgraph\depbuilder.py             129     83.8%        6         3.9%        19     12.3%      154      9.2% 
+C:\PythonDev\pynocle\depgraph\formatting.py              65     83.3%        0         0.0%        13     16.7%       78      4.6% 
+C:\PythonDev\pynocle\depgraph\pagerank.py               164     77.4%        14        6.6%        34     16.0%      212     12.6% 
+C:\PythonDev\pynocle\depgraph\rendering.py               95     83.3%        2         1.8%        17     14.9%      114      6.8% 
+C:\PythonDev\pynocle\depgraph\test_pagerank.py           50     86.2%        5         8.6%        3       5.2%       58      3.5% 
+C:\PythonDev\pynocle\depgraph\test_xmlrpcrenderer.py     4      22.2%        11       61.1%        3      16.7%       18      1.1% 
+C:\PythonDev\pynocle\depgraph\xmlrpcrenderer.py          75     84.3%        1         1.1%        13     14.6%       89      5.3% 
+C:\PythonDev\pynocle\inheritance\__init__.py             45     75.0%        0         0.0%        15     25.0%       60      3.6% 
+C:\PythonDev\pynocle\sloc\__init__.py                    4      100.0%       0         0.0%        0       0.0%       4       0.2% 
+C:\PythonDev\pynocle\sloc\formatting.py                  46     86.8%        0         0.0%        7      13.2%       53      3.2% 
+C:\PythonDev\pynocle\sloc\slocing.py                     92     85.2%        1         0.9%        15     13.9%      108      6.4% 
+C:\PythonDev\pynocle\tableprint.py                       59     86.8%        1         1.5%        8      11.8%       68      4.0% 
+C:\PythonDev\pynocle\test_init.py                        11     84.6%        1         7.7%        1       7.7%       13      0.8% 
+C:\PythonDev\pynocle\utils.py                            90     78.3%        1         0.9%        24     20.9%      115      6.8% 
+                                                                                                                                   
+TOTALS                                                  1367    79.5%        48        4.8%       266     15.6%      1681    100.0%
+-----------------------------------------------------------------------------------------------------------------------------------
 
