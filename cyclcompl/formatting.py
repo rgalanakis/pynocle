@@ -33,9 +33,10 @@ class CCTextFormatter(utils.IReportFormatter):
 
     def format_data(self, files_stats_failures):
         """Formats the output of measure_cyclcompl ([filename, stats], [failures])."""
-        self.format_failures(files_stats_failures[1])
+        self.format_failures(map(utils.prettify_path, files_stats_failures[1]))
         allrows = []
         for filename, stat in files_stats_failures[0]:
+            filename = utils.prettify_path(filename)
             rows = self.format_file_and_stats(filename, stat)
             for r in rows:
                 r.insert(0, filename)

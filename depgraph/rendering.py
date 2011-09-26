@@ -101,10 +101,6 @@ class DefaultRenderer(IRenderer):
             f.write('}')
 
 
-def strip_roots(depgraphdata, root):
-    for startpt, endpt in depgraphdata:
-        yield startpt.replace(root).lstrip('\\', '/'), endpt.replace(root).lstrip('\\', '/')
-
 def clean_paths(depgraphdata):
     def san(p):
         p = os.path.splitdrive(p)[1]
