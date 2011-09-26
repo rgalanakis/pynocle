@@ -7,7 +7,7 @@ Overview
 ========
 
 Pynocle is a python module and API for the generation of software metrics.  It aims to be as dead simple to use as
-possible.  Simply create a pynocle.Monocle object, and call one of the makeawesome methods to generate all
+possible.  Simply create a pynocle.Monocle object, and call generate_all to generate all
 supported metrics!  In the future, there will be much more configuration available.
 
 Currently supported metrics include:
@@ -26,7 +26,10 @@ Usage
 ========
 
 pynocle is meant to be used as a simple API from your own python code.  Simply import pynocle, create a Monocle
-instance, and call one of the makeawesome methods (depending on if you want coverage or not).  That's it!
+instance, and the generate_all method.  That's it!
+
+To generate coverage, you can pass a parameterless function (like nose.run) into pynocle.run_with_coverage.  Pass any
+coverage.coverage instance into Monocle.coverdata in order to generate coverage reports.
 
 The internal API's are more complex and flexible and we'll be working on exposing that configuration as time goes by.
 
@@ -39,6 +42,7 @@ Dependencies
 - Python 2.6 or higher
 - For coverage support, requires the coverage module: http://pypi.python.org/pypi/coverage
 - For dependency graph generation support, requires GraphViz's free software: http://www.graphviz.org/
+- For page ranking algorithm, requires numpy.
 
 
 Installation
@@ -47,7 +51,8 @@ Installation
 There's currently no installation support, and there probably won't be until the API is greatly stabilized.
 You can download the source from http://code.google.com/p/pynocle/, and just 'import pynocle' and you're ready to go!
 
-Make sure you have GraphViz's 'dot' in your application path, and the coverage module installed, to use all features.
+Make sure you have GraphViz's 'dot' in your application path, and the coverage and numpy modules installed,
+to use all features.
 
 
 To Do
