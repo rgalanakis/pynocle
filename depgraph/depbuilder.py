@@ -99,7 +99,7 @@ class DepBuilder:
         if filename.endswith('.pyd'):
             return []
         if filename.endswith('.pyc'):
-            filename = filename[:-3] + 'py'
+            filename = filename[:-1]
         if not os.path.exists(filename):
             return []
         try:
@@ -135,6 +135,7 @@ class DepBuilder:
         """
         try:
             module = __import__(modulename)
+            module = sys.modules[modulename]
         except ImportError:
             #We need to support relative imports.
             impdir = os.path.dirname(importing_module_filename)
@@ -145,7 +146,7 @@ class DepBuilder:
             possiblepath = os.path.join(impdir, modulenameslashes, '__init__.py')
             if os.path.exists(possiblepath):
                 return possiblepath
-            #raise
+            #raise #Do we want to raise here?  Need more testing on other codebases since it doesn't raise on pynocle's
             return None
         if hasattr(module, '__file__'): #some modules don't have a __file__ attribute, like sys
             return os.path.abspath(module.__file__)
