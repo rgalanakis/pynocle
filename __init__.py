@@ -9,10 +9,7 @@ create a new Monocle object with the directories and files you want to analyze
 
 __author__ = "Rob Galanakis"
 __copyright__ = "Copyright 2011, Rob Galanakis"
-__credits__ = ["Rob Galanakis"]
-__license__ = "LGPL"
 __version__ = "0.1.2"
-__maintainer__ = "Rob Galanakis"
 __email__ = "rob.galanakis@gmail.com"
 __status__ = "Pre-Alpha"
 
