@@ -13,10 +13,7 @@ setup(name="pynocle",
       author_email=pynocle.__email__,
       url="http://code.google.com/p/pynocle/",
       description="Software metrics for your python code",
-      long_description="""
-Generates software metrics for python codebases, such as line count, cyclomatic complexity, coupling, dependency
-graphs, and more.  Has a dead simple API and aims to get you metrics immediately.
-""",
+      long_description=open('README.txt').read(),
       license='GPL',
       packages=['', 'cyclcompl', 'depgraph', 'inheritance', 'sloc'],
       install_requires=['numpy', 'coverage']
