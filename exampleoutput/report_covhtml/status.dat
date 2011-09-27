@@ -39,7 +39,7 @@ p19
 I0
 sS'n_statements'
 p20
-I8
+I9
 sS'n_excluded'
 p21
 I0
@@ -51,7 +51,7 @@ p23
 I0
 sbssS'hash'
 p24
-S'a\xdd:!q\xdc:\x99Z?N/\x11v\x16?'
+S'J\x81B\xe22\x7f\x88\xc8k\xf2\x99-\x9dt\xc4\xd2'
 p25
 ssS'test_init'
 p26
@@ -84,7 +84,7 @@ I10
 sg23
 I0
 sbssg24
-S'X\x85*\xc3\x8aQ:R\x81gU2_\x9c\xfb\xa6'
+S'|&\xe9\xb2\\\x8f\x8dN\xa7 \xa0\x98\xc1\xb0\xc2\x94'
 p32
 ssS'depgraph_depbuilder'
 p33
@@ -118,7 +118,7 @@ I88
 sg23
 I0
 sbssg24
-S'\xe16\xaf\x80\x12Q\xb6\x05\x88\xc0\x00\xc6\xbftQ '
+S'\x855q3\x082\x80!\x19\xc6\x81\xcf\xbc\xad\xe2l'
 p40
 ssS'test_utils'
 p41
@@ -143,7 +143,7 @@ I1
 sg19
 I0
 sg20
-I51
+I102
 sg21
 I0
 sg22
@@ -151,7 +151,7 @@ I0
 sg23
 I0
 sbssg24
-S'z\x9a\xbc\xc8\x91\xfeZS\x8b\xa9\xe5$\xf8B\x12\xa0'
+S'\xc4O\x8c-\x90\x8e\x06\xbb\xd0m[Iv\x83\xd3\xec'
 p47
 ssS'depgraph_xmlrpcrenderer'
 p48
@@ -177,7 +177,7 @@ I1
 sg19
 I0
 sg20
-I65
+I66
 sg21
 I0
 sg22
@@ -185,7 +185,7 @@ I47
 sg23
 I0
 sbssg24
-S'z\xc8\xdb\x0b"\xf9!\xac=\\\x07(TA\xc6\xe1'
+S'Mf\x11\xffL#y\xea,\x1b+\xcf\x15\xda\xf9\xc2'
 p55
 ssS'cyclcompl___init__'
 p56
@@ -219,7 +219,7 @@ I0
 sg23
 I0
 sbssg24
-S"'.\t\x03\xe1\xf8\x88\xb1\x158\x90\xab\x07z2\xf2"
+S'2\x8d\xcb\xe7\xda \xf5\x0f\x89\xc6mH\x1b\xd8p\x0f'
 p63
 ssS'sloc_formatting'
 p64
@@ -253,7 +253,7 @@ I23
 sg23
 I0
 sbssg24
-S'E\x17_\x01\xca\x91\xb8\xbaT\x16\xe0\x90\xc2\x10X\x17'
+S'\x15V\x14\x7f\x8e\xac\xe4P\x87\x06\xc9\xc6r\xcb~\xc2'
 p71
 ssS'utils'
 p72
@@ -278,15 +278,15 @@ I1
 sg19
 I0
 sg20
-I64
+I65
 sg21
 I0
 sg22
-I22
+I5
 sg23
 I0
 sbssg24
-S'{\x8a$\xb6\xe7\xb6\xe1\x11\xf9*\xee\xcdt\\l\xef'
+S'd\x0f5\x8e<#-eBU\x1c\xe0\xd0\x07\x8d\xb4'
 p78
 ssS'cyclcompl_statbuilder'
 p79
@@ -312,7 +312,7 @@ I1
 sg19
 I0
 sg20
-I95
+I96
 sg21
 I0
 sg22
@@ -320,7 +320,7 @@ I64
 sg23
 I0
 sbssg24
-S'\xf5\x1c\xfa\x12\x04\x7f\xec\x1c\xc7;\x95\xe8\xba^\x98p'
+S'\x0e\xbbw\xf8\xc3L\x9a\x99\xd8\xa2(e\xf4\x0b\xac\x84'
 p86
 ssS'depgraph_pagerank'
 p87
@@ -346,7 +346,7 @@ I1
 sg19
 I0
 sg20
-I103
+I104
 sg21
 I0
 sg22
@@ -354,7 +354,7 @@ I5
 sg23
 I0
 sbssg24
-S'\x16\xd5\xfef\xc7\xe1Xa\x1cIk\x98/Bkb'
+S'd\xa8\xe2\xedr\x84V\xe5\x96\x8e\xa5\xf2\x08t\xdd\xa3'
 p94
 ssS'depgraph_test_pagerank'
 p95
@@ -388,7 +388,7 @@ I0
 sg23
 I0
 sbssg24
-S'8o\xba\xdfISV\xd0J\x83\xe97[\xb2\xe5\x81'
+S'\x95U\xed,\xcf\xd6\x7f\x18r\xb7\xd7\x1a\xca8\xce\xf6'
 p102
 ssS'depgraph_test_xmlrpcrenderer'
 p103
@@ -422,7 +422,7 @@ I0
 sg23
 I0
 sbssg24
-S'\xb9D\xc7(\xf9\xa5\x9c\x08\n\x03@\x18\x14\xf1\x02u'
+S'\xf5\xa36\xde+\xea\x90^\x01(p0\x96\xba\x8d+'
 p110
 ssS'depgraph___init__'
 p111
@@ -456,7 +456,7 @@ I0
 sg23
 I0
 sbssg24
-S'\x15\n\x1c\x16\xed\x9b\x07tX\xea(N_\x90I\xd9'
+S'\xb9\x9ckD\xcf8\x88\xbf\x10e0\x99\xe0\xbfQ\x08'
 p118
 ssS'depgraph_formatting'
 p119
@@ -490,7 +490,7 @@ I40
 sg23
 I0
 sbssg24
-S'\x81\x0bks%FS\x8b\x9dH\xa5\x1e\x83\x7fj4'
+S'D\xf5\x1f|\x95Cn\xa9\xa5\xa6\xd9\x9d\xa1r\xd2\xa1'
 p126
 ssS'cyclcompl_formatting'
 p127
@@ -524,7 +524,7 @@ I41
 sg23
 I0
 sbssg24
-S'\xdf\x9bj\xd7^9\xbb\xa0\x89\xa0I\xed\xc4K\xeb\xc7'
+S'\xea\xdb\xfb\xbf\x03\xaa\xf5\xdc\xc8\x15M3\xb2\xc6\x03\xbe'
 p134
 ssS'inheritance___init__'
 p135
@@ -558,7 +558,7 @@ I27
 sg23
 I0
 sbssg24
-S'\xc4\xbd\xad\xa7=\x91\xa9\x91\xc15\\\x0c\xe0\x19\xe3\x9e'
+S'\xbcLE\x1bb\xf6B\xdbX\x99:\n\x9ce\x13\x1d'
 p142
 ssS'tableprint'
 p143
@@ -583,7 +583,7 @@ I1
 sg19
 I0
 sg20
-I44
+I45
 sg21
 I0
 sg22
@@ -591,7 +591,7 @@ I33
 sg23
 I0
 sbssg24
-S'UR\xef\x7f\xd13ZN\xbd\x8b\x05\x15\x9b\xee\xebO'
+S'\xc3A^\x08z\xe3;\tz\xa9\x91p\xbf\xea\x11F'
 p149
 ssS'depgraph_rendering'
 p150
@@ -625,7 +625,7 @@ I55
 sg23
 I0
 sbssg24
-S'\x83\xed.\x9ea\x97\xbb\xedF"\x8c\xc8^qjS'
+S'p\xb4\x17E\x06\xadF\xe0\xe3\xef<\x88R?\xb1\xe9'
 p157
 ssS'sloc___init__'
 p158
@@ -659,7 +659,7 @@ I0
 sg23
 I0
 sbssg24
-S'\\\x87\x0e\xf1._\xc2\xc3\xb5\xaao\xa9\xaeR\x19\x1b'
+S'\xa0\xc6\xdb\x17\xe2J\x8d\xd2]\xc7\x1c\xef\xc7\xbb0x'
 p165
 ssS'__init__'
 p166
@@ -684,7 +684,7 @@ I1
 sg19
 I0
 sg20
-I153
+I151
 sg21
 I0
 sg22
@@ -692,7 +692,7 @@ I109
 sg23
 I0
 sbssg24
-S'\x0cu\x8ePo(\x93\\\x84C\xac%!\xfe\xf1\xa6'
+S'\xb4\xd4\xe4\xa3\xd3\x12\xdc\x18%-\xb1\x9e\x10\xae\xf9\x82'
 p172
 ssS'sloc_slocing'
 p173
@@ -726,7 +726,7 @@ I45
 sg23
 I0
 sbssg24
-S"O\xfe4P\xf8\xb0\xec\xff'\xad\xa4\xd1J\xe2\x81\xf6"
+S'\xce\xe9\xdbf\xca]{\x94\x1b\xf8\xe2d$\xa6\x1e~'
 p180
 sssS'version'
 p181

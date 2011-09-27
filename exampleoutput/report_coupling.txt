@@ -10,7 +10,7 @@ module's resilience to change between 0 (completely stable) and 1 (unstable).
 Filename                        Ca    Ce      I  
 -------------------------------------------------
 __init__                        1     6     0.857
-_pynoclecover                   1     0     0.000
+_pynoclecover                   2     0     0.000
 cyclcompl\__init__              1     2     0.667
 cyclcompl\formatting            1     2     0.667
 cyclcompl\statbuilder           1     1     0.500
@@ -23,11 +23,12 @@ depgraph\test_pagerank          0     1     1.000
 depgraph\test_xmlrpcrenderer    0     2     1.000
 depgraph\xmlrpcrenderer         1     1     0.500
 inheritance\__init__            1     1     0.500
+setup                           0     0     0.000
 sloc\__init__                   1     2     0.667
 sloc\formatting                 1     2     0.667
 sloc\slocing                    1     0     0.000
 tableprint                      3     0     0.000
-test_init                       0     1     1.000
+test_init                       0     2     1.000
 test_utils                      0     1     1.000
 utils                           10    0     0.000
 -------------------------------------------------
