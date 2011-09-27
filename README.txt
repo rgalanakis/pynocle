@@ -44,34 +44,15 @@ Dependencies
  * For dependency graph generation support, requires GraphViz's free software: http://www.graphviz.org/
  * For page ranking algorithm, requires numpy.
 
+
 ============
 Installation
 ============
 
 Run setup.py to install pynocle and python dependencies.
 
-Make sure you have GraphViz's 'dot' in your application path to use dependency graph visualization features.
-
-=====
-To Do
-=====
-
-- Add support for coupling metrics
-  - http://codebetter.com/patricksmacchia/2008/02/15/code-metrics-on-coupling-dead-code-design-flaws-and-re-engineering/
-  - Determine how to represent these conditions in the dependency graph.
-  - Done
-    - 9/25 Set up PageRank algorithm for weighing Ce.
-    - 9/25 Add Afferent Coupling (modules using it) and Efferent Coupling (modules it uses) support
-    - 9/25 Create another report for coupling.
-
-- Additional metrics to support (http://www.ndepend.com/Metrics.aspx)
-  - Number of subclasses
-  - Depth of baseclasses
-  - Number of baseclasses
-  - Function parameter count
-  - Function variables
-
-- Start using some markup and ideally sortable tables, rather than crappy plain text!
+Make sure you have GraphViz's 'dot' in your application path to use dependency graph visualization features.  This
+will be configurable in the future.
 
 
 =======
