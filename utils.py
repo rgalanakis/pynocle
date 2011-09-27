@@ -65,12 +65,12 @@ def write_report(filename, data, formatter_factory):
         fmt.format_report_footer()
 
 class _FindAll:
-    """Helper state class for counting lines of groups of files."""
+    """Helper state class for getting all filenames from a group of files and folders."""
     def __init__(self, files_and_folders, pattern):
         self.processed_files = []
         self.processed_files_set = set()
         self.pattern = pattern
-        self.findall(files_and_folders)
+        self.findall(map(os.path.abspath, files_and_folders))
 
     def not_yet_processed(self, filename):
         return filename not in self.processed_files_set
@@ -82,7 +82,7 @@ class _FindAll:
         files = fnmatch.filter(filenames, self.pattern)
         unique = filter(self.not_yet_processed, files)
         self.processed_files.extend(unique)
-        self.processed_files_set.intersection_update(unique)
+        self.processed_files_set.update(unique)
 
     def findall(self, files_and_folders):
         """Counts the lines of code recursively in all files and folders."""
@@ -93,8 +93,8 @@ class _FindAll:
 
 
 def find_all(files_and_folders, pattern='*.py'):
-    """Given a collection of files and folders, return all files in the collection and recursively under any folders
-    in the collection that fnmatch pattern.
+    """Given a collection of files and folders, return all the absolute path of files in the collection
+    and recursively under any folders in the collection that fnmatch pattern.
     """
     fa = _FindAll(files_and_folders, pattern)
     return fa.processed_files
