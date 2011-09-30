@@ -26,6 +26,7 @@ import shutil
 import _pynoclecover
 import cyclcompl
 import depgraph
+import funcinfo
 import inheritance
 import sloc
 
@@ -131,6 +132,12 @@ def generate_inheritance_report(codefilenames, reportfilename, formatter_factory
         f.write('Functionality not yet supported!\n\n')
         f.write(repr(classgroup))
 
+def generate_funcinfo_report(codefilenames, reportfilename, formatter_factory=None):
+    funcinfos = funcinfo.extract_funcinfos(*codefilenames)
+    with open(reportfilename, 'w') as f:
+        f.write('Functionality not yet supported!\n\n')
+        f.write(repr(funcinfos))
+
 def _generate_html_jump_str(htmlfilename, paths):
     """Generates the html contents for the jump page."""
     htmltemplate = '\n'.join(
@@ -189,6 +196,8 @@ class Monocle(object):
                  couplingrank_fmtfactory=None,
                  inheritance_filename='report_inheritance.txt',
                  inheritance_fmtfactory=None,
+                 funcinfo_filename='report_funcinfo.txt',
+                 funcinfo_fmtfactory=None,
                  htmljump_filename='index.html',
                  ):
         self.outputdir = outputdir
@@ -204,6 +213,7 @@ class Monocle(object):
         self.coupling_filename = join(coupling_filename)
         self.couplingrank_filename = join(couplingrank_filename)
         self.inheritance_filename = join(inheritance_filename)
+        self.funcinfo_filename = join(funcinfo_filename)
         self.htmljump_filename = join(htmljump_filename)
 
         self.cyclcompl_fmtfactory = cyclcompl_fmtfactory
@@ -212,7 +222,8 @@ class Monocle(object):
         self.coupling_fmtfactory = coupling_fmtfactory
         self.couplingrank_fmtfactory = couplingrank_fmtfactory
         self.inheritance_fmtfactory = inheritance_fmtfactory
-
+        self.funcinfo_fmtfactory = funcinfo_fmtfactory
+        
         self._filesforjump = []
 
     def ensure_clean_output(self):
@@ -249,7 +260,11 @@ class Monocle(object):
     def generate_inheritance_report(self):
         generate_inheritance_report(self.filenames, self.inheritance_filename, self.inheritance_fmtfactory)
         self._filesforjump.append(self.inheritance_filename)
-    
+
+    def generate_funcinfo_report(self):
+        generate_funcinfo_report(self.filenames, self.funcinfo_filename, self.funcinfo_fmtfactory)
+        self._filesforjump.append(self.funcinfo_filename)
+
     def generate_html_jump(self):
         """Generates an html page that links to any generated reports."""
         return generate_html_jump(self.htmljump_filename, *self._filesforjump)
@@ -263,13 +278,15 @@ class Monocle(object):
         """
         if cleanoutput:
             self.ensure_clean_output()
-        funcs = [self.generate_inheritance_report,
-                     self.generate_cyclomatic_complexity,
-                     self.generate_sloc,
-                     self.generate_coupling_report,
-                     self.generate_couplingrank_report,
-                     self.generate_dependency_graph,
-                     self.generate_html_jump]
+        funcs = [
+                 #self.generate_funcinfo_report,
+                 self.generate_inheritance_report,
+                 self.generate_cyclomatic_complexity,
+                 self.generate_sloc,
+                 self.generate_coupling_report,
+                 self.generate_couplingrank_report,
+                 self.generate_dependency_graph,
+                 self.generate_html_jump]
         if self.coveragedata:
             funcs.insert(0, self.generate_cover_html)
             funcs.insert(0, self.generate_cover_report)
