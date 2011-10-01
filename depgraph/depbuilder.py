@@ -10,6 +10,7 @@ import pynocle._modulefinder as modulefinder
 import pynocle.utils as utils
 
 PYTHON_EXE_DIR_FILTER = os.path.dirname(sys.executable) + '*'
+EXCLUDE_MODULES = ('sys', 'time','imp')
 
 class Dependency(object):
     """Data object that represents a single dependency with a startpoint and endpoint."""
@@ -78,7 +79,7 @@ class DepBuilder:
     exclude_modules: Any modules that match one of the strings in this collection will not be considered for
         dependencies.  This is necessary because some modules do not have filenames.
     """
-    def __init__(self, filenames, exclude_paths=(PYTHON_EXE_DIR_FILTER,), exclude_modules=('sys',)):
+    def __init__(self, filenames, exclude_paths=(PYTHON_EXE_DIR_FILTER,), exclude_modules=EXCLUDE_MODULES):
         exclude_paths += (r'C:\Program Files (x86)\JetBrains\PyCharm *',)
         self._processed = set()
         self.dependencies = []
@@ -103,6 +104,8 @@ class DepBuilder:
             return []
         if filename.endswith('.pyc'):
             filename = filename[:-1]
+        if not os.path.splitext(filename)[1]: #Has no ext whatsoever
+            filename += '.py'
         if not os.path.exists(filename):
             return []
         try:
