@@ -8,6 +8,19 @@ import tempfile
 
 import pynocle.utils as utils
 
+def lerp(minval, maxval, term):
+    return (maxval - minval) * term + minval
+
+def saturate(num, floats=True):
+    if hasattr(num, '__iter__'):
+        return [saturate(x) for x in num]
+    if num < 0:
+        return num
+    maxval = 1 if floats else 255
+    if num > maxval:
+        return maxval
+    return num
+
 class IRenderer(object):
     __metaclass__ = abc.ABCMeta
 
@@ -32,8 +45,8 @@ class IRenderer(object):
         return '[%s]' % ','.join(filter(None, [argstr, kws]))
 
     def get_output_format(self, outputfilename, overrideformat=None):
-        """Returns the format string based on the arguments (use overrideformat if provided, otherwise use
-        outputfilename's extension).
+        """Returns the file format/type/extension string based on the arguments (use overrideformat if provided,
+        otherwise use outputfilename's extension).
         """
         result = overrideformat
         if not result:
@@ -78,30 +91,46 @@ class DefaultRenderer(IRenderer):
     def _is_package(self, fullpath):
         return os.path.isdir(fullpath) or os.path.splitext(fullpath)[0].endswith('__init__')
 
+    def _write_edges(self, out):
+        """Writes all edges for all dependencies, and returns two dictionaries where the keys are the nodenames
+        and the values are the full paths.  First dictionary is for packages, second is for modules.
+        """
+        pkgs = {}
+        modules = {}
+        for startpath, endpath in self.deps:
+            startname = self.styler.nodetext(startpath)
+            endname = self.styler.nodetext(endpath)
+            if self.styler.exclude(startpath) or self.styler.exclude(endpath):
+                continue
+            edgeattrs = self.get_attr_str(weight=self.styler.weight(startname, endname))
+            out.write('    "%s" -> "%s" %s;\n' % (startname, endname, edgeattrs))
+            for fullname, purename in (startpath, startname), (endpath, endname):
+                if self._is_package(fullname):
+                    pkgs[purename] = fullname
+                else:
+                    modules[purename] = fullname
+        return pkgs, modules
+
+    def _write_clusters(self, clusters, out):
+        #subgraph cluster_Computers {label="Computers"; labelloc="b"; Computers_icon};
+        for clustername, clusternodes in clusters.items():
+            out.write('    subgraph cluster_%s {\n' % clustername)
+            out.write('        label="%s";\n' % clustername)
+            for kvp in self.styler.clusterstyle(clustername).items():
+                out.write('        %s=%s;\n' % kvp)
+            for node in clusternodes:
+                out.write('        "%s";\n' % node)
+            out.write('    }\n')
+
     def savedot(self, filename):
         with open(filename, 'w') as f:
             f.write('digraph G {\n')
-            #f.write('concentrate = true;\n')
-            #f.write('ordering = out;\n')
-            f.write('ranksep=%s;\n' % self.styler.ranksep())
-            f.write('node %s;\n' % self.get_attr_str(**self.styler.nodestyle()))
-            pkgs = {}
-            modules = {}
-            for startpt, endpt in self.deps:
-                startname = self.styler.nodetext(startpt)
-                endname = self.styler.nodetext(endpt)
-                if self.styler.exclude(startpt) or self.styler.exclude(endpt):
-                    continue
-                edgeattrs = self.get_attr_str(weight=self.styler.weight(startname, endname))
-                f.write('    "%s" -> "%s" %s;\n' % (startname, endname, edgeattrs))
-                for fullname, purename in (startpt, startname), (endpt, endname):
-                    if self._is_package(fullname):
-                        d = pkgs
-                    else:
-                        d = modules
-                    d[purename] = fullname
-
+            for kvp in self.styler.graphsettings().items():
+                f.write('    %s=%s;\n' % kvp)
+            
+            pkgs, modules = self._write_edges(f)
             failed = dict([(self.styler.nodetext(fname), fname) for fname in self.failedfiles])
+
             for dictitems, style_func in (
                 (failed.items(), self.styler.failedstyle),
                 (pkgs.items(), self.styler.packagestyle),
@@ -111,29 +140,79 @@ class DefaultRenderer(IRenderer):
                     style = style_func(self.depgroup, fullname)
                     stylestr = self.get_attr_str(**style)
                     f.write('    "%s" %s\n' % (purename, stylestr))
+
+            clusters = self.styler.create_clusters(failed.keys() + pkgs.keys() + modules.keys())
+            if clusters:
+                self._write_clusters(clusters, f)
             f.write('}')
 
 
+class RoundRobinColorChooser(object):
+    def __init__(self, colors=()):
+        self.lastind = -1
+        self.colors = colors or ('#fbb4ae', '#b3cde3', '#ccebc5', '#decbe4', '#fed9a6', '#ffffcc',
+                                 '#e5d8bd', '#fddaec', '#f2f2f2')
+
+    def next(self):
+        self.lastind += 1
+        self.lastind %= len(self.colors)
+        result = self.colors[self.lastind]
+        return result.upper()
+
+
 class DefaultStyler(object):
-    """Graph styling for dot rendering."""
+    """Graph styling for dot rendering.
+
+    All dot colors can be found here: http://www.graphviz.org/doc/info/colors.html#brewer
+    """
 
     def __init__(self, **kwargs):
         self.weight_normal = kwargs.get('weight_normal', 1)
         self.weight_heaviest = kwargs.get('weight_heaviest', 4)
-        self.max_coupling = float(kwargs.get('max_coupling', 100))
+        self.colorchooser = RoundRobinColorChooser()
 
-    def _float_col_to_hex(self, fl):
-        return hex(int(fl * 255))
+    def create_clusters(self, nodenames):
+        """Return a dictionary of {package name, (modules)), where package name will be the cluster name (and is
+        also normally the package name), and modules are the names of all nodes included in the package (including
+        the __init__ files, usually).
 
-    def _calc_color(self, depgroup, depnode):
+        Return None to disable clustering.
+        """
+        result = {}
+        for name in nodenames:
+            splitname = name.split('.')
+            first = splitname[0]
+            result.setdefault(first, [])
+            result[first].append(name)
+        for clusname, nodes in result.items():
+            if len(nodes) == 1:
+                result.pop(clusname)
+        return result
+
+    def _calc_outline_col(self, ca, maxca):
+        """Should go from black to bright blue as ca approaches maxca."""
+        bluechan = lerp(0x00, 0xff, float(ca) / maxca)
+        return '#0000%02x' % bluechan
+
+    def _calc_fill_col(self, ce, maxce):
+        """Should go from green to red as ce approaches maxce."""
+        ratio = float(ce) / maxce
+        redchan = lerp(0x00, 0xff, ratio)
+        greenchan = lerp(0xff, 0x00, ratio)
+        return '#%02x%02x00' % (redchan, greenchan)
+
+    def _calc_node_colors(self, depgroup, depnode):
+        """Returns a tuple of (outline color, fill color).  Outline color will go from black at zero Ca to red at
+        1 Ca.  Fill color will go from a green at 0 Ce to reddish at 1 Ce.
+        """
         try:
             ca = depgroup.depnode_to_ca[depnode]
             ce = depgroup.depnode_to_ce[depnode]
         except KeyError:
             return None
-        grn = utils.lerp(0, 1, ca / self.max_coupling)
-        red = utils.lerp(0, 1, ce / self.max_coupling)
-        return map(self._float_col_to_hex, (red, grn, 0))
+        outlcol = self._calc_outline_col(ca, max(depgroup.depnode_to_ca.values()))
+        fillcol = self._calc_fill_col(ce, max(depgroup.depnode_to_ce.values()))
+        return '"%s"' % outlcol, '"%s"' % fillcol
 
     def nodetext(self, s):
         """Prettifies s for rendering on the node.
@@ -165,61 +244,31 @@ class DefaultStyler(object):
             # together
             return self.weight_heaviest
         if a.startswith(b) or b.startswith(a):
-            return utils.lerp(self.weight_normal, self.weight_heaviest, .5)
+            return lerp(self.weight_normal, self.weight_heaviest, .5)
         return self.weight_normal
 
-    def ranksep(self):
-        """Return a number value that will be used for ranksep."""
-        return 1.0
+    def graphsettings(self):
+        """Returns a dictionary of top-level graph settings (ranksep, 'node', concentrate, etc.')."""
+        return {'ranksep':'1.0', 'concentrate':'true', 'compound':'true',
+                'node':'[style=filled,fontname=Arial,fontsize=10]'}
 
     def exclude(self, path):
         """Return True if a node should be excluded (such as tests)."""
         return os.path.basename(path).startswith('test')
 
-    def nodestyle(self):
-        """Return a dictionary of keys and values that will be used for overall node styling."""
-        return {'style':'filled', 'fontname': 'Arial', 'fontsize':10}
-
     def failedstyle(self, depgroup, depnode):
         """Return a dictionary of keys and values that will be used to style the nodes of failed parses."""
-        return {'shape': 'polygon', 'sides': 8, 'fillcolor':'red', 'color': 'red', 'style': 'filled',
+        return {'shape': 'polygon', 'sides': 8, 'fillcolor':'red', 'color': 'red',
                 'fontcolor':'white', 'peripheries': 2}
 
     def packagestyle(self, depgroup, depnode):
-        col = self._calc_color(depgroup, depnode)
-        return {'shape':'box', 'color':'black', 'fillcolor':'palegreen3', 'style':'filled'}
+        outline, fill = self._calc_node_colors(depgroup, depnode)
+        return {'shape':'box', 'color':outline, 'fillcolor':fill}
 
     def modulestyle(self, depgroup, depnode):
-        col = self._calc_color(depgroup, depnode)
-        return {'shape': 'ellipse', 'color':'black', 'fillcolor':'palegreen', 'style':'filled'}
+        outline, fill = self._calc_node_colors(depgroup, depnode)
+        return {'shape': 'ellipse', 'color':outline, 'fillcolor':fill}
 
-
-
-
-class pydepgraphdot:
-
-    def color(self,s,type):
-        # Return the node color for this module name. This is a default policy - please override.
-        #
-        # Calculate a color systematically based on the hash of the module name. Modules in the
-        # same package have the same color. Unpackaged modules are grey
-        t = self.normalise_module_name_for_hash_coloring(s,type)
-        return self.color_from_name(t)
-
-    def normalise_module_name_for_hash_coloring(self,s,type):
-        if type==imp.PKG_DIRECTORY:
-            return s
-        else:
-            i = s.rfind('.')
-            if i<0:
-                return ''
-            else:
-                return s[:i]
-
-    def color_from_name(self,name):
-        n = md5.md5(name).digest()
-        hf = float(ord(n[0])+ord(n[1])*0xff)/0xffff
-        sf = float(ord(n[2]))/0xff
-        vf = float(ord(n[3]))/0xff
-        r,g,b = colorsys.hsv_to_rgb(hf, 0.3+0.6*sf, 0.8+0.2*vf)
-        return '#%02x%02x%02x' % (r*256,g*256,b*256)
+    def clusterstyle(self, clustername):
+        col = '"%s"' % self.colorchooser.next()
+        return {'color':'black', 'fillcolor':col, 'style':'filled'}
