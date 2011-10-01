@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import sys
 
 import pynocle.tableprint as tableprint
@@ -10,7 +11,7 @@ DEFAULT_THRESHOLD = 5
 
 
 class CCTextFormatter(utils.IReportFormatter):
-    def __init__(self, out=sys.stdout, threshold=None, writeempty=False):
+    def __init__(self, out=sys.stdout, threshold=None, writeempty=False, leading_path=None):
         if threshold is None:
             threshold = DEFAULT_THRESHOLD
         elif threshold < 1:
@@ -18,6 +19,7 @@ class CCTextFormatter(utils.IReportFormatter):
         self.writeempty = writeempty
         self.threshold = threshold
         self._outstream = out
+        self.leading_path = leading_path
 
     def format_report_header(self):
         self._outstream.write('Cyclomatic Complexity is a measure of decisions that can be made in a procedure.\n'
@@ -35,10 +37,12 @@ class CCTextFormatter(utils.IReportFormatter):
 
     def format_data(self, files_stats_failures):
         """Formats the output of measure_cyclcompl ([filename, stats], [failures])."""
-        self.format_failures(map(utils.prettify_path, files_stats_failures[1]))
+        def prettify(s):
+            return utils.prettify_path(s, self.leading_path)
+        self.format_failures(map(prettify, files_stats_failures[1]))
         allrows = []
         for filename, stat in files_stats_failures[0]:
-            filename = utils.prettify_path(filename)
+            filename = utils.prettify_path(filename, self.leading_path)
             rows = self.format_file_and_stats(filename, stat)
             for r in rows:
                 r.insert(0, filename)

@@ -96,7 +96,7 @@ class DepBuilder:
         return path in self.exclude_modules
 
     def _extless(self, filename):
-        return os.path.splitext(filename)[0]
+        return os.path.splitext(filename.replace(os.altsep, os.sep))[0]
 
     def get_all_importnodes(self, filename):
         #We can only read py files right now

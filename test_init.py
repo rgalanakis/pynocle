@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import nose
+import os
 
 if __name__ == '__main__':
     import _pynoclecover
@@ -18,5 +19,5 @@ if __name__ == '__main__':
         else:
             raise
     import pynocle
-    m = pynocle.Monocle(outputdir='exampleoutput', coveragedata=cov)
+    m = pynocle.Monocle(outputdir='exampleoutput', coveragedata=cov, rootdir=os.path.dirname(__file__))
     m.generate_all()

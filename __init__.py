@@ -171,8 +171,8 @@ class Monocle(object):
     """Class that manages the filenames and default paths for the monocle methods.  Methods are the same as
     top-level module functions.
 
-    outputdir: Directory relative to cwd to write files.
-    files_and_folders: All files and files recursively under directories in this collection will be reported on.
+    outputdir: Directory to write reports.
+    rootdir: The root directory of the python files to search.
     coveragedata: A coverage.coverage instance.  You can get this from running coverage, or loading a coverage data
         file.
 
@@ -180,7 +180,7 @@ class Monocle(object):
     and factory methods that are used to output those reports.
     """
     def __init__(self, outputdir='output',
-                 files_and_folders=(os.getcwd(),),
+                 rootdir=None,
                  coveragedata=None,
                  coverhtml_dir='report_covhtml',
                  coverreport_filename='report_coverage.txt',
@@ -201,7 +201,10 @@ class Monocle(object):
                  htmljump_filename='index.html',
                  ):
         self.outputdir = outputdir
-        self.filenames = utils.find_all(files_and_folders)
+        if not isinstance(rootdir, basestring):
+            raise ValueError, 'Monocle only supports one root directory right now.'
+        rootdir = rootdir or os.getcwd()
+        self.filenames = utils.find_all([rootdir])
         self.coveragedata = coveragedata
 
         join = lambda x: os.path.join(self.outputdir, x)
@@ -295,6 +298,7 @@ class Monocle(object):
             try:
                 func()
             except Exception as exc:
+                raise
                 import traceback
                 excs.append((exc, traceback.format_exc()))
         if excs:

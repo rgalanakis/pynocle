@@ -9,8 +9,9 @@ import pynocle.utils as utils
 
 class CouplingTextFormatter(utils.IReportFormatter):
     """Functionality for formatting coupling info into a readable file."""
-    def __init__(self, out=sys.stdout):
+    def __init__(self, out=sys.stdout, leading_path=None):
         self._outstream = out
+        self.leading_path = leading_path
 
     def format_report_header(self):
         """Prints out a coupling explanation and header to self.out."""
@@ -42,15 +43,16 @@ class CouplingTextFormatter(utils.IReportFormatter):
             f = sortedfilenames[i]
             ca = dependencygroup.depnode_to_ca[f]
             ce = dependencygroup.depnode_to_ce[f]
-            rows.append([utils.prettify_path(f), str(ca), str(ce), self._calc_instability(ca, ce)])
+            rows.append([utils.prettify_path(f, self.leading_path), str(ca), str(ce), self._calc_instability(ca, ce)])
         tbl = tableprint.Table(header, rows, just=justs)
         tbl.write(self._outstream)
 
 
 class RankTextFormatter(utils.IReportFormatter):
     """Functionality for formatting SLOC info into a readable file."""
-    def __init__(self, out=sys.stdout):
+    def __init__(self, out=sys.stdout, leading_path=None):
         self._outstream = out
+        self.leading_path = leading_path
 
     def format_report_header(self):
         """Prints out a SLOC explanation and header to self.out."""
@@ -58,7 +60,7 @@ class RankTextFormatter(utils.IReportFormatter):
         self._outstream.write('High vaules are more "important" in the same way highly ranked webpages are.\n\n')
 
     def _fmt_rank(self, val):
-        return '%.5f' % val
+        return '%.5f' % (100 * val)
 
     def format_data(self, dependencygroup):
         header = 'Filename', 'PageRank', 'PageID', 'Outgoing Links'
@@ -67,7 +69,7 @@ class RankTextFormatter(utils.IReportFormatter):
         matrix = converter.create_matrix()
         ranking = pagerank.pageRank(matrix)
         ids = [idx for idx in range(len(matrix))]
-        filenames = [utils.prettify_path(converter.id_to_node_map[nid]) for nid in ids]
+        filenames = [utils.prettify_path(converter.id_to_node_map[nid], self.leading_path) for nid in ids]
 
         rowinfos = zip(filenames, ranking, ids, matrix)
         rowinfos.sort(key=lambda item: item[1]) #sort by ranking

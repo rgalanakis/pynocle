@@ -34,7 +34,7 @@ class IRenderer(object):
 
     def savetempdot(self):
         """Saves a dot file to a temp file and returns the filename."""
-        fd, dotpath = 1, 'C:\\temp.dot'#tempfile.mkstemp('.dot')
+        fd, dotpath = tempfile.mkstemp('.dot')
         self.savedot(dotpath)
         return dotpath
 
@@ -77,13 +77,13 @@ class IRenderer(object):
 
 
 class DefaultRenderer(IRenderer):
-    def __init__(self, dependencygroup, exe='dot'):
+    def __init__(self, dependencygroup, exe='dot', leading_path=None):
         self.depgroup = dependencygroup
         self.deps = dependencygroup.dependencies
         self.failedfiles = dependencygroup.failed
         self.exe = exe
         #Make a copy of our defaults and change any overridden ones.
-        self.styler = DefaultStyler()
+        self.styler = DefaultStyler(leading_path=leading_path)
 
     def dotexe(self):
         return self.exe
@@ -169,6 +169,7 @@ class DefaultStyler(object):
     def __init__(self, **kwargs):
         self.weight_normal = kwargs.get('weight_normal', 1)
         self.weight_heaviest = kwargs.get('weight_heaviest', 4)
+        self.leading_path = kwargs.get('leading_path') or os.getcwd()
         self.colorchooser = RoundRobinColorChooser()
 
     def create_clusters(self, nodenames):
@@ -223,9 +224,9 @@ class DefaultStyler(object):
         s2 = os.path.splitext(s2)[0]
         if s2.endswith('__init__'):
             s2 = s2[:-9] #-9 is len of __init__ and preceding path sep
-        s2 = utils.prettify_path(s2)
+        s2 = utils.prettify_path(s2, self.leading_path)
         if not s2: #We've removed the whole path, grab the cwd
-            s2 = os.getcwd().split(os.sep)[-1]
+            s2 = self.leading_path.split(os.sep)[-1]
         else:
             s2 = os.path.splitdrive(s2)[1]
             s2 = s2.replace('/', '.').replace('\\', '.')
