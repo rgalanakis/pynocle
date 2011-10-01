@@ -6,6 +6,7 @@ import fnmatch
 import os
 import sys
 
+import pynocle._modulefinder as modulefinder
 import pynocle.utils as utils
 
 PYTHON_EXE_DIR_FILTER = os.path.dirname(sys.executable) + '*'
@@ -121,7 +122,7 @@ class DepBuilder:
         impnodes = self.get_all_importnodes(filename)
         for node in impnodes:
             modulename = node.names[0][0]
-            modulefilename = self.get_module_filename(modulename, filename)
+            modulefilename = modulefinder.get_module_filename(modulename, filename)
             if modulefilename:
                 puremodulefilename = self._extless(modulefilename)
             else:
@@ -130,27 +131,3 @@ class DepBuilder:
                 self.dependencies.append(Dependency(purename, puremodulefilename))
             if modulefilename:
                 self.process_file(modulefilename)
-
-    def get_module_filename(self, modulename, importing_module_filename):
-        """Return the filename of the module at modulename that is being imported by importing_module_filename.  If
-        the module does not have a __file__ attr, return None.
-        """
-        try:
-            module = __import__(modulename)
-            module = sys.modules[modulename]
-        except ImportError:
-            #We need to support relative imports.
-            impdir = os.path.dirname(importing_module_filename)
-            modulenameslashes = modulename.replace('.', os.sep)
-            possiblepath = os.path.join(impdir, modulenameslashes + '.py')
-            if os.path.exists(possiblepath):
-                return possiblepath
-            possiblepath = os.path.join(impdir, modulenameslashes, '__init__.py')
-            if os.path.exists(possiblepath):
-                return possiblepath
-            #raise #Do we want to raise here?  Need more testing on other codebases since it doesn't raise on pynocle's
-            return None
-        if hasattr(module, '__file__'): #some modules don't have a __file__ attribute, like sys
-            return os.path.abspath(module.__file__)
-        return
-
