@@ -280,7 +280,7 @@ class Monocle(object):
             self.ensure_clean_output()
         funcs = [
                  #self.generate_funcinfo_report,
-                 self.generate_inheritance_report,
+                 #self.generate_inheritance_report,
                  self.generate_cyclomatic_complexity,
                  self.generate_sloc,
                  self.generate_coupling_report,
