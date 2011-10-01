@@ -125,9 +125,12 @@ def swap_keys_and_values(d):
         raise KeyError, 'There were duplicate values in argument.  Values: %s' % d.values()
     return result
 
-def prettify_path(path, leading=os.getcwd()):
+def prettify_path(path, leading=None):
     """If path begins with leading, strip it and remove any new leading slashes.  Also removes the extension.
+
+    leader: If None, cwd.
     """
+    leading = leading or os.getcwd()
     s = os.path.splitext(path)[0]
     if s.startswith(leading):
         s = s.replace(leading, '')

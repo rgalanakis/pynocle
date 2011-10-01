@@ -98,7 +98,10 @@ class _ModuleFinder(object):
                 return pkg
         except ImportError:
             pass
-        raise NotImplementedError
+        #At this point, we may have a module we can't do anything with.  It could be a stdlib module or something that
+        #isn't available to us, so just return nothing for now...
+        return None
+        #raise NotImplementedError
 
     def get_module_filename(self):
         """Provides a wrapper for _get_module_filename that will call maybestrip to possibly strip the ext."""

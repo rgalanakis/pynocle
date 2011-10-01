@@ -7,8 +7,9 @@ import pynocle.utils as utils
 
 class SlocTextFormatter(utils.IReportFormatter):
     """Functionality for formatting SLOC info into a readable file."""
-    def __init__(self, out=sys.stdout):
+    def __init__(self, out=sys.stdout, leading_path=None):
         self.out = out
+        self.leading_path = leading_path
 
     def outstream(self):
         return self.out
@@ -43,7 +44,7 @@ class SlocTextFormatter(utils.IReportFormatter):
         rows = []
         sortedbyfilename = sorted(slocgroup.filenamesToSlocInfos.items(), key=lambda kvp: kvp[0])
         for filename, d in sortedbyfilename:
-            row = (utils.prettify_path(filename),
+            row = (utils.prettify_path(filename, self.leading_path),
                    str(d['code']), self._fmtperc(d['codeperc']),
                    str(d['comment']), self._fmtperc(d['commentperc']),
                    str(d['blank']), self._fmtperc(d['blankperc']),
