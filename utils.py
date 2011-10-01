@@ -132,3 +132,6 @@ def prettify_path(path, leading=os.getcwd()):
     if s.startswith(leading):
         s = s.replace(leading, '')
     return s.strip('\\/')
+
+def lerp(minval, maxval, term):
+    return (maxval - minval) * term + minval
