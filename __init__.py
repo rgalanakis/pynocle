@@ -101,12 +101,12 @@ def generate_sloc(codefilenames, reportfilename, formatter_factory=None):
 def generate_dependency_graph(codefilenames, reportfilename, renderer_factory=None):
     """Generates a dependency graph image to reportfilename for the files in codefilenames.
 
-    renderer: A callable that returns an depgraph.IRenderer instance and takes a collection of depgraph.Dependency
-        instances and a collection of filenames that failed to parse as its args.  Defaults to depgraph.DefaultRenderer
+    renderer_factory: A callable that takes a depgraph.DependencyGroup instance and returns an depgraph.IRenderer
+    instance.  Defaults to depgraph.DefaultRenderer.
     """
     depb = depgraph.DepBuilder(codefilenames)
     renderer_factory = renderer_factory or depgraph.DefaultRenderer
-    renderer = renderer_factory(depb.dependencies, depb.failed)
+    renderer = renderer_factory(depgraph.DependencyGroup(depb.dependencies, depb.failed))
     renderer.render(reportfilename)
 
 def generate_coupling_report(codefilenames, reportfilename, formatter_factory=None):
