@@ -7,6 +7,13 @@ Showing items with a CC greater than or equal to 5
 WARNING: The following files failed to parse:
 	bogus
 
+_modulefinder
+--------------------------------------------------
+Type      Name                                  CC
+--------------------------------------------------
+Method    _ModuleFinder._get_module_filename    8 
+--------------------------------------------------
+
 __init__
 ------------------------------------
 Type      Name                    CC
@@ -30,12 +37,13 @@ Function    _pageRankGenerator      6
 --------------------------------------
 
 All results, sorted by CC:
-----------------------------------------------------------------
-Filename               Type        Name                       CC
-----------------------------------------------------------------
-depgraph\depbuilder    Method      DepBuilder.process_file    7 
-depgraph\pagerank      Function    _transposeLinkMatrix       7 
-depgraph\pagerank      Function    _pageRankGenerator         6 
-__init__               Method      Monocle.generate_all       5 
-----------------------------------------------------------------
+---------------------------------------------------------------------------
+Filename               Type        Name                                  CC
+---------------------------------------------------------------------------
+_modulefinder          Method      _ModuleFinder._get_module_filename    8 
+depgraph\depbuilder    Method      DepBuilder.process_file               7 
+depgraph\pagerank      Function    _transposeLinkMatrix                  7 
+depgraph\pagerank      Function    _pageRankGenerator                    6 
+__init__               Method      Monocle.generate_all                  5 
+---------------------------------------------------------------------------
 
