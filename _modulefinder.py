@@ -105,7 +105,10 @@ class _ModuleFinder(object):
 
     def get_module_filename(self):
         """Provides a wrapper for _get_module_filename that will call maybestrip to possibly strip the ext."""
-        result = self.maybestrip(self._get_module_filename())
+        result = self._get_module_filename()
+        if not result:
+            return result
+        result = self.maybestrip(result)
         if len(result) == 1:
             raise SystemError('Not a valid return value, there is a bug somewhere!')
         return result

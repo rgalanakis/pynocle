@@ -77,13 +77,13 @@ class IRenderer(object):
 
 
 class DefaultRenderer(IRenderer):
-    def __init__(self, dependencygroup, exe='dot', leading_path=None):
+    def __init__(self, dependencygroup, exe='dot', leading_path=None, styler=None):
         self.depgroup = dependencygroup
         self.deps = dependencygroup.dependencies
         self.failedfiles = dependencygroup.failed
         self.exe = exe
         #Make a copy of our defaults and change any overridden ones.
-        self.styler = DefaultStyler(leading_path=leading_path)
+        self.styler = styler or DefaultStyler(leading_path=leading_path)
 
     def dotexe(self):
         return self.exe
@@ -226,7 +226,7 @@ class DefaultStyler(object):
             s2 = s2[:-9] #-9 is len of __init__ and preceding path sep
         s2 = utils.prettify_path(s2, self.leading_path)
         if not s2: #We've removed the whole path, grab the cwd
-            s2 = self.leading_path.split(os.sep)[-1]
+            s2 = self.leading_path.replace(os.altsep, os.sep).split(os.sep)[-1]
         else:
             s2 = os.path.splitdrive(s2)[1]
             s2 = s2.replace('/', '.').replace('\\', '.')
