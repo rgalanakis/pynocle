@@ -98,33 +98,45 @@ def generate_sloc(codefilenames, reportfilename, formatter_factory=None):
     formatter_factory = formatter_factory or sloc.SlocTextFormatter
     utils.write_report(reportfilename, slocgrp, formatter_factory)
 
-def generate_dependency_graph(codefilenames, reportfilename, renderer_factory=None):
-    """Generates a dependency graph image to reportfilename for the files in codefilenames.
+def _create_dependency_group(codefilenames, dependencygroup):
+    """If dependencygroup is provided, returns that, otherwise generates a new DependencyGroup from
+    codefilenames.
+    """
+    if not dependencygroup:
+        depb = depgraph.DepBuilder(codefilenames)
+        dependencygroup = depgraph.DependencyGroup(depb.dependencies, depb.failed)
+    return dependencygroup
+
+def generate_dependency_graph(codefilenames, reportfilename, renderer_factory=None, _dependencygroup=None):
+    """Generates a dependency graph image to reportfilename for the files in codefilenames.  Returns an
+    instance of dependency_group.
 
     renderer_factory: A callable that takes a depgraph.DependencyGroup instance and returns an depgraph.IRenderer
-    instance.  Defaults to depgraph.DefaultRenderer.
+        instance.  Defaults to depgraph.DefaultRenderer.
     """
-    depb = depgraph.DepBuilder(codefilenames)
+    depgrp = _create_dependency_group(codefilenames, _dependencygroup)
     renderer_factory = renderer_factory or depgraph.DefaultRenderer
-    renderer = renderer_factory(depgraph.DependencyGroup(depb.dependencies, depb.failed))
+    renderer = renderer_factory(depgrp)
     renderer.render(reportfilename)
+    return depgrp
 
-def generate_coupling_report(codefilenames, reportfilename, formatter_factory=None):
+def generate_coupling_report(codefilenames, reportfilename, formatter_factory=None, _dependencygroup=None):
     """Generates a report for Afferent and Efferent Coupling between all modules in codefilenames, saved to
-    reportfilename.
+    reportfilename.  Returns an instance of DependencyGroup.
     """
-    depb = depgraph.DepBuilder(codefilenames)
-    depgroup = depgraph.DependencyGroup(depb.dependencies, depb.failed)
+    depgrp = _create_dependency_group(codefilenames, _dependencygroup)
     formatter_factory = formatter_factory or depgraph.CouplingTextFormatter
-    utils.write_report(reportfilename, depgroup, formatter_factory)
+    utils.write_report(reportfilename, depgrp, formatter_factory)
+    return depgrp
 
-def generate_couplingrank_report(codefilenames, reportfilename, formatter_factory=None):
+def generate_couplingrank_report(codefilenames, reportfilename, formatter_factory=None, _dependencygroup=None):
     """Generates a PageRank report for all modules in codefilenames, saved to reportfilename.
 
     formatter_factory: Callable that returns an ICouplingFormatter instance.
     """
     factory = formatter_factory or depgraph.formatting.RankTextFormatter
-    generate_coupling_report(codefilenames, reportfilename, formatter_factory=factory)
+    generate_coupling_report(codefilenames, reportfilename, formatter_factory=factory,
+                             _dependencygroup=_dependencygroup)
 
 def generate_inheritance_report(codefilenames, reportfilename, formatter_factory=None):
     classgroup = inheritance.ClassGraph(inheritance.InheritanceBuilder(codefilenames).classinfos())
@@ -203,7 +215,7 @@ class Monocle(object):
         self.outputdir = outputdir
         if not isinstance(rootdir, basestring):
             raise ValueError, 'Monocle only supports one root directory right now.'
-        rootdir = rootdir or os.getcwd()
+        rootdir = os.path.abspath(rootdir or os.getcwd())
         self.filenames = utils.find_all([rootdir])
         self.coveragedata = coveragedata
 
@@ -219,11 +231,16 @@ class Monocle(object):
         self.funcinfo_filename = join(funcinfo_filename)
         self.htmljump_filename = join(htmljump_filename)
 
-        self.cyclcompl_fmtfactory = cyclcompl_fmtfactory
-        self.sloc_fmtfactory = sloc_fmtfactory
-        self.depgraph_renderfactory = depgraph_renderfactory
-        self.coupling_fmtfactory = coupling_fmtfactory
-        self.couplingrank_fmtfactory = couplingrank_fmtfactory
+        self.cyclcompl_fmtfactory = cyclcompl_fmtfactory or (
+            lambda f: cyclcompl.CCTextFormatter(f, leading_path=rootdir))
+        self.sloc_fmtfactory = sloc_fmtfactory or (
+            lambda f: sloc.SlocTextFormatter(f, leading_path=rootdir))
+        self.depgraph_renderfactory = depgraph_renderfactory or (
+            lambda g: depgraph.DefaultRenderer(g, leading_path=rootdir))
+        self.coupling_fmtfactory = coupling_fmtfactory or (
+            lambda f: depgraph.CouplingTextFormatter(f, leading_path=rootdir))
+        self.couplingrank_fmtfactory = couplingrank_fmtfactory or (
+            lambda f: depgraph.CouplingTextFormatter(f, leading_path=rootdir))
         self.inheritance_fmtfactory = inheritance_fmtfactory
         self.funcinfo_fmtfactory = funcinfo_fmtfactory
         
@@ -248,16 +265,16 @@ class Monocle(object):
         generate_sloc(self.filenames, self.sloc_filename, self.sloc_fmtfactory)
         self._filesforjump.append(self.sloc_filename)
 
-    def generate_dependency_graph(self):
-        generate_dependency_graph(self.filenames, self.depgraph_filename, self.depgraph_renderfactory)
+    def generate_dependency_graph(self, _depgrp=None):
+        generate_dependency_graph(self.filenames, self.depgraph_filename, self.depgraph_renderfactory, _depgrp)
         self._filesforjump.append(self.depgraph_filename)
 
-    def generate_coupling_report(self):
-        generate_coupling_report(self.filenames, self.coupling_filename, self.coupling_fmtfactory)
+    def generate_coupling_report(self, _depgrp=None):
+        generate_coupling_report(self.filenames, self.coupling_filename, self.coupling_fmtfactory, _depgrp)
         self._filesforjump.append(self.coupling_filename)
 
-    def generate_couplingrank_report(self):
-        generate_couplingrank_report(self.filenames, self.couplingrank_filename, self.couplingrank_fmtfactory)
+    def generate_couplingrank_report(self, _depgrp=None):
+        generate_couplingrank_report(self.filenames, self.couplingrank_filename, self.couplingrank_fmtfactory, _depgrp)
         self._filesforjump.append(self.couplingrank_filename)
 
     def generate_inheritance_report(self):
@@ -281,25 +298,26 @@ class Monocle(object):
         """
         if cleanoutput:
             self.ensure_clean_output()
-        funcs = [
-                 #self.generate_funcinfo_report,
-                 #self.generate_inheritance_report,
-                 self.generate_cyclomatic_complexity,
-                 self.generate_sloc,
-                 self.generate_coupling_report,
-                 self.generate_couplingrank_report,
-                 self.generate_dependency_graph,
-                 self.generate_html_jump]
-        if self.coveragedata:
-            funcs.insert(0, self.generate_cover_html)
-            funcs.insert(0, self.generate_cover_report)
         excs = []
-        for func in funcs:
+        def trydo(func):
             try:
-                func()
+                return func()
             except Exception as exc:
-                raise
                 import traceback
                 excs.append((exc, traceback.format_exc()))
+
+        trydo(self.generate_sloc)
+        trydo(self.generate_cyclomatic_complexity)
+
+        if self.coveragedata:
+            trydo(self.generate_cover_report)
+            trydo(self.generate_cover_html)
+            
+        depgrp = trydo(self.generate_coupling_report)
+        depgrp = trydo(lambda: self.generate_couplingrank_report(depgrp))
+        depgrp = trydo(lambda: self.generate_dependency_graph(depgrp))
+        trydo(self.generate_html_jump)
+         #self.generate_funcinfo_report,
+         #self.generate_inheritance_report,
         if excs:
             raise utils.AggregateError, excs

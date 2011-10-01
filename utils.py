@@ -126,12 +126,13 @@ def swap_keys_and_values(d):
     return result
 
 def prettify_path(path, leading=None):
-    """If path begins with leading, strip it and remove any new leading slashes.  Also removes the extension.
+    """If path begins with leading, strip it and remove any new leading slashes.  Also removes the extension and ensures
+    all seps are os.sep.
 
     leader: If None, cwd.
     """
-    leading = leading or os.getcwd()
-    s = os.path.splitext(path)[0]
+    leading = (leading or os.getcwd()).replace(os.altsep, os.sep)
+    s = os.path.splitext(path.replace(os.altsep, os.sep))[0]
     if s.startswith(leading):
         s = s.replace(leading, '')
-    return s.strip('\\/')
+    return s.strip(os.sep)
