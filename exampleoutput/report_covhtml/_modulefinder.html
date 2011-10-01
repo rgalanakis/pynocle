@@ -24,8 +24,8 @@
         </h1>
         <img id='keyboard_icon' src='keybd_closed.png'>
         <h2 class='stats'>
-            76 statements
-            <span class='run hide_run shortkey_r' onclick='coverage.toggle_lines(this, "run")'>68 run</span>
+            75 statements
+            <span class='run hide_run shortkey_r' onclick='coverage.toggle_lines(this, "run")'>67 run</span>
             <span class='mis shortkey_m' onclick='coverage.toggle_lines(this, "mis")'>8 missing</span>
             <span class='exc shortkey_x' onclick='coverage.toggle_lines(this, "exc")'>0 excluded</span>
             
@@ -102,7 +102,7 @@
 <p id='n40' class='stm run hide_run'><a href='#n40'>40</a></p>
 <p id='n41' class='stm run hide_run'><a href='#n41'>41</a></p>
 <p id='n42' class='stm run hide_run'><a href='#n42'>42</a></p>
-<p id='n43' class='stm run hide_run'><a href='#n43'>43</a></p>
+<p id='n43' class='pln'><a href='#n43'>43</a></p>
 <p id='n44' class='stm run hide_run'><a href='#n44'>44</a></p>
 <p id='n45' class='stm run hide_run'><a href='#n45'>45</a></p>
 <p id='n46' class='stm run hide_run'><a href='#n46'>46</a></p>
@@ -226,8 +226,8 @@
 <p id='t40' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class='key'>return</span><span class='strut'>&nbsp;</span></p>
 <p id='t41' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; <span class='key'>try</span><span class='op'>:</span><span class='strut'>&nbsp;</span></p>
 <p id='t42' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class='nam'>path</span> <span class='op'>=</span> <span class='nam'>imp</span><span class='op'>.</span><span class='nam'>find_module</span><span class='op'>(</span><span class='nam'>self</span><span class='op'>.</span><span class='nam'>splitmodulename</span><span class='op'>[</span><span class='num'>0</span><span class='op'>]</span><span class='op'>)</span><span class='op'>[</span><span class='num'>1</span><span class='op'>]</span><span class='strut'>&nbsp;</span></p>
-<p id='t43' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class='key'>if</span> <span class='nam'>path</span> <span class='op'>==</span> <span class='nam'>self</span><span class='op'>.</span><span class='nam'>splitmodulename</span><span class='op'>[</span><span class='num'>0</span><span class='op'>]</span><span class='op'>:</span><span class='strut'>&nbsp;</span></p>
-<p id='t44' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class='key'>return</span> <span class='nam'>path</span><span class='strut'>&nbsp;</span></p>
+<p id='t43' class='pln'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class='com'>#if path == self.splitmodulename[0]:</span><span class='strut'>&nbsp;</span></p>
+<p id='t44' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class='key'>return</span> <span class='nam'>path</span><span class='strut'>&nbsp;</span></p>
 <p id='t45' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; <span class='key'>except</span> <span class='nam'>ImportError</span><span class='op'>:</span><span class='strut'>&nbsp;</span></p>
 <p id='t46' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class='key'>pass</span><span class='strut'>&nbsp;</span></p>
 <p id='t47' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; <span class='key'>return</span> <span class='nam'>None</span><span class='strut'>&nbsp;</span></p>

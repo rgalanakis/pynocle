@@ -22,11 +22,12 @@ Method    Monocle.generate_all    5
 ------------------------------------
 
 depgraph\depbuilder
----------------------------------------
-Type      Name                       CC
----------------------------------------
-Method    DepBuilder.process_file    7 
----------------------------------------
+----------------------------------------------
+Type      Name                              CC
+----------------------------------------------
+Method    DepBuilder.get_all_importnodes    5 
+Method    DepBuilder.process_file           7 
+----------------------------------------------
 
 depgraph\pagerank
 --------------------------------------
@@ -36,6 +37,15 @@ Function    _transposeLinkMatrix    7
 Function    _pageRankGenerator      6 
 --------------------------------------
 
+depgraph\rendering
+----------------------------------------------
+Type        Name                            CC
+----------------------------------------------
+Method      DefaultRenderer._write_edges    6 
+Method      DefaultRenderer.savedot         6 
+Function    saturate                        5 
+----------------------------------------------
+
 All results, sorted by CC:
 ---------------------------------------------------------------------------
 Filename               Type        Name                                  CC
@@ -44,6 +54,10 @@ _modulefinder          Method      _ModuleFinder._get_module_filename    8
 depgraph\depbuilder    Method      DepBuilder.process_file               7 
 depgraph\pagerank      Function    _transposeLinkMatrix                  7 
 depgraph\pagerank      Function    _pageRankGenerator                    6 
+depgraph\rendering     Method      DefaultRenderer._write_edges          6 
+depgraph\rendering     Method      DefaultRenderer.savedot               6 
 __init__               Method      Monocle.generate_all                  5 
+depgraph\depbuilder    Method      DepBuilder.get_all_importnodes        5 
+depgraph\rendering     Function    saturate                              5 
 ---------------------------------------------------------------------------
 
