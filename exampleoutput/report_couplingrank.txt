@@ -1,30 +1,33 @@
 Google's PageRank algorithm applied to Coupling
 High vaules are more "important" in the same way highly ranked webpages are.
 
---------------------------------------------------------------------------
-Filename                        PageRank    PageID    Outgoing Links      
---------------------------------------------------------------------------
-utils                           0.26797     2         []                  
-depgraph\rendering              0.06739     12        [2]                 
-tableprint                      0.06081     6         []                  
-__init__                        0.05092     1         [2, 3, 4, 8, 13, 14]
-depgraph\pagerank               0.05013     11        [2]                 
-_pynoclecover                   0.03911     3         []                  
-sloc\slocing                    0.03497     16        []                  
-sloc\formatting                 0.03497     15        [2, 6]              
-cyclcompl\statbuilder           0.03497     7         [2]                 
-cyclcompl\formatting            0.03497     5         [2, 6]              
-depgraph\xmlrpcrenderer         0.03190     21        [12]                
-depgraph\formatting             0.03077     10        [2, 6, 11]          
-depgraph\depbuilder             0.03077     9         [2]                 
-sloc\__init__                   0.02960     14        [15, 16]            
-inheritance\__init__            0.02960     13        [2]                 
-depgraph\__init__               0.02960     8         [9, 10, 12]         
-cyclcompl\__init__              0.02960     4         [5, 7]              
-depgraph\test_xmlrpcrenderer    0.02239     20        [12, 21]            
-depgraph\test_pagerank          0.02239     19        [11]                
-test_utils                      0.02239     18        [2]                 
-test_init                       0.02239     17        [1, 3]              
-setup                           0.02239     0         [1]                 
---------------------------------------------------------------------------
+--------------------------------------------------------------------
+Filename                        PageRank    PageID    Outgoing Links
+--------------------------------------------------------------------
+utils                           0.20024     7         []            
+tableprint                      0.06187     9         []            
+_modulefinder                   0.05756     5         []            
+__init__                        0.05466     1         []            
+depgraph\pagerank               0.05319     14        []            
+depgraph\rendering              0.04105     15        [7]           
+sloc\slocing                    0.03424     24        []            
+sloc\formatting                 0.03424     22        [7, 9]        
+depgraph\xmlrpcrenderer         0.03424     18        []            
+cyclcompl\statbuilder           0.03424     10        [7]           
+cyclcompl\formatting            0.03424     8         [7, 9]        
+_pynoclecover                   0.03424     3         []            
+depgraph\formatting             0.03084     13        [7, 9, 14]    
+depgraph\depbuilder             0.03084     12        [5, 7]        
+sloc\__init__                   0.02403     23        [22, 24]      
+inheritance\__init__            0.02403     21        [7]           
+funcinfo\__init__               0.02403     20        [7]           
+depgraph\__init__               0.02403     19        [12, 13, 15]  
+depgraph\test_xmlrpcrenderer    0.02403     17        [15, 18]      
+depgraph\test_pagerank          0.02403     16        [14]          
+cyclcompl\__init__              0.02403     11        [8, 10]       
+test_utils                      0.02403     6         [7]           
+test_modulefinder               0.02403     4         [5]           
+test_init                       0.02403     2         [1, 3]        
+setup                           0.02403     0         [1]           
+--------------------------------------------------------------------
 
