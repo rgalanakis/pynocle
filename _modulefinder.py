@@ -40,8 +40,8 @@ class _ModuleFinder(object):
             return
         try:
             path = imp.find_module(self.splitmodulename[0])[1]
-            if path == self.splitmodulename[0]:
-                return path
+            #if path == self.splitmodulename[0]:
+            return path
         except ImportError:
             pass
         return None
