@@ -1,0 +1,56 @@
+<html>
+  <head>
+    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+    <script type='text/javascript'>
+      google.load('visualization', '1', {packages:['table']});
+      google.setOnLoadCallback(drawTable);
+      function drawTable() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Filename');
+        data.addColumn('number', 'PageRank');
+        data.addColumn('number', 'PageID');
+        data.addColumn('string', 'Outgoing Links');
+
+        data.addRow(['utils', {'f': '17.87886', 'v': 0.17878865}, 2, '[]']);
+        data.addRow(['sys', {'f': '10.98029', 'v': 0.10980286}, 10, '[]']);
+        data.addRow(['depgraph\\rendering', {'f': '4.04187', 'v': 0.040418655}, 22, '[2]']);
+        data.addRow(['__init__', {'f': '3.72630', 'v': 0.037262954}, 1, '[2, 3, 4, 5, 6, 7, 8]']);
+        data.addRow(['depgraph\\pagerank', {'f': '3.70776', 'v': 0.037077609}, 21, '[2]']);
+        data.addRow(['tableprint', {'f': '3.63362', 'v': 0.036336236}, 9, '[10]']);
+        data.addRow(['_modulefinder', {'f': '3.12420', 'v': 0.031242022}, 13, '[10, 14]']);
+        data.addRow(['imp', {'f': '3.07456', 'v': 0.030745625}, 14, '[]']);
+        data.addRow(['_pynoclecover', {'f': '2.69414', 'v': 0.026941357}, 3, '[]']);
+        data.addRow(['sloc\\slocing', {'f': '2.48905', 'v': 0.024890512}, 31, '[]']);
+        data.addRow(['sloc\\formatting', {'f': '2.48905', 'v': 0.024890512}, 29, '[2, 9, 10]']);
+        data.addRow(['depgraph\\xmlrpcrenderer', {'f': '2.48905', 'v': 0.024890512}, 25, '[10, 22]']);
+        data.addRow(['cyclcompl\\statbuilder', {'f': '2.48905', 'v': 0.024890512}, 17, '[2]']);
+        data.addRow(['cyclcompl\\formatting', {'f': '2.48905', 'v': 0.024890512}, 16, '[2, 9, 10]']);
+        data.addRow(['depgraph\\formatting', {'f': '2.24160', 'v': 0.022416024}, 20, '[2, 9, 10, 21]']);
+        data.addRow(['depgraph\\depbuilder', {'f': '2.24160', 'v': 0.022416024}, 19, '[2, 10, 13]']);
+        data.addRow(['sloc', {'f': '2.19924', 'v': 0.021992382}, 8, '[]']);
+        data.addRow(['inheritance', {'f': '2.19924', 'v': 0.021992382}, 7, '[]']);
+        data.addRow(['funcinfo', {'f': '2.19924', 'v': 0.021992382}, 6, '[]']);
+        data.addRow(['depgraph', {'f': '2.19924', 'v': 0.021992382}, 5, '[]']);
+        data.addRow(['cyclcompl', {'f': '2.19924', 'v': 0.021992382}, 4, '[]']);
+        data.addRow(['sloc\\__init__', {'f': '1.74670', 'v': 0.017467046}, 30, '[29, 31]']);
+        data.addRow(['inheritance\\__init__', {'f': '1.74670', 'v': 0.017467046}, 28, '[2]']);
+        data.addRow(['funcinfo\\__init__', {'f': '1.74670', 'v': 0.017467046}, 27, '[2]']);
+        data.addRow(['depgraph\\__init__', {'f': '1.74670', 'v': 0.017467046}, 26, '[19, 20, 22]']);
+        data.addRow(['depgraph\\test_xmlrpcrenderer', {'f': '1.74670', 'v': 0.017467046}, 24, '[22, 25]']);
+        data.addRow(['depgraph\\test_pagerank', {'f': '1.74670', 'v': 0.017467046}, 23, '[21]']);
+        data.addRow(['cyclcompl\\__init__', {'f': '1.74670', 'v': 0.017467046}, 18, '[16, 17]']);
+        data.addRow(['test_utils', {'f': '1.74670', 'v': 0.017467046}, 15, '[2]']);
+        data.addRow(['test_modulefinder', {'f': '1.74670', 'v': 0.017467046}, 12, '[10, 13]']);
+        data.addRow(['test_init', {'f': '1.74670', 'v': 0.017467046}, 11, '[1, 3, 10]']);
+        data.addRow(['setup', {'f': '1.74670', 'v': 0.017467046}, 0, '[1]']);
+
+        var table = new google.visualization.Table(document.getElementById('table_div'));
+        table.draw(data, {showRowNumber: true});
+      }
+    </script>
+  </head>
+
+  <body>
+    <div id='table_div'></div>
+  </body>
+</html>
