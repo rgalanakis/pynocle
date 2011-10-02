@@ -24,8 +24,8 @@
         </h1>
         <img id='keyboard_icon' src='keybd_closed.png'>
         <h2 class='stats'>
-            65 statements
-            <span class='run hide_run shortkey_r' onclick='coverage.toggle_lines(this, "run")'>60 run</span>
+            66 statements
+            <span class='run hide_run shortkey_r' onclick='coverage.toggle_lines(this, "run")'>61 run</span>
             <span class='mis shortkey_m' onclick='coverage.toggle_lines(this, "mis")'>5 missing</span>
             <span class='exc shortkey_x' onclick='coverage.toggle_lines(this, "exc")'>0 excluded</span>
             
@@ -190,10 +190,14 @@
 <p id='n128' class='stm run hide_run'><a href='#n128'>128</a></p>
 <p id='n129' class='pln'><a href='#n129'>129</a></p>
 <p id='n130' class='pln'><a href='#n130'>130</a></p>
-<p id='n131' class='stm run hide_run'><a href='#n131'>131</a></p>
-<p id='n132' class='stm run hide_run'><a href='#n132'>132</a></p>
-<p id='n133' class='stm run hide_run'><a href='#n133'>133</a></p>
+<p id='n131' class='pln'><a href='#n131'>131</a></p>
+<p id='n132' class='pln'><a href='#n132'>132</a></p>
+<p id='n133' class='pln'><a href='#n133'>133</a></p>
 <p id='n134' class='stm run hide_run'><a href='#n134'>134</a></p>
+<p id='n135' class='stm run hide_run'><a href='#n135'>135</a></p>
+<p id='n136' class='stm run hide_run'><a href='#n136'>136</a></p>
+<p id='n137' class='stm run hide_run'><a href='#n137'>137</a></p>
+<p id='n138' class='stm run hide_run'><a href='#n138'>138</a></p>
                 
             </td>
             <td class='text' valign='top'>
@@ -324,13 +328,17 @@
 <p id='t125' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; <span class='key'>raise</span> <span class='nam'>KeyError</span><span class='op'>,</span> <span class='str'>&#39;There were duplicate values in argument.&nbsp; Values: %s&#39;</span> <span class='op'>%</span> <span class='nam'>d</span><span class='op'>.</span><span class='nam'>values</span><span class='op'>(</span><span class='op'>)</span><span class='strut'>&nbsp;</span></p>
 <p id='t126' class='stm run hide_run'>&nbsp; &nbsp; <span class='key'>return</span> <span class='nam'>result</span><span class='strut'>&nbsp;</span></p>
 <p id='t127' class='pln'><span class='strut'>&nbsp;</span></p>
-<p id='t128' class='stm run hide_run'><span class='key'>def</span> <span class='nam'>prettify_path</span><span class='op'>(</span><span class='nam'>path</span><span class='op'>,</span> <span class='nam'>leading</span><span class='op'>=</span><span class='nam'>os</span><span class='op'>.</span><span class='nam'>getcwd</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span><span class='op'>:</span><span class='strut'>&nbsp;</span></p>
-<p id='t129' class='pln'>&nbsp; &nbsp; <span class='str'>&quot;&quot;&quot;If path begins with leading, strip it and remove any new leading slashes.&nbsp; Also removes the extension.</span><span class='strut'>&nbsp;</span></p>
-<p id='t130' class='pln'><span class='str'>&nbsp; &nbsp; &quot;&quot;&quot;</span><span class='strut'>&nbsp;</span></p>
-<p id='t131' class='stm run hide_run'>&nbsp; &nbsp; <span class='nam'>s</span> <span class='op'>=</span> <span class='nam'>os</span><span class='op'>.</span><span class='nam'>path</span><span class='op'>.</span><span class='nam'>splitext</span><span class='op'>(</span><span class='nam'>path</span><span class='op'>)</span><span class='op'>[</span><span class='num'>0</span><span class='op'>]</span><span class='strut'>&nbsp;</span></p>
-<p id='t132' class='stm run hide_run'>&nbsp; &nbsp; <span class='key'>if</span> <span class='nam'>s</span><span class='op'>.</span><span class='nam'>startswith</span><span class='op'>(</span><span class='nam'>leading</span><span class='op'>)</span><span class='op'>:</span><span class='strut'>&nbsp;</span></p>
-<p id='t133' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; <span class='nam'>s</span> <span class='op'>=</span> <span class='nam'>s</span><span class='op'>.</span><span class='nam'>replace</span><span class='op'>(</span><span class='nam'>leading</span><span class='op'>,</span> <span class='str'>&#39;&#39;</span><span class='op'>)</span><span class='strut'>&nbsp;</span></p>
-<p id='t134' class='stm run hide_run'>&nbsp; &nbsp; <span class='key'>return</span> <span class='nam'>s</span><span class='op'>.</span><span class='nam'>strip</span><span class='op'>(</span><span class='str'>&#39;\\/&#39;</span><span class='op'>)</span><span class='strut'>&nbsp;</span></p>
+<p id='t128' class='stm run hide_run'><span class='key'>def</span> <span class='nam'>prettify_path</span><span class='op'>(</span><span class='nam'>path</span><span class='op'>,</span> <span class='nam'>leading</span><span class='op'>=</span><span class='nam'>None</span><span class='op'>)</span><span class='op'>:</span><span class='strut'>&nbsp;</span></p>
+<p id='t129' class='pln'>&nbsp; &nbsp; <span class='str'>&quot;&quot;&quot;If path begins with leading, strip it and remove any new leading slashes.&nbsp; Also removes the extension and ensures</span><span class='strut'>&nbsp;</span></p>
+<p id='t130' class='pln'><span class='str'>&nbsp; &nbsp; all seps are os.sep.</span><span class='strut'>&nbsp;</span></p>
+<p id='t131' class='pln'><span class='strut'>&nbsp;</span></p>
+<p id='t132' class='pln'><span class='str'>&nbsp; &nbsp; leader: If None, cwd.</span><span class='strut'>&nbsp;</span></p>
+<p id='t133' class='pln'><span class='str'>&nbsp; &nbsp; &quot;&quot;&quot;</span><span class='strut'>&nbsp;</span></p>
+<p id='t134' class='stm run hide_run'>&nbsp; &nbsp; <span class='nam'>leading</span> <span class='op'>=</span> <span class='op'>(</span><span class='nam'>leading</span> <span class='key'>or</span> <span class='nam'>os</span><span class='op'>.</span><span class='nam'>getcwd</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span><span class='op'>.</span><span class='nam'>replace</span><span class='op'>(</span><span class='nam'>os</span><span class='op'>.</span><span class='nam'>altsep</span><span class='op'>,</span> <span class='nam'>os</span><span class='op'>.</span><span class='nam'>sep</span><span class='op'>)</span><span class='strut'>&nbsp;</span></p>
+<p id='t135' class='stm run hide_run'>&nbsp; &nbsp; <span class='nam'>s</span> <span class='op'>=</span> <span class='nam'>os</span><span class='op'>.</span><span class='nam'>path</span><span class='op'>.</span><span class='nam'>splitext</span><span class='op'>(</span><span class='nam'>path</span><span class='op'>.</span><span class='nam'>replace</span><span class='op'>(</span><span class='nam'>os</span><span class='op'>.</span><span class='nam'>altsep</span><span class='op'>,</span> <span class='nam'>os</span><span class='op'>.</span><span class='nam'>sep</span><span class='op'>)</span><span class='op'>)</span><span class='op'>[</span><span class='num'>0</span><span class='op'>]</span><span class='strut'>&nbsp;</span></p>
+<p id='t136' class='stm run hide_run'>&nbsp; &nbsp; <span class='key'>if</span> <span class='nam'>s</span><span class='op'>.</span><span class='nam'>startswith</span><span class='op'>(</span><span class='nam'>leading</span><span class='op'>)</span><span class='op'>:</span><span class='strut'>&nbsp;</span></p>
+<p id='t137' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; <span class='nam'>s</span> <span class='op'>=</span> <span class='nam'>s</span><span class='op'>.</span><span class='nam'>replace</span><span class='op'>(</span><span class='nam'>leading</span><span class='op'>,</span> <span class='str'>&#39;&#39;</span><span class='op'>)</span><span class='strut'>&nbsp;</span></p>
+<p id='t138' class='stm run hide_run'>&nbsp; &nbsp; <span class='key'>return</span> <span class='nam'>s</span><span class='op'>.</span><span class='nam'>strip</span><span class='op'>(</span><span class='nam'>os</span><span class='op'>.</span><span class='nam'>sep</span><span class='op'>)</span><span class='strut'>&nbsp;</span></p>
                 
             </td>
         </tr>

@@ -303,6 +303,7 @@ class Monocle(object):
             try:
                 return func()
             except Exception as exc:
+                #raise
                 import traceback
                 excs.append((exc, traceback.format_exc()))
 
