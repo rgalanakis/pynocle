@@ -10,7 +10,7 @@ import pynocle.utils as utils
 DEFAULT_THRESHOLD = 5
 
 
-class CCTextFormatter(utils.IReportFormatter):
+class _CCFormatter(utils.IReportFormatter):
     def __init__(self, out=sys.stdout, threshold=None, writeempty=False, leading_path=None):
         if threshold is None:
             threshold = DEFAULT_THRESHOLD
@@ -20,6 +20,14 @@ class CCTextFormatter(utils.IReportFormatter):
         self.threshold = threshold
         self._outstream = out
         self.leading_path = leading_path
+
+    def above_threshold(self, flatstat):
+        return flatstat[2] >= self.threshold #ind 2 is cc amount
+
+    def prettify(self, s):
+        return utils.prettify_path(s, self.leading_path)
+
+class CCTextFormatter(_CCFormatter):
 
     def format_report_header(self):
         self._outstream.write('Cyclomatic Complexity is a measure of decisions that can be made in a procedure.\n'
@@ -37,12 +45,10 @@ class CCTextFormatter(utils.IReportFormatter):
 
     def format_data(self, files_stats_failures):
         """Formats the output of measure_cyclcompl ([filename, stats], [failures])."""
-        def prettify(s):
-            return utils.prettify_path(s, self.leading_path)
-        self.format_failures(map(prettify, files_stats_failures[1]))
+        self.format_failures(map(self.prettify, files_stats_failures[1]))
         allrows = []
         for filename, stat in files_stats_failures[0]:
-            filename = utils.prettify_path(filename, self.leading_path)
+            filename = self.prettify(filename)
             rows = self.format_file_and_stats(filename, stat)
             for r in rows:
                 r.insert(0, filename)
@@ -54,9 +60,8 @@ class CCTextFormatter(utils.IReportFormatter):
 
     def _get_table_for_stats(self, stats):
         rows = []
-        for type, name, cc in stats.flatStats:
-            if cc >= self.threshold:
-                rows.append([type, name, str(cc)])
+        for type, name, cc in filter(self.above_threshold, stats.flatStats):
+            rows.append([type, name, str(cc)])
         tbl = tableprint.Table(['Type', 'Name', 'CC'], rows)
         return tbl
 
@@ -69,4 +74,24 @@ class CCTextFormatter(utils.IReportFormatter):
         elif self.writeempty:
             self._outstream.write('No items with a CC >= %s\n\n' % self.threshold)
         return tbl.rows
+
+
+class CCGoogleChartFormatter(_CCFormatter):
+
+    def format_report_header(self):
+        cols = ('Filename', 'string'), ('Type', 'string'), ('Name', 'string'), ('CC', 'number')
+        self.outstream().write(tableprint.googlechart_table_html_header(colnames_and_types=cols))
+
+    def format_report_footer(self):
+        self.outstream().write(tableprint.googlechart_table_html_footer())
+
+    def format_data(self, files_stats_failures):
+        """Formats the output of measure_cyclcompl ([filename, stats], [failures])."""
+        rows = []
+        for filename, stats in files_stats_failures[0]:
+            filename = utils.prettify_path(filename, self.leading_path)
+            for type, name, cc in filter(self.above_threshold, stats.flatStats):
+                rows.append([filename, type, name, cc])
+        for row in rows:
+            self.outstream().write('        data.addRow(%s);\n' % row)
 

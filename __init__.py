@@ -9,7 +9,7 @@ create a new Monocle object with the directories and files you want to analyze
 
 __author__ = "Rob Galanakis"
 __copyright__ = "Copyright 2011, Rob Galanakis"
-__version__ = "0.1.21"
+__version__ = "0.1.23"
 __email__ = "rob.galanakis@gmail.com"
 __status__ = "Pre-Alpha"
 
@@ -95,7 +95,7 @@ def generate_sloc(codefilenames, reportfilename, formatter_factory=None):
         to format the report.
     """
     slocgrp = sloc.SlocGroup(codefilenames)
-    formatter_factory = formatter_factory or sloc.SlocTextFormatter
+    formatter_factory = formatter_factory or sloc.SlocGoogleChartFormatter
     utils.write_report(reportfilename, slocgrp, formatter_factory)
 
 def _create_dependency_group(codefilenames, dependencygroup):
@@ -125,7 +125,7 @@ def generate_coupling_report(codefilenames, reportfilename, formatter_factory=No
     reportfilename.  Returns an instance of DependencyGroup.
     """
     depgrp = _create_dependency_group(codefilenames, _dependencygroup)
-    formatter_factory = formatter_factory or depgraph.CouplingTextFormatter
+    formatter_factory = formatter_factory or depgraph.CouplingGoogleChartFormatter
     utils.write_report(reportfilename, depgrp, formatter_factory)
     return depgrp
 
@@ -134,7 +134,7 @@ def generate_couplingrank_report(codefilenames, reportfilename, formatter_factor
 
     formatter_factory: Callable that returns an ICouplingFormatter instance.
     """
-    factory = formatter_factory or depgraph.formatting.RankTextFormatter
+    factory = formatter_factory or depgraph.RankGoogleChartFormatter
     generate_coupling_report(codefilenames, reportfilename, formatter_factory=factory,
                              _dependencygroup=_dependencygroup)
 
@@ -187,6 +187,7 @@ class Monocle(object):
     rootdir: The root directory of the python files to search.
     coveragedata: A coverage.coverage instance.  You can get this from running coverage, or loading a coverage data
         file.
+    debug: If True, fail early instead of failing after all report generation.
 
     Other arguments are filenames relative to outputdir that reports will be written to,
     and factory methods that are used to output those reports.
@@ -196,28 +197,29 @@ class Monocle(object):
                  coveragedata=None,
                  coverhtml_dir='report_covhtml',
                  coverreport_filename='report_coverage.txt',
-                 cyclcompl_filename='report_cyclcompl.txt',
+                 cyclcompl_filename='report_cyclcompl.html',
                  cyclcompl_fmtfactory=None,
-                 sloc_filename='report_sloc.txt',
+                 sloc_filename='report_sloc.html',
                  sloc_fmtfactory=None,
                  depgraph_filename='depgraph.png',
                  depgraph_renderfactory=None,
-                 coupling_filename='report_coupling.txt',
+                 coupling_filename='report_coupling.html',
                  coupling_fmtfactory=None,
-                 couplingrank_filename='report_couplingrank.txt',
+                 couplingrank_filename='report_couplingrank.html',
                  couplingrank_fmtfactory=None,
                  inheritance_filename='report_inheritance.txt',
                  inheritance_fmtfactory=None,
                  funcinfo_filename='report_funcinfo.txt',
                  funcinfo_fmtfactory=None,
                  htmljump_filename='index.html',
-                 ):
+                 debug=False):
         self.outputdir = outputdir
         if not isinstance(rootdir, basestring):
             raise ValueError, 'Monocle only supports one root directory right now.'
         rootdir = os.path.abspath(rootdir or os.getcwd())
         self.filenames = utils.find_all([rootdir])
         self.coveragedata = coveragedata
+        self.debug = debug
 
         join = lambda x: os.path.join(self.outputdir, x)
         self.coverhtml_dir = join(coverhtml_dir)
@@ -232,15 +234,15 @@ class Monocle(object):
         self.htmljump_filename = join(htmljump_filename)
 
         self.cyclcompl_fmtfactory = cyclcompl_fmtfactory or (
-            lambda f: cyclcompl.CCTextFormatter(f, leading_path=rootdir))
+            lambda f: cyclcompl.CCGoogleChartFormatter(f, leading_path=rootdir))
         self.sloc_fmtfactory = sloc_fmtfactory or (
-            lambda f: sloc.SlocTextFormatter(f, leading_path=rootdir))
+            lambda f: sloc.SlocGoogleChartFormatter(f, leading_path=rootdir))
         self.depgraph_renderfactory = depgraph_renderfactory or (
             lambda g: depgraph.DefaultRenderer(g, leading_path=rootdir))
         self.coupling_fmtfactory = coupling_fmtfactory or (
-            lambda f: depgraph.CouplingTextFormatter(f, leading_path=rootdir))
+            lambda f: depgraph.CouplingGoogleChartFormatter(f, leading_path=rootdir))
         self.couplingrank_fmtfactory = couplingrank_fmtfactory or (
-            lambda f: depgraph.CouplingTextFormatter(f, leading_path=rootdir))
+            lambda f: depgraph.RankGoogleChartFormatter(f, leading_path=rootdir))
         self.inheritance_fmtfactory = inheritance_fmtfactory
         self.funcinfo_fmtfactory = funcinfo_fmtfactory
         
@@ -300,10 +302,11 @@ class Monocle(object):
             self.ensure_clean_output()
         excs = []
         def trydo(func):
+            if self.debug:
+                return func()
             try:
                 return func()
             except Exception as exc:
-                #raise
                 import traceback
                 excs.append((exc, traceback.format_exc()))
 

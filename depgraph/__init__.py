@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 
 import depbuilder
-from depbuilder import DepBuilder
-from depbuilder import DependencyGroup
+from depbuilder import DepBuilder, DependencyGroup
 import formatting
-from formatting import CouplingTextFormatter
-from formatting import RankTextFormatter
+from formatting import CouplingTextFormatter, CouplingGoogleChartFormatter, RankTextFormatter, RankGoogleChartFormatter
 import rendering
 from rendering import IRenderer, DefaultRenderer
