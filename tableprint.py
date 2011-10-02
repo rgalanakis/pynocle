@@ -2,7 +2,6 @@
 """
 Module that handles the formatting of table information.
 """
-
 import StringIO
 import sys
 
@@ -71,36 +70,53 @@ class Table(object):
         return sio.getvalue()
 
 
-def googlechart_table_html_header(table_var='data', colnames_and_types=()):
-    """Return the html header for a googlecharts table.
+class GoogleChartTable(object):
+    """Helper for writing out table data using Google Chart Tools.
 
-    table_var: The name of the DataTable variable in the JS.
-    colnames_and_types: Collection of two item tuples that define the type and name of the columns.
+    colnames_and_types: Shoudl be a collection of two item tuples that specify the type and name of the columns, ie:
+        [('Filename', 'string'), ('Value', 'number')]
+    table_var: The variable name for the DataTable object in JS.
     """
-    lines =["""<html>
-  <head>
-    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
-    <script type='text/javascript'>
-      google.load('visualization', '1', {packages:['table']});
-      google.setOnLoadCallback(drawTable);
-      function drawTable() {
-        var %s = new google.visualization.DataTable();""" % table_var]
-    for colname, coltype in colnames_and_types:
-        lines.append("        data.addColumn('%s', '%s');" % (coltype, colname))
-    lines.append('\n')
-    return '\n'.join(lines)
+    def __init__(self, colnames_and_types, table_var='data'):
+        self.colnames_and_types = colnames_and_types
+        self.table_var = table_var
 
+    def first_part(self):
+        """Returns the first part of the html file for a table as a string.  Includes the table column definitions.
+        After this, the caller should call the 'second_part' function to fill the table with actual data.
+        """
+        lines =["""<html>
+      <head>
+        <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+        <script type='text/javascript'>
+          google.load('visualization', '1', {packages:['table']});
+          google.setOnLoadCallback(drawTable);
+          function drawTable() {
+            var %s = new google.visualization.DataTable();""" % self.table_var]
+        for colname, coltype in self.colnames_and_types:
+            lines.append("        data.addColumn('%s', '%s');" % (coltype, colname))
+        lines.append('\n')
+        return '\n'.join(lines)
 
-def googlechart_table_html_footer(table_var='data'):
-        return """
-        var table = new google.visualization.Table(document.getElementById('table_div'));
+    def second_part(self, rows):
+        """Writes each row in rows to the table, using formatstr."""
+        entrystr = '        data.addRow(%s);\n'
+        return '\n'.join([entrystr % row for row in rows])
+
+    def last_part(self, abovetable='', belowtable=''):
+        """Returns the final part of the html file for a table as a string.  This includes the actual drawing,
+        and the rest of the html head/body elements.
+
+        abovetable: Any HTML to include above the table.
+        belowtable: Any HTML to include below the table.
+        """
+        return """\nvar table = new google.visualization.Table(document.getElementById('table_div'));
         table.draw(%s, {showRowNumber: true});
       }
     </script>
   </head>
 
   <body>
-    <div id='table_div'></div>
+    %s<div id='table_div'></div>%s
   </body>
-</html>
-""" % table_var
+</html>""" % (self.table_var, abovetable, belowtable)

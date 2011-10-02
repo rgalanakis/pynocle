@@ -20,10 +20,17 @@ if __name__ == '__main__':
         else:
             raise
     import pynocle
-    #os.chdir('..')
     dirname = os.path.dirname(__file__)
-    m = pynocle.Monocle(outputdir=os.path.join(dirname, 'exampleoutput'), coveragedata=cov, rootdir=dirname, debug=True)
+    outdir = os.path.join(dirname, 'exampleoutput')
+    m = pynocle.Monocle(outdir, rootdir=dirname, coveragedata=cov, debug=True)
     #root = os.path.join(dirname, '..', 'pipeline')
     #sys.path.append(root)
     #m = pynocle.Monocle(outputdir=r'C:\testmetrics', rootdir=root)
     m.generate_all()
+    m2 = pynocle.Monocle(outdir, rootdir=dirname, debug=True,
+                         cyclcompl_filename='report_cyclcompl.txt',
+                         coupling_filename='report_coupling.txt',
+                         couplingrank_filename='report_couplingrank.txt',
+                         sloc_filename='report_sloc.txt')
+    m2._filesforjump.update(m._filesforjump)
+    m2.generate_all(False)

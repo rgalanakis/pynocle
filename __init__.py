@@ -29,10 +29,16 @@ import depgraph
 import sloc
 
 def _check_coverage():
+    """If coverage is a MissingDependencyError (as opposed to a module), raise.  We do this so we don't fail if we
+    try to import coverage.
+    """
     if type(coverage) == utils.MissingDependencyError:
         raise coverage
 
 def run_with_coverage(func, **coveragekwargs):
+    """Runs and returns the result of func (a parameterless function).  coveragekwargs are used to create a
+    coverage.coverage instance.
+    """
     _check_coverage()
     return _pynoclecover.run_with_coverage(func, **coveragekwargs)
 
@@ -98,8 +104,7 @@ def generate_html_jump(filename, *paths):
         f.write(_generate_html_jump_str(filename, sorted(paths)))
 
 class Monocle(object):
-    """Class that manages the filenames and default paths for the monocle methods.  Methods are the same as
-    top-level module functions.
+    """Entry point for all metrics generation.
 
     outputdir: Directory to write reports.
     rootdir: The root directory of the python files to search.
@@ -107,8 +112,9 @@ class Monocle(object):
         file.
     debug: If True, fail early instead of failing after all report generation.
 
-    Other arguments are filenames relative to outputdir that reports will be written to,
-    and factory methods that are used to output those reports.
+    *_filename/*_dir: File/directory names to output metrics to.  IReportFormatter instances will be chosen
+    per-report based on the filename extension.  In order to override this mapping or provide your own formatter,
+    modify the *_formatter_registry objects in each module.  Better override support will be added in the future.
     """
     def __init__(self, outputdir='output',
                  rootdir=None,
@@ -179,25 +185,22 @@ class Monocle(object):
         self._filesforjump.add(self.coverreport_filename)
 
     def generate_cyclomatic_complexity(self):
-        """Generates a cyclomatic complexity report based on all the files in codefilenames, output to reportfilename.
+        """Generates a cyclomatic complexity report for all files in self.files, output to self.cyclcompl_filename.
         """
         ccdata, failures = cyclcompl.measure_cyclcompl(self.filenames)
         utils.write_report(self.cyclcompl_filename, (ccdata, failures), self.cyclcompl_fmtfactory)
         self._filesforjump.add(self.cyclcompl_filename)
 
     def generate_sloc(self):
-        """Generates a Source Lines of Code report for files in codefilenames, output to reportfilename.
-
-        formatter_factory: Callable that takes the filestream of reportfilename returns the sloc.ISlocFormatter to use
-            to format the report.
+        """Generates a Source Lines of Code report for all files in self.files, output to self.sloc_filename.
         """
         slocgrp = sloc.SlocGroup(self.filenames)
         utils.write_report(self.sloc_filename, slocgrp, self.sloc_fmtfactory)
         self._filesforjump.add(self.sloc_filename)
 
     def generate_dependency_graph(self, _depgrp=None):
-        """Generates a dependency graph image to reportfilename for the files in codefilenames.  Returns an
-        instance of dependency_group.
+        """Generates a dependency graph image to self.depgraph_filename for the files in self.files.  Returns an
+        instance of DependencyGroup.
         """
         depgrp = _create_dependency_group(self.filenames, _depgrp)
         renderer = self.depgraph_renderfactory(depgrp)
@@ -206,8 +209,8 @@ class Monocle(object):
         return depgrp
 
     def generate_coupling_report(self, _depgrp=None):
-        """Generates a report for Afferent and Efferent Coupling between all modules in codefilenames, saved to
-        reportfilename.  Returns an instance of DependencyGroup.
+        """Generates a report for Afferent and Efferent Coupling between all modules in self.filenames, saved to
+        self.coupling_filename.  Returns an instance of DependencyGroup.
         """
         depgrp = _create_dependency_group(self.filenames, _depgrp)
         utils.write_report(self.coupling_filename, depgrp, self.coupling_fmtfactory)
@@ -215,9 +218,8 @@ class Monocle(object):
         return depgrp
 
     def generate_couplingrank_report(self, _depgrp=None):
-        """Generates a PageRank report for all modules in codefilenames, saved to reportfilename.
-
-        formatter_factory: Callable that returns an ICouplingFormatter instance.
+        """Generates a PageRank report for all code in self.filenames to self.couplingrank_filename.  Returns an
+        instance of DependencyGroup.
         """
         depgrp = _create_dependency_group(self.filenames, _depgrp)
         utils.write_report(self.couplingrank_filename, depgrp, self.couplingrank_fmtfactory)
@@ -232,7 +234,8 @@ class Monocle(object):
         """Run all report generation functions.
 
         If coveragedata is not set, skip the coverage functions.
-        Raises an AggregateError after all functions run if any function raises.
+        If not self.debug, raises an AggregateError after all functions run if any function raises (so metrics will
+            be generated for any function that succeeds).
         cleanoutput: If True, run ensure_clean_output to clear the output directory.
         """
         if cleanoutput:

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Functions for finding modules so pynocle doesn't have to go through python's import machinery.  Ideally it does
 not have to run any code in order to analyze.
 """
@@ -63,9 +64,6 @@ class _ModuleFinder(object):
         if result:
             return result
 
-        if self.modulename == 'talib.servicelauncher':
-            print 'a'
-
         #Now go through each component and look for an __init__
         for attempt in None, self.imp_mod_dir:
             lastpath = attempt#self.imp_mod_dir
@@ -118,7 +116,8 @@ def get_module_filename(modulename, importing_module_filename=None, stripext=Tru
 
 
 class ModuleFinderCache(object):
-    """Provides caching behavior for the get_module_filename function.
+    """Provides caching behavior for the get_module_filename function.  Useful for a single run of a metric generation.
+    We do not want to cache the values at a module/static level because the paths involved in the lookup can change.
 
     modulename_to_importing_filename_to_result is a dict of dicts:
     { modulename: {importing_module_filename: result} }
