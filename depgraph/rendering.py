@@ -225,12 +225,12 @@ class DefaultStyler(object):
         if s2.endswith('__init__'):
             s2 = s2[:-9] #-9 is len of __init__ and preceding path sep
         s2 = utils.prettify_path(s2, self.leading_path)
-        if not s2: #We've removed the whole path, grab the cwd
+        if not s2: #We've removed the whole path, grab the last dir from the leadingpath that removed it
             s2 = self.leading_path.replace(os.altsep, os.sep).split(os.sep)[-1]
         else:
             s2 = os.path.splitdrive(s2)[1]
-            s2 = s2.replace('/', '.').replace('\\', '.')
-        return s2
+            s2 = s2.replace(os.sep, '.').replace(os.altsep, '.')
+        return s2.strip('.')
 
     def weight(self, a, b):
         """Return the weight of the dependency from a to b. Higher weights usually have shorter straighter edges.

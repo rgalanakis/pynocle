@@ -86,19 +86,41 @@ class DepBuilder:
         self.failed = []
         self.exclude_paths = exclude_paths
         self.exclude_modules = set(exclude_modules)
+        self.modulefinder_cache = modulefinder.ModuleFinderCache()
         for fn in filenames:
             self.process_file(fn)
 
     def is_excluded(self, path):
+        """Check whether the given path is an excluded module.  Excluded modules will be cached in
+        self.excluded_modules so they don't have to be re-checked.  If path evaluates to False, it is excluded.
+        """
+        if not path:
+            return True
+        if path in self.exclude_modules:
+            return True
         for epath in self.exclude_paths:
             if fnmatch.fnmatch(path, epath):
+                self.exclude_modules.add(path)
                 return True
-        return path in self.exclude_modules
+        p2 = set(path)
+        if not '.' in p2 and not os.sep in p2 and not os.altsep in p2:
+            self.exclude_modules.add(path)
+            return True
+        return False
 
     def _extless(self, filename):
-        return os.path.splitext(filename.replace(os.altsep, os.sep))[0]
+        """Return an extensionless path for filename."""
+        return os.path.splitext(filename)[0]
+
+    def is_importnode(self, node):
+        """Return true if node is a compiler.ast.Import."""
+        return isinstance(node, compiler.ast.Import)
 
     def get_all_importnodes(self, filename):
+        """Compiles an AST for filename and returns all import nodes inside of it.  If no file for filename exists,
+        or ot is an unparseable file (pyd, pyc), return an empty list.  If the file cannot be parsed, append
+        to self.failed and return an empty list.
+        """
         #We can only read py files right now
         if filename.endswith('.pyd'):
             return []
@@ -113,24 +135,23 @@ class DepBuilder:
         except SyntaxError:
             self.failed.append(self._extless(filename))
             return []
-        importnodes = filter(lambda node: isinstance(node, compiler.ast.Import),
-                             utils.flatten(astnode, lambda node: node.getChildNodes()))
+        importnodes = filter(self.is_importnode, utils.flatten(astnode, lambda node: node.getChildNodes()))
         return importnodes
 
     def process_file(self, filename):
-        purename = self._extless(filename)
-        if purename in self._processed or self.is_excluded(purename):
+        """Process the file at filename.  Adds it to processed, and finds dependencies for all import nodes."""
+        filename = os.path.abspath(filename)
+        extless_filename = self._extless(filename)
+        if extless_filename in self._processed or self.is_excluded(extless_filename):
             return
-        self._processed.add(purename)
+        self._processed.add(extless_filename)
         impnodes = self.get_all_importnodes(filename)
         for node in impnodes:
-            modulename = node.names[0][0]
-            modulefilename = modulefinder.get_module_filename(modulename, filename)
-            if modulefilename:
-                puremodulefilename = self._extless(modulefilename)
-            else:
-                puremodulefilename = modulename
-            if not self.is_excluded(puremodulefilename):
-                self.dependencies.append(Dependency(purename, puremodulefilename))
-            if modulefilename:
-                self.process_file(modulefilename)
+            imported_module = node.names[0][0]
+            imported_modulefilename = self.modulefinder_cache.get_module_filename(imported_module, filename)
+            if imported_modulefilename:
+                imported_modulefilename = os.path.abspath(imported_modulefilename)
+                extless_imported_modulefilename = self._extless(imported_modulefilename)
+                if not self.is_excluded(extless_imported_modulefilename):
+                    self.dependencies.append(Dependency(extless_filename, extless_imported_modulefilename))
+                self.process_file(imported_modulefilename)
