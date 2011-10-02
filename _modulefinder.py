@@ -6,24 +6,17 @@ import os
 import sys
 
 class _ModuleFinder(object):
-    def __init__(self, modulename, importing_module_filename, stripext):
+    def __init__(self, modulename, importing_module_filename):
         self.modulename = modulename
-        self.stripext = stripext
         self.imp_mod_dir = os.path.dirname(os.path.abspath(importing_module_filename))
         self.splitmodulename = modulename.split('.')
 
     def __repr__(self):
-        return 'ModuleFinder(modulename: %s, imp_mod_dir: %s, stripext: %s)' % (
-            self.modulename, self.imp_mod_dir, self.stripext)
+        return 'ModuleFinder(modulename: %s, imp_mod_dir: %s)' % (
+            self.modulename, self.imp_mod_dir)
 
     __str__ = __repr__
     
-    def maybestrip(self, path):
-        """Strips ext if self.stripext."""
-        if self.stripext:
-            return os.path.splitext(path)[0]
-        return path
-
     def find_in_sysmodules(self):
         """Looks for a module in sys.modules that has a matching modulename and a __file__ attr."""
         if self.modulename in sys.modules:
@@ -57,7 +50,7 @@ class _ModuleFinder(object):
                 return fullpath
         return None
 
-    def _get_module_filename(self):
+    def get_module_filename(self):
         """See module-level get_module_filename."""
 
         #First look for the module and return the filename if set
@@ -70,26 +63,31 @@ class _ModuleFinder(object):
         if result:
             return result
 
-        #Now go through each component and look for an __init__
-        lastpath = self.imp_mod_dir
-        for i in range(len(self.splitmodulename)):
-            try:
-                paths = [lastpath] if lastpath else None
-                lastpath = imp.find_module(self.splitmodulename[i], paths)[1]
-                #If this is our last component, and it is a package, use it
-                if i == len(self.splitmodulename) - 1:
-                    package = self.find_package(lastpath)
-                    if package:
-                        return package
-            except ImportError:
-                pass
+        if self.modulename == 'talib.servicelauncher':
+            print 'a'
 
-        #If we ended up with a path to a file, use it.
-        if os.path.isfile(lastpath):
-            return lastpath
+        #Now go through each component and look for an __init__
+        for attempt in None, self.imp_mod_dir:
+            lastpath = attempt#self.imp_mod_dir
+            for i in range(len(self.splitmodulename)):
+                try:
+                    paths = [lastpath] if lastpath else None
+                    lastpath = imp.find_module(self.splitmodulename[i], paths)[1]
+                    #If this is our last component, and it is a package, use it
+                    if i == len(self.splitmodulename) - 1:
+                        package = self.find_package(lastpath)
+                        if package:
+                            return package
+                except ImportError:
+                    pass
+
+            #If we ended up with a path to a file, use it.
+            if lastpath and os.path.isfile(lastpath):
+                return lastpath
 
         #Trying to import a package from a file in the package will if imp_mod_dir is set to the package dir
         #So we can jump up a dir and check if it fails, since lastpath is going to be as deep as possible.
+        #noinspection PyUnboundLocalVariable
         upadir = os.path.abspath(os.path.join(lastpath, '..'))
         try:
             path = imp.find_module(self.splitmodulename[-1], [upadir])[1]
@@ -98,21 +96,11 @@ class _ModuleFinder(object):
                 return pkg
         except ImportError:
             pass
+
         #At this point, we may have a module we can't do anything with.  It could be a stdlib module or something that
         #isn't available to us, so just return nothing for now...
         return None
         #raise NotImplementedError
-
-    def get_module_filename(self):
-        """Provides a wrapper for _get_module_filename that will call maybestrip to possibly strip the ext."""
-        result = self._get_module_filename()
-        if not result:
-            return result
-        result = self.maybestrip(result)
-        if len(result) == 1:
-            raise SystemError('Not a valid return value, there is a bug somewhere!')
-        return result
-
 
 def get_module_filename(modulename, importing_module_filename=None, stripext=True):
     """Return the filename of the module at modulename.  Tries to emulate the python import logic, without running
@@ -123,5 +111,38 @@ def get_module_filename(modulename, importing_module_filename=None, stripext=Tru
     stripext: If true, strip the extension from the returned filename.  If False, the filename may or may not have an
         extension.
     """
-    return _ModuleFinder(modulename, importing_module_filename, stripext).get_module_filename()
+    result = _ModuleFinder(modulename, importing_module_filename).get_module_filename()
+    if result and stripext:
+        result = os.path.splitext(result)[0]
+    return result
 
+
+class ModuleFinderCache(object):
+    """Provides caching behavior for the get_module_filename function.
+
+    modulename_to_importing_filename_to_result is a dict of dicts:
+    { modulename: {importing_module_filename: result} }
+    """
+    def __init__(self):
+        self.modulename_to_importing_filename_to_result = {}
+
+    def cached(self, modulename, importing_module_filename):
+        """Returns a tuple of (was in cache, value if it was in cache) for modulename/importing_module_filename.
+        If not cached, creates the collections in the cache.
+
+        Note that extensionless values should never be stored in the cache!
+        """
+        importing_to_result = self.modulename_to_importing_filename_to_result.setdefault(modulename, {})
+        if importing_module_filename in importing_to_result:
+            return True, importing_to_result[importing_module_filename]
+        return False, None
+
+    def get_module_filename(self, modulename, importing_module_filename=None, stripext=True):
+        importing_module_filename = os.path.splitext(importing_module_filename)[0]
+        incache, result = self.cached(modulename, importing_module_filename)
+        if not incache:
+            result = get_module_filename(modulename, importing_module_filename, stripext=False)
+            self.modulename_to_importing_filename_to_result[modulename][importing_module_filename] = result
+        if result and stripext:
+            result = os.path.splitext(result)[0]
+        return result
