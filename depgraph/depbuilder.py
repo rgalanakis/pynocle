@@ -149,7 +149,8 @@ class DepBuilder:
         for node in impnodes:
             imported_module = node.names[0][0]
             imported_modulefilename = self.modulefinder_cache.get_module_filename(imported_module, filename)
-            if imported_modulefilename:
+            #We can get back 'sys' as a filename so check if it's excluded before we get the abspath
+            if imported_modulefilename and not self.is_excluded(imported_modulefilename):
                 imported_modulefilename = os.path.abspath(imported_modulefilename)
                 extless_imported_modulefilename = self._extless(imported_modulefilename)
                 if not self.is_excluded(extless_imported_modulefilename):
