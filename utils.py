@@ -64,6 +64,24 @@ def write_report(filename, data, formatter_factory):
         fmt.format_data(data)
         fmt.format_report_footer()
 
+
+class ExtensionFormatterRegistry(object):
+    def __init__(self, mapping=()):
+        self.mapping = dict(mapping)
+
+    def Register(self, ext, value):
+        self.mapping[ext] = value
+
+    def GetFormatter(self, ext, default=None):
+        return self.mapping.get(ext, default)
+
+    def GetFormatterFactory(self, ext, default=None, **kwargs):
+        result = self.GetFormatter(ext, default)
+        if not result:
+            return result
+        return lambda stream: result(stream, **kwargs)
+
+
 class _FindAll:
     """Helper state class for getting all filenames from a group of files and folders."""
     def __init__(self, files_and_folders, pattern):

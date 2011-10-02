@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 
-import os
 import sys
 
 import pynocle.tableprint as tableprint
 import pynocle.utils as utils
 
 #Anything under 7 is considered fine.
-DEFAULT_THRESHOLD = 5
-
+DEFAULT_THRESHOLD = 6
 
 class _CCFormatter(utils.IReportFormatter):
     def __init__(self, out=sys.stdout, threshold=None, writeempty=False, leading_path=None):
@@ -95,3 +93,5 @@ class CCGoogleChartFormatter(_CCFormatter):
         for row in rows:
             self.outstream().write('        data.addRow(%s);\n' % row)
 
+
+formatter_registry = utils.ExtensionFormatterRegistry({'.txt': CCTextFormatter, '.html': CCGoogleChartFormatter})
