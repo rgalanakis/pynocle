@@ -22,7 +22,7 @@ if __name__ == '__main__':
     import pynocle
     #os.chdir('..')
     dirname = os.path.dirname(__file__)
-    m = pynocle.Monocle(outputdir=os.path.join(dirname, 'exampleoutput'), coveragedata=cov, rootdir=dirname)
+    m = pynocle.Monocle(outputdir=os.path.join(dirname, 'exampleoutput'), coveragedata=cov, rootdir=dirname, debug=True)
     #root = os.path.join(dirname, '..', 'pipeline')
     #sys.path.append(root)
     #m = pynocle.Monocle(outputdir=r'C:\testmetrics', rootdir=root)

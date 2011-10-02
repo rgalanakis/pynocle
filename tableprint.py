@@ -69,3 +69,38 @@ class Table(object):
         with StringIO.StringIO() as sio:
             self.write(sio)
         return sio.getvalue()
+
+
+def googlechart_table_html_header(table_var='data', colnames_and_types=()):
+    """Return the html header for a googlecharts table.
+
+    table_var: The name of the DataTable variable in the JS.
+    colnames_and_types: Collection of two item tuples that define the type and name of the columns.
+    """
+    lines =["""<html>
+  <head>
+    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+    <script type='text/javascript'>
+      google.load('visualization', '1', {packages:['table']});
+      google.setOnLoadCallback(drawTable);
+      function drawTable() {
+        var %s = new google.visualization.DataTable();""" % table_var]
+    for colname, coltype in colnames_and_types:
+        lines.append("        data.addColumn('%s', '%s');" % (coltype, colname))
+    lines.append('\n')
+    return '\n'.join(lines)
+
+
+def googlechart_table_html_footer(table_var='data'):
+        return """
+        var table = new google.visualization.Table(document.getElementById('table_div'));
+        table.draw(%s, {showRowNumber: true});
+      }
+    </script>
+  </head>
+
+  <body>
+    <div id='table_div'></div>
+  </body>
+</html>
+""" % table_var
