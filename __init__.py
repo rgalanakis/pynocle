@@ -26,8 +26,6 @@ import shutil
 import _pynoclecover
 import cyclcompl
 import depgraph
-import funcinfo
-import inheritance
 import sloc
 
 def _check_coverage():
@@ -61,43 +59,6 @@ def ensure_clean_output(outputdir, _ran=False):
         if not os.path.isdir(outputdir):
             raise
 
-def generate_cover_html(cov, directory):
-    """Outputs a coverage html report from cov into directory.
-
-    cov: An instance of coverage.coverage.
-    directory: The directory all the html files will be output to.  Directory must exist.
-    """
-    #isinstance causes scope problems so use exact type checking here.
-    _check_coverage()
-    cov.html_report(directory=directory)
-
-def generate_cover_report(cov, filename):
-    """Generates a coverage report for cov to filename."""
-    #isinstance causes scope problems so use exact type checking here.
-    _check_coverage()
-    with open(filename, 'w') as f:
-        cov.report(file=f)
-
-def generate_cyclomatic_complexity(codefilenames, reportfilename, formatter_factory=None):
-    """Generates a cyclomatic complexity report based on all the files in codefilenames, output to reportfilename.
-
-    formatter_factory: Callable that takes the filestream of reportfilename and return the cyclcompl.CCFormatter
-        to use to format the report.
-    """
-    ccdata, failures = cyclcompl.measure_cyclcompl(codefilenames)
-    factory = formatter_factory or cyclcompl.CCTextFormatter
-    utils.write_report(reportfilename, (ccdata, failures), factory)
-
-def generate_sloc(codefilenames, reportfilename, formatter_factory=None):
-    """Generates a Source Lines of Code report for files in codefilenames, output to reportfilename.
-
-    formatter_factory: Callable that takes the filestream of reportfilename returns the sloc.ISlocFormatter to use
-        to format the report.
-    """
-    slocgrp = sloc.SlocGroup(codefilenames)
-    formatter_factory = formatter_factory or sloc.SlocGoogleChartFormatter
-    utils.write_report(reportfilename, slocgrp, formatter_factory)
-
 def _create_dependency_group(codefilenames, dependencygroup):
     """If dependencygroup is provided, returns that, otherwise generates a new DependencyGroup from
     codefilenames.
@@ -106,49 +67,6 @@ def _create_dependency_group(codefilenames, dependencygroup):
         depb = depgraph.DepBuilder(codefilenames)
         dependencygroup = depgraph.DependencyGroup(depb.dependencies, depb.failed)
     return dependencygroup
-
-def generate_dependency_graph(codefilenames, reportfilename, renderer_factory=None, _dependencygroup=None):
-    """Generates a dependency graph image to reportfilename for the files in codefilenames.  Returns an
-    instance of dependency_group.
-
-    renderer_factory: A callable that takes a depgraph.DependencyGroup instance and returns an depgraph.IRenderer
-        instance.  Defaults to depgraph.DefaultRenderer.
-    """
-    depgrp = _create_dependency_group(codefilenames, _dependencygroup)
-    renderer_factory = renderer_factory or depgraph.DefaultRenderer
-    renderer = renderer_factory(depgrp)
-    renderer.render(reportfilename)
-    return depgrp
-
-def generate_coupling_report(codefilenames, reportfilename, formatter_factory=None, _dependencygroup=None):
-    """Generates a report for Afferent and Efferent Coupling between all modules in codefilenames, saved to
-    reportfilename.  Returns an instance of DependencyGroup.
-    """
-    depgrp = _create_dependency_group(codefilenames, _dependencygroup)
-    formatter_factory = formatter_factory or depgraph.CouplingGoogleChartFormatter
-    utils.write_report(reportfilename, depgrp, formatter_factory)
-    return depgrp
-
-def generate_couplingrank_report(codefilenames, reportfilename, formatter_factory=None, _dependencygroup=None):
-    """Generates a PageRank report for all modules in codefilenames, saved to reportfilename.
-
-    formatter_factory: Callable that returns an ICouplingFormatter instance.
-    """
-    factory = formatter_factory or depgraph.RankGoogleChartFormatter
-    generate_coupling_report(codefilenames, reportfilename, formatter_factory=factory,
-                             _dependencygroup=_dependencygroup)
-
-def generate_inheritance_report(codefilenames, reportfilename, formatter_factory=None):
-    classgroup = inheritance.ClassGraph(inheritance.InheritanceBuilder(codefilenames).classinfos())
-    with open(reportfilename, 'w') as f:
-        f.write('Functionality not yet supported!\n\n')
-        f.write(repr(classgroup))
-
-def generate_funcinfo_report(codefilenames, reportfilename, formatter_factory=None):
-    funcinfos = funcinfo.extract_funcinfos(*codefilenames)
-    with open(reportfilename, 'w') as f:
-        f.write('Functionality not yet supported!\n\n')
-        f.write(repr(funcinfos))
 
 def _generate_html_jump_str(htmlfilename, paths):
     """Generates the html contents for the jump page."""
@@ -198,26 +116,18 @@ class Monocle(object):
                  coverhtml_dir='report_covhtml',
                  coverreport_filename='report_coverage.txt',
                  cyclcompl_filename='report_cyclcompl.html',
-                 cyclcompl_fmtfactory=None,
                  sloc_filename='report_sloc.html',
-                 sloc_fmtfactory=None,
                  depgraph_filename='depgraph.png',
-                 depgraph_renderfactory=None,
                  coupling_filename='report_coupling.html',
-                 coupling_fmtfactory=None,
                  couplingrank_filename='report_couplingrank.html',
-                 couplingrank_fmtfactory=None,
-                 inheritance_filename='report_inheritance.txt',
-                 inheritance_fmtfactory=None,
-                 funcinfo_filename='report_funcinfo.txt',
-                 funcinfo_fmtfactory=None,
                  htmljump_filename='index.html',
                  debug=False):
-        self.outputdir = outputdir
         if not isinstance(rootdir, basestring):
             raise ValueError, 'Monocle only supports one root directory right now.'
         rootdir = os.path.abspath(rootdir or os.getcwd())
         self.filenames = utils.find_all([rootdir])
+
+        self.outputdir = outputdir
         self.coveragedata = coveragedata
         self.debug = debug
 
@@ -229,67 +139,94 @@ class Monocle(object):
         self.depgraph_filename = join(depgraph_filename)
         self.coupling_filename = join(coupling_filename)
         self.couplingrank_filename = join(couplingrank_filename)
-        self.inheritance_filename = join(inheritance_filename)
-        self.funcinfo_filename = join(funcinfo_filename)
         self.htmljump_filename = join(htmljump_filename)
 
-        self.cyclcompl_fmtfactory = cyclcompl_fmtfactory or (
-            lambda f: cyclcompl.CCGoogleChartFormatter(f, leading_path=rootdir))
-        self.sloc_fmtfactory = sloc_fmtfactory or (
-            lambda f: sloc.SlocGoogleChartFormatter(f, leading_path=rootdir))
-        self.depgraph_renderfactory = depgraph_renderfactory or (
-            lambda g: depgraph.DefaultRenderer(g, leading_path=rootdir))
-        self.coupling_fmtfactory = coupling_fmtfactory or (
-            lambda f: depgraph.CouplingGoogleChartFormatter(f, leading_path=rootdir))
-        self.couplingrank_fmtfactory = couplingrank_fmtfactory or (
-            lambda f: depgraph.RankGoogleChartFormatter(f, leading_path=rootdir))
-        self.inheritance_fmtfactory = inheritance_fmtfactory
-        self.funcinfo_fmtfactory = funcinfo_fmtfactory
+        kwargs = {'leading_path': rootdir}
+        def gext(s):
+            return os.path.splitext(s)[1]
+        self.cyclcompl_fmtfactory = cyclcompl.formatter_registry.GetFormatterFactory(gext(self.cyclcompl_filename),
+                                                                                     **kwargs)
+        self.sloc_fmtfactory = sloc.formatter_registry.GetFormatterFactory(gext(self.sloc_filename), **kwargs)
+        self.coupling_fmtfactory = depgraph.coupling_formatter_registry.GetFormatterFactory(
+            gext(self.coupling_filename), **kwargs)
+        self.couplingrank_fmtfactory = depgraph.couplingrank_formatter_registry.GetFormatterFactory(
+            gext(self.couplingrank_filename), **kwargs)
+
+        self.depgraph_renderfactory = lambda g: depgraph.DefaultRenderer(g, leading_path=rootdir)
         
-        self._filesforjump = []
+        self._filesforjump = set()
 
     def ensure_clean_output(self):
         ensure_clean_output(self.outputdir)
 
     def generate_cover_html(self):
-        generate_cover_html(self.coveragedata, self.coverhtml_dir)
-        self._filesforjump.append(os.path.join(self.coverhtml_dir, 'index.html'))
+        """Outputs a coverage html report from cov into directory.
+
+        cov: An instance of coverage.coverage.
+        directory: The directory all the html files will be output to.  Directory must exist.
+        """
+        #isinstance causes scope problems so use exact type checking here.
+        _check_coverage()
+        self.coveragedata.html_report(directory=self.coverhtml_dir)
+        self._filesforjump.add(os.path.join(self.coverhtml_dir, 'index.html'))
 
     def generate_cover_report(self):
-        generate_cover_report(self.coveragedata, self.coverreport_filename)
-        self._filesforjump.append(self.coverreport_filename)
+        """Generates a coverage report for cov to filename."""
+        #isinstance causes scope problems so use exact type checking here.
+        _check_coverage()
+        with open(self.coverreport_filename, 'w') as f:
+            self.coveragedata.report(file=f)
+        self._filesforjump.add(self.coverreport_filename)
 
     def generate_cyclomatic_complexity(self):
-        generate_cyclomatic_complexity(self.filenames, self.cyclcompl_filename, self.cyclcompl_fmtfactory)
-        self._filesforjump.append(self.cyclcompl_filename)
+        """Generates a cyclomatic complexity report based on all the files in codefilenames, output to reportfilename.
+        """
+        ccdata, failures = cyclcompl.measure_cyclcompl(self.filenames)
+        utils.write_report(self.cyclcompl_filename, (ccdata, failures), self.cyclcompl_fmtfactory)
+        self._filesforjump.add(self.cyclcompl_filename)
 
     def generate_sloc(self):
-        generate_sloc(self.filenames, self.sloc_filename, self.sloc_fmtfactory)
-        self._filesforjump.append(self.sloc_filename)
+        """Generates a Source Lines of Code report for files in codefilenames, output to reportfilename.
+
+        formatter_factory: Callable that takes the filestream of reportfilename returns the sloc.ISlocFormatter to use
+            to format the report.
+        """
+        slocgrp = sloc.SlocGroup(self.filenames)
+        utils.write_report(self.sloc_filename, slocgrp, self.sloc_fmtfactory)
+        self._filesforjump.add(self.sloc_filename)
 
     def generate_dependency_graph(self, _depgrp=None):
-        generate_dependency_graph(self.filenames, self.depgraph_filename, self.depgraph_renderfactory, _depgrp)
-        self._filesforjump.append(self.depgraph_filename)
+        """Generates a dependency graph image to reportfilename for the files in codefilenames.  Returns an
+        instance of dependency_group.
+        """
+        depgrp = _create_dependency_group(self.filenames, _depgrp)
+        renderer = self.depgraph_renderfactory(depgrp)
+        renderer.render(self.depgraph_filename)
+        self._filesforjump.add(self.depgraph_filename)
+        return depgrp
 
     def generate_coupling_report(self, _depgrp=None):
-        generate_coupling_report(self.filenames, self.coupling_filename, self.coupling_fmtfactory, _depgrp)
-        self._filesforjump.append(self.coupling_filename)
+        """Generates a report for Afferent and Efferent Coupling between all modules in codefilenames, saved to
+        reportfilename.  Returns an instance of DependencyGroup.
+        """
+        depgrp = _create_dependency_group(self.filenames, _depgrp)
+        utils.write_report(self.coupling_filename, depgrp, self.coupling_fmtfactory)
+        self._filesforjump.add(self.coupling_filename)
+        return depgrp
 
     def generate_couplingrank_report(self, _depgrp=None):
-        generate_couplingrank_report(self.filenames, self.couplingrank_filename, self.couplingrank_fmtfactory, _depgrp)
-        self._filesforjump.append(self.couplingrank_filename)
+        """Generates a PageRank report for all modules in codefilenames, saved to reportfilename.
 
-    def generate_inheritance_report(self):
-        generate_inheritance_report(self.filenames, self.inheritance_filename, self.inheritance_fmtfactory)
-        self._filesforjump.append(self.inheritance_filename)
-
-    def generate_funcinfo_report(self):
-        generate_funcinfo_report(self.filenames, self.funcinfo_filename, self.funcinfo_fmtfactory)
-        self._filesforjump.append(self.funcinfo_filename)
+        formatter_factory: Callable that returns an ICouplingFormatter instance.
+        """
+        depgrp = _create_dependency_group(self.filenames, _depgrp)
+        utils.write_report(self.couplingrank_filename, depgrp, self.couplingrank_fmtfactory)
+        self._filesforjump.add(self.couplingrank_filename)
+        return depgrp
 
     def generate_html_jump(self):
         """Generates an html page that links to any generated reports."""
-        return generate_html_jump(self.htmljump_filename, *self._filesforjump)
+        return generate_html_jump(self.htmljump_filename, *sorted(self._filesforjump))
 
     def generate_all(self, cleanoutput=True):
         """Run all report generation functions.

@@ -134,3 +134,9 @@ class RankGoogleChartFormatter(_CouplingFormatter):
             row = [rowi[0], self._js_perc(rowi[1]), rowi[2], str(rowi[3])]
             self.outstream().write('        data.addRow(%s);\n' % row)
             
+
+coupling_formatter_registry = utils.ExtensionFormatterRegistry({'.txt': CouplingTextFormatter,
+                                                                '.html': CouplingGoogleChartFormatter})
+
+couplingrank_formatter_registry = utils.ExtensionFormatterRegistry({'.txt': RankTextFormatter,
+                                                                '.html': RankGoogleChartFormatter})

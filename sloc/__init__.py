@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
 import formatting
-from formatting import SlocTextFormatter, SlocGoogleChartFormatter
+from formatting import formatter_registry
 import slocing
 from slocing import SlocGroup

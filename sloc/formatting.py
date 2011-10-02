@@ -104,3 +104,6 @@ class SlocGoogleChartFormatter(_SlocFormatter):
         rows.append(self._get_totals_row(slocgroup))
         for row in rows:
             self.outstream().write('        data.addRow(%s);\n' % row)
+
+
+formatter_registry = utils.ExtensionFormatterRegistry({'.txt': SlocTextFormatter, '.html': SlocGoogleChartFormatter})
