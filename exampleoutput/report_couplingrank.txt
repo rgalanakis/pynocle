@@ -1,38 +1,45 @@
-Google's PageRank algorithm applied to Coupling
-High vaules are more "important" in the same way highly ranked webpages are.
+Afferent and Efferent Coupling
+Measures the coupling between modules.
+Afferent coupling (Ca) is the number of modules that use a given module.  0 can indicate dead code.
+Efferent coupling (Ce)is the number of modules a given module imports.  A high value can indicate a
+brittle module.
+Instability (I) is the ratio of Ce to total coupling. I = Ce / (Ce + Ca). Indicates the
+module's resilience to change between 0 (completely stable) and 1 (unstable).
 
----------------------------------------------------------------------------
-Filename                        PageRank    PageID    Outgoing Links       
----------------------------------------------------------------------------
-utils                           0.21873     2         []                   
-depgraph\rendering              0.05543     20        [2]                  
-tableprint                      0.04888     14        []                   
-_modulefinder                   0.04548     11        []                   
-__init__                        0.04319     1         [2, 3, 4, 5, 6, 7, 8]
-depgraph\pagerank               0.04202     19        [2]                  
-_pynoclecover                   0.03230     3         []                   
-sloc\slocing                    0.02705     29        []                   
-sloc\formatting                 0.02705     27        [2, 14]              
-depgraph\xmlrpcrenderer         0.02705     23        [20]                 
-cyclcompl\statbuilder           0.02705     15        [2]                  
-cyclcompl\formatting            0.02705     13        [2, 14]              
-depgraph\formatting             0.02436     18        [2, 14, 19]          
-depgraph\depbuilder             0.02436     17        [2, 11]              
-sloc                            0.02423     8         []                   
-inheritance                     0.02423     7         []                   
-funcinfo                        0.02423     6         []                   
-depgraph                        0.02423     5         []                   
-cyclcompl                       0.02423     4         []                   
-sloc\__init__                   0.01898     28        [27, 29]             
-inheritance\__init__            0.01898     26        [2]                  
-funcinfo\__init__               0.01898     25        [2]                  
-depgraph\__init__               0.01898     24        [17, 18, 20]         
-depgraph\test_xmlrpcrenderer    0.01898     22        [20, 23]             
-depgraph\test_pagerank          0.01898     21        [19]                 
-cyclcompl\__init__              0.01898     16        [13, 15]             
-test_utils                      0.01898     12        [2]                  
-test_modulefinder               0.01898     10        [11]                 
-test_init                       0.01898     9         [1, 3]               
-setup                           0.01898     0         [1]                  
----------------------------------------------------------------------------
+-------------------------------------------------
+Filename                        Ca    Ce      I  
+-------------------------------------------------
+__init__                        1     7     0.875
+_modulefinder                   2     2     0.500
+_pynoclecover                   2     0     0.000
+cyclcompl                       1     0     0.000
+cyclcompl\__init__              0     2     1.000
+cyclcompl\formatting            1     3     0.750
+cyclcompl\statbuilder           1     1     0.500
+depgraph                        1     0     0.000
+depgraph\__init__               0     3     1.000
+depgraph\depbuilder             1     3     0.750
+depgraph\formatting             1     4     0.800
+depgraph\pagerank               2     1     0.333
+depgraph\rendering              3     1     0.250
+depgraph\test_pagerank          0     1     1.000
+depgraph\test_xmlrpcrenderer    0     2     1.000
+depgraph\xmlrpcrenderer         1     2     0.667
+funcinfo                        1     0     0.000
+funcinfo\__init__               0     1     1.000
+imp                             1     0     0.000
+inheritance                     1     0     0.000
+inheritance\__init__            0     1     1.000
+setup                           0     0     0.000
+sloc                            1     0     0.000
+sloc\__init__                   0     2     1.000
+sloc\formatting                 1     3     0.750
+sloc\slocing                    1     0     0.000
+sys                             9     0     0.000
+tableprint                      3     1     0.250
+test_init                       0     3     1.000
+test_modulefinder               0     2     1.000
+test_utils                      0     1     1.000
+utils                           11    0     0.000
+-------------------------------------------------
 

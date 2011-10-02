@@ -2,6 +2,7 @@
 
 import nose
 import os
+import sys
 
 if __name__ == '__main__':
     import _pynoclecover
@@ -19,5 +20,10 @@ if __name__ == '__main__':
         else:
             raise
     import pynocle
-    m = pynocle.Monocle(outputdir='exampleoutput', coveragedata=cov, rootdir=os.path.dirname(__file__))
+    #os.chdir('..')
+    dirname = os.path.dirname(__file__)
+    m = pynocle.Monocle(outputdir=os.path.join(dirname, 'exampleoutput'), coveragedata=cov, rootdir=dirname)
+    #root = os.path.join(dirname, '..', 'pipeline')
+    #sys.path.append(root)
+    #m = pynocle.Monocle(outputdir=r'C:\testmetrics', rootdir=root)
     m.generate_all()

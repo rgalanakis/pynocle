@@ -8,25 +8,26 @@ WARNING: The following files failed to parse:
 	bogus
 
 _modulefinder
---------------------------------------------------
-Type      Name                                  CC
---------------------------------------------------
-Method    _ModuleFinder._get_module_filename    8 
---------------------------------------------------
+-------------------------------------------------
+Type      Name                                 CC
+-------------------------------------------------
+Method    _ModuleFinder.get_module_filename    11
+-------------------------------------------------
 
 __init__
-------------------------------------
-Type      Name                    CC
-------------------------------------
-Method    Monocle.generate_all    5 
-------------------------------------
+--------------------------------
+Type      Name                CC
+--------------------------------
+Method    Monocle.__init__    8 
+--------------------------------
 
 depgraph\depbuilder
 ----------------------------------------------
 Type      Name                              CC
 ----------------------------------------------
+Method    DepBuilder.is_excluded            7 
 Method    DepBuilder.get_all_importnodes    5 
-Method    DepBuilder.process_file           7 
+Method    DepBuilder.process_file           6 
 ----------------------------------------------
 
 depgraph\pagerank
@@ -47,17 +48,18 @@ Function    saturate                        5
 ----------------------------------------------
 
 All results, sorted by CC:
----------------------------------------------------------------------------
-Filename               Type        Name                                  CC
----------------------------------------------------------------------------
-_modulefinder          Method      _ModuleFinder._get_module_filename    8 
-depgraph\depbuilder    Method      DepBuilder.process_file               7 
-depgraph\pagerank      Function    _transposeLinkMatrix                  7 
-depgraph\pagerank      Function    _pageRankGenerator                    6 
-depgraph\rendering     Method      DefaultRenderer._write_edges          6 
-depgraph\rendering     Method      DefaultRenderer.savedot               6 
-__init__               Method      Monocle.generate_all                  5 
-depgraph\depbuilder    Method      DepBuilder.get_all_importnodes        5 
-depgraph\rendering     Function    saturate                              5 
----------------------------------------------------------------------------
+--------------------------------------------------------------------------
+Filename               Type        Name                                 CC
+--------------------------------------------------------------------------
+_modulefinder          Method      _ModuleFinder.get_module_filename    11
+__init__               Method      Monocle.__init__                     8 
+depgraph\depbuilder    Method      DepBuilder.is_excluded               7 
+depgraph\pagerank      Function    _transposeLinkMatrix                 7 
+depgraph\depbuilder    Method      DepBuilder.process_file              6 
+depgraph\pagerank      Function    _pageRankGenerator                   6 
+depgraph\rendering     Method      DefaultRenderer._write_edges         6 
+depgraph\rendering     Method      DefaultRenderer.savedot              6 
+depgraph\depbuilder    Method      DepBuilder.get_all_importnodes       5 
+depgraph\rendering     Function    saturate                             5 
+--------------------------------------------------------------------------
 
