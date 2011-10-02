@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import abc
-import getopt
+import colorsys
+import hashlib
 import os
 import subprocess
 import tempfile
@@ -147,17 +148,16 @@ class DefaultRenderer(IRenderer):
             f.write('}')
 
 
-class RoundRobinColorChooser(object):
-    def __init__(self, colors=()):
-        self.lastind = -1
-        self.colors = colors or ('#fbb4ae', '#b3cde3', '#ccebc5', '#decbe4', '#fed9a6', '#ffffcc',
-                                 '#e5d8bd', '#fddaec', '#f2f2f2')
-
-    def next(self):
-        self.lastind += 1
-        self.lastind %= len(self.colors)
-        result = self.colors[self.lastind]
-        return result.upper()
+def name_to_color(name):
+    """Converts name into an rgb color based on its md5 hash.  Copied from http://www.tarind.com/depgraph2dot.py.
+    Don't try to understand this code...
+    """
+    n = hashlib.md5(name).digest()
+    hf = float(ord(n[0])+ord(n[1])*0xff)/0xffff
+    sf = float(ord(n[2]))/0xff
+    vf = float(ord(n[3]))/0xff
+    r,g,b = colorsys.hsv_to_rgb(hf, 0.3+0.6*sf, 0.8+0.2*vf)
+    return '#%02x%02x%02x' % (r*256,g*256,b*256)
 
 
 class DefaultStyler(object):
@@ -170,7 +170,6 @@ class DefaultStyler(object):
         self.weight_normal = kwargs.get('weight_normal', 1)
         self.weight_heaviest = kwargs.get('weight_heaviest', 4)
         self.leading_path = kwargs.get('leading_path') or os.getcwd()
-        self.colorchooser = RoundRobinColorChooser()
 
     def create_clusters(self, nodenames):
         """Return a dictionary of {package name, (modules)), where package name will be the cluster name (and is
@@ -191,9 +190,9 @@ class DefaultStyler(object):
         return result
 
     def _calc_outline_col(self, ca, maxca):
-        """Should go from black to bright blue as ca approaches maxca."""
-        bluechan = lerp(0x00, 0xff, float(ca) / maxca)
-        return '#0000%02x' % bluechan
+        """Should go from black to bright red as ca approaches maxca."""
+        redchan = lerp(0x00, 0xff, float(ca) / maxca)
+        return '#%02x0000' % redchan
 
     def _calc_fill_col(self, ce, maxce):
         """Should go from green to red as ce approaches maxce."""
@@ -271,5 +270,5 @@ class DefaultStyler(object):
         return {'shape': 'ellipse', 'color':outline, 'fillcolor':fill}
 
     def clusterstyle(self, clustername):
-        col = '"%s"' % self.colorchooser.next()
+        col = '"%s"' % name_to_color(clustername)
         return {'color':'black', 'fillcolor':col, 'style':'filled'}
