@@ -107,10 +107,10 @@ class SlocGoogleChartFormatter(_SlocFormatter):
     def _stringify(self, row):
         """Returns a row/list as a list of properly formatted strings."""
         return [row[0],
-               str(row[1]), self._js_perc(row[2]),
-               str(row[3]), self._js_perc(row[4]),
-               str(row[5]), self._js_perc(row[6]),
-               str(row[7]), self._js_perc(row[8])]
+               row[1], self._js_perc(row[2]),
+               row[3], self._js_perc(row[4]),
+               row[5], self._js_perc(row[6]),
+               row[7], self._js_perc(row[8])]
 
     def format_data(self, slocgroup):
         rows = map(self._stringify, self.create_rows(slocgroup))
