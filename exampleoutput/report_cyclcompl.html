@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+    <script type='text/javascript'>
+      google.load('visualization', '1', {packages:['table']});
+      google.setOnLoadCallback(drawTable);
+      function drawTable() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Filename');
+        data.addColumn('string', 'Type');
+        data.addColumn('string', 'Name');
+        data.addColumn('number', 'CC');
+
+        data.addRow(['_modulefinder', 'Method', '_ModuleFinder.get_module_filename', 11]);
+        data.addRow(['__init__', 'Method', 'Monocle.__init__', 8]);
+        data.addRow(['depgraph\\depbuilder', 'Method', 'DepBuilder.is_excluded', 7]);
+        data.addRow(['depgraph\\depbuilder', 'Method', 'DepBuilder.get_all_importnodes', 5]);
+        data.addRow(['depgraph\\depbuilder', 'Method', 'DepBuilder.process_file', 6]);
+        data.addRow(['depgraph\\pagerank', 'Function', '_transposeLinkMatrix', 7]);
+        data.addRow(['depgraph\\pagerank', 'Function', '_pageRankGenerator', 6]);
+        data.addRow(['depgraph\\rendering', 'Method', 'DefaultRenderer._write_edges', 6]);
+        data.addRow(['depgraph\\rendering', 'Method', 'DefaultRenderer.savedot', 6]);
+        data.addRow(['depgraph\\rendering', 'Function', 'saturate', 5]);
+
+        var table = new google.visualization.Table(document.getElementById('table_div'));
+        table.draw(data, {showRowNumber: true});
+      }
+    </script>
+  </head>
+
+  <body>
+    <div id='table_div'></div>
+  </body>
+</html>
