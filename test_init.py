@@ -4,7 +4,7 @@ import nose
 import os
 import sys
 
-if __name__ == '__main__':
+def run_on_pynocle(cov=None):
     import _pynoclecover
     #Under debugger in pycharm, it uses the wrong coverage module!
     try:
@@ -19,13 +19,11 @@ if __name__ == '__main__':
             cov = None
         else:
             raise
+
     import pynocle
     dirname = os.path.dirname(__file__)
     outdir = os.path.join(dirname, 'exampleoutput')
     m = pynocle.Monocle(outdir, rootdir=dirname, coveragedata=cov, debug=True)
-    #root = os.path.join(dirname, '..', 'pipeline')
-    #sys.path.append(root)
-    #m = pynocle.Monocle(outputdir=r'C:\testmetrics', rootdir=root)
     m.generate_all()
     m2 = pynocle.Monocle(outdir, rootdir=dirname, debug=True,
                          cyclcompl_filename='report_cyclcompl.txt',
@@ -34,3 +32,18 @@ if __name__ == '__main__':
                          sloc_filename='report_sloc.txt')
     m2._filesforjump.update(m._filesforjump)
     m2.generate_all(False)
+
+def run_on_ccppipeline():
+    import pynocle
+    dirname = os.path.dirname(__file__)
+    pipedir = os.path.join(dirname, '..', 'pipeline')
+    outdir = os.path.join(pipedir, 'metrics')
+    sys.path.append(pipedir)
+    m = pynocle.Monocle(outdir, rootdir=pipedir, debug=True)
+    m.generate_all()
+
+if __name__ == '__main__':
+    if '--testccp' in sys.argv:
+        run_on_ccppipeline()
+    else:
+        run_on_pynocle()
