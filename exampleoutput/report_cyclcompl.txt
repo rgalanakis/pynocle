@@ -19,7 +19,7 @@ depgraph\depbuilder
 Type      Name                       CC
 ---------------------------------------
 Method    DepBuilder.is_excluded     7 
-Method    DepBuilder.process_file    6 
+Method    DepBuilder.process_file    7 
 ---------------------------------------
 
 depgraph\pagerank
@@ -44,8 +44,8 @@ Filename               Type        Name                                 CC
 --------------------------------------------------------------------------
 _modulefinder          Method      _ModuleFinder.get_module_filename    10
 depgraph\depbuilder    Method      DepBuilder.is_excluded               7 
+depgraph\depbuilder    Method      DepBuilder.process_file              7 
 depgraph\pagerank      Function    _transposeLinkMatrix                 7 
-depgraph\depbuilder    Method      DepBuilder.process_file              6 
 depgraph\pagerank      Function    _pageRankGenerator                   6 
 depgraph\rendering     Method      DefaultRenderer._write_edges         6 
 depgraph\rendering     Method      DefaultRenderer.savedot              6 
