@@ -22,6 +22,14 @@ def saturate(num, floats=True):
         return maxval
     return num
 
+def nth_percentile(values, n=0.95):
+    """Get's the value in values that is closest to the nth percentile.  For example, nth_percentile([4, 2, 1, 5], .75)
+    would return 4.
+    """
+    sorted_vals = sorted(values)
+    ind = int(len(sorted_vals) * n)
+    return sorted_vals[ind]
+
 class IRenderer(object):
     __metaclass__ = abc.ABCMeta
 
@@ -176,17 +184,22 @@ class DefaultStyler(object):
         also normally the package name), and modules are the names of all nodes included in the package (including
         the __init__ files, usually).
 
+        Will also nest clusters for packages nested within other packages.
+
         Return None to disable clustering.
         """
         result = {}
         for name in nodenames:
-            splitname = name.split('.')
-            first = splitname[0]
-            result.setdefault(first, [])
-            result[first].append(name)
-        for clusname, nodes in result.items():
-            if len(nodes) == 1:
-                result.pop(clusname)
+            dotind = name.find('.')
+            if dotind > -1:
+                cluster = name[:dotind]
+                items = result.setdefault(cluster, [])
+                items.append(name)
+#            while dotind > -1:
+#                cluster = name[:dotind]
+#                result.setdefault(cluster, [])
+#                result[cluster].append(name)
+#                dotind = name.find('.', dotind + 1)
         return result
 
     def _calc_outline_col(self, ca, maxca):
@@ -210,8 +223,8 @@ class DefaultStyler(object):
             ce = depgroup.depnode_to_ce[depnode]
         except KeyError:
             return None
-        outlcol = self._calc_outline_col(ca, max(depgroup.depnode_to_ca.values()))
-        fillcol = self._calc_fill_col(ce, max(depgroup.depnode_to_ce.values()))
+        outlcol = self._calc_outline_col(ca, nth_percentile(depgroup.depnode_to_ca.values()))
+        fillcol = self._calc_fill_col(ce, nth_percentile(depgroup.depnode_to_ce.values()))
         return '"%s"' % outlcol, '"%s"' % fillcol
 
     def nodetext(self, s):
