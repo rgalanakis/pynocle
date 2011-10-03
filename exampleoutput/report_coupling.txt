@@ -8,34 +8,32 @@ module's resilience to change between 0 (completely stable) and 1 (unstable).
 -------------------------------------------------
 Filename                        Ca    Ce      I  
 -------------------------------------------------
-__init__                        1     5     0.833
-_modulefinder                   2     2     0.500
+__init__                        2     5     0.714
+_modulefinder                   2     0     0.000
 _pynoclecover                   2     0     0.000
 cyclcompl                       1     0     0.000
 cyclcompl\__init__              0     2     1.000
-cyclcompl\formatting            1     3     0.750
+cyclcompl\formatting            1     2     0.667
 cyclcompl\statbuilder           1     1     0.500
 depgraph                        1     0     0.000
 depgraph\__init__               0     3     1.000
-depgraph\depbuilder             1     3     0.750
-depgraph\formatting             1     4     0.800
+depgraph\depbuilder             1     2     0.667
+depgraph\formatting             1     3     0.750
 depgraph\pagerank               2     1     0.333
 depgraph\rendering              3     1     0.250
 depgraph\test_pagerank          0     1     1.000
 depgraph\test_xmlrpcrenderer    0     2     1.000
-depgraph\xmlrpcrenderer         1     2     0.667
+depgraph\xmlrpcrenderer         1     1     0.500
 funcinfo\__init__               0     1     1.000
-imp                             1     0     0.000
 inheritance\__init__            0     1     1.000
 setup                           0     0     0.000
 sloc                            1     0     0.000
 sloc\__init__                   0     2     1.000
-sloc\formatting                 1     3     0.750
+sloc\formatting                 1     2     0.667
 sloc\slocing                    1     0     0.000
-sys                             9     0     0.000
-tableprint                      3     1     0.250
+tableprint                      3     0     0.000
 test_init                       0     3     1.000
-test_modulefinder               0     2     1.000
+test_modulefinder               0     1     1.000
 test_utils                      0     1     1.000
 utils                           11    0     0.000
 -------------------------------------------------

@@ -185,7 +185,7 @@ I38
 sg23
 I0
 sbssg24
-S'qw\x11\xe8\xa1\x0c\xfc\x84>5\xc2\x81\xf4\x106\x8a'
+S'\xbf\xdc\x15\x1d\x1a\xe5\xe8\rl\x9a\x8d\xce\xce\x83d@'
 p55
 ssS'__init__'
 p56
@@ -210,7 +210,7 @@ I1
 sg19
 I0
 sg20
-I143
+I144
 sg21
 I0
 sg22
@@ -218,7 +218,7 @@ I110
 sg23
 I0
 sbssg24
-S'\xf0\xf8\x026\xaa\x85\x15=\xbe=\xb6p\x88\x11\x0b\xdf'
+S'Y=\xbc)?\x8e\x89\xc0OV\x11$05\xb9e'
 p62
 ssS'sloc_slocing'
 p63
@@ -421,7 +421,7 @@ I135
 sg23
 I0
 sbssg24
-S'-=?\x80\x0c\xc3M\xb7\xaf=\x0f\rN\\KG'
+S'1\xf2[\xc0\x83*\xb2W+\xb5\x8a\r2\x94N\xb1'
 p109
 ssS'depgraph_xmlrpcrenderer'
 p110
@@ -557,7 +557,7 @@ I85
 sg23
 I0
 sbssg24
-S'B\xf9\x9a\xe6\xdb\x1e]\x07N\x11L $J\xa2E'
+S'B\xd4{cX\xcb\xa1\x84\xfa\x85\x06\xbb\xb9\xf1H\x15'
 p141
 ssS'depgraph_test_pagerank'
 p142
@@ -784,15 +784,15 @@ I1
 sg19
 I0
 sg20
-I23
+I35
 sg21
 I0
 sg22
-I19
+I29
 sg23
 I0
 sbssg24
-S'\x9c\xd3\x9f\xf49\xb2\x03\x80)\x12\xc1|\xff\xe1M-'
+S'\x1b\xe7F\xc7:\x95ge-\xa8;\x16=\xb6\x02\xea'
 p194
 ssS'sloc___init__'
 p195
