@@ -6,6 +6,8 @@ Utilities for pynocle project.
 import abc
 import fnmatch
 import os
+import traceback
+
 
 class PynocleError(Exception):
     """Base class for custom exception hierarchy."""
@@ -13,15 +15,27 @@ class PynocleError(Exception):
 
 
 class AggregateError(PynocleError):
-    """Error that holds a group of other errors.  Argument will be a collection
-    of tuples (error instance, error traceback).
+    """Error that holds a group of other errors.  Exceptions should be a
+    collection of sys.exc_infos.  It is expected to raise this error with
+    the first aggregate's traceback.
     """
-    pass
+    def __init__(self, exc_infos):
+        self.exc_infos = exc_infos
+        formatted = [''.join(traceback.format_exception(*ei))
+                     for ei in exc_infos]
+        self.formatted_exc_infos = '\n'.join(formatted)
+        PynocleError.__init__(self)
+
+    def __str__(self):
+        return 'Errors:\n{0}\n{1}{0}'.format('-' * 10,
+                                             self.formatted_exc_infos)
+
+    __repr__ = __str__
 
 
 class MissingDependencyError(PynocleError):
-    """If you hit this exception, it means you tried to use a feature in pynocle that required a dependency you
-    weren't set up with!
+    """If you hit this exception, it means you tried to use a feature
+    in pynocle that required a dependency you weren't set up with!
     """
     pass
 

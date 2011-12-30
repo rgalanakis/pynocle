@@ -16,5 +16,5 @@ setup(name="pynocle",
       long_description=open('README.rst').read(),
       license='GPL',
       packages=['', 'cyclcompl', 'depgraph', 'inheritance', 'sloc'],
-      install_requires=['numpy', 'coverage']
+      install_requires=['numpy']
      )
