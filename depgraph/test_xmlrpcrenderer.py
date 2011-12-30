@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-import os
-import unittest
-
-import rendering
-import xmlrpcrenderer
+#import os
+#import unittest
+#
+#import rendering
+#import xmlrpcrenderer
 
 #class TestRpc(unittest.TestCase):
 #    """"Uncomment and try this out while a local server is running, if you want to see the xmlrpc in action.""""
