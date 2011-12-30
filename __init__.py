@@ -13,34 +13,14 @@ __version__ = "0.1.23"
 __email__ = "rob.galanakis@gmail.com"
 __status__ = "Pre-Alpha"
 
-import pynocle.utils as utils
-
-try:
-    import coverage
-except ImportError as exc:
-    coverage = utils.MissingDependencyError(repr(exc))
-    pass
 import os
 import shutil
+import sys
 
-import _pynoclecover
 import cyclcompl
 import depgraph
 import sloc
-
-def _check_coverage():
-    """If coverage is a MissingDependencyError (as opposed to a module), raise.  We do this so we don't fail if we
-    try to import coverage.
-    """
-    if type(coverage) == utils.MissingDependencyError:
-        raise coverage
-
-def run_with_coverage(func, **coveragekwargs):
-    """Runs and returns the result of func (a parameterless function).  coveragekwargs are used to create a
-    coverage.coverage instance.
-    """
-    _check_coverage()
-    return _pynoclecover.run_with_coverage(func, **coveragekwargs)
+import pynocle.utils as utils
 
 
 def ensure_clean_output(outputdir, _ran=0):
@@ -131,8 +111,7 @@ class Monocle(object):
                  depgraph_filename='depgraph.png',
                  coupling_filename='report_coupling.html',
                  couplingrank_filename='report_couplingrank.html',
-                 htmljump_filename='index.html',
-                 debug=False):
+                 htmljump_filename='index.html'):
         if not isinstance(rootdir, basestring):
             raise ValueError, 'Monocle only supports one root directory right now.'
         rootdir = os.path.abspath(rootdir or os.getcwd())
@@ -140,7 +119,6 @@ class Monocle(object):
 
         self.outputdir = outputdir
         self.coveragedata = coveragedata
-        self.debug = debug
 
         join = lambda x: os.path.join(self.outputdir, x)
         self.coverhtml_dir = join(coverhtml_dir)
@@ -177,14 +155,11 @@ class Monocle(object):
         directory: The directory all the html files will be output to.  Directory must exist.
         """
         #isinstance causes scope problems so use exact type checking here.
-        _check_coverage()
         self.coveragedata.html_report(directory=self.coverhtml_dir)
         self._filesforjump.add(os.path.join(self.coverhtml_dir, 'index.html'))
 
     def generate_cover_report(self):
         """Generates a coverage report for cov to filename."""
-        #isinstance causes scope problems so use exact type checking here.
-        _check_coverage()
         with open(self.coverreport_filename, 'w') as f:
             self.coveragedata.report(file=f)
         self._filesforjump.add(self.coverreport_filename)
@@ -245,15 +220,12 @@ class Monocle(object):
         """
         if cleanoutput:
             self.ensure_clean_output()
-        excs = []
+        exc_infos = []
         def trydo(func):
-            if self.debug:
-                return func()
             try:
                 return func()
-            except Exception as exc:
-                import traceback
-                excs.append((exc, traceback.format_exc()))
+            except Exception:
+                exc_infos.append(sys.exc_info())
 
         trydo(self.generate_sloc)
         trydo(self.generate_cyclomatic_complexity)
@@ -268,5 +240,5 @@ class Monocle(object):
         trydo(self.generate_html_jump)
          #self.generate_funcinfo_report,
          #self.generate_inheritance_report,
-        if excs:
-            raise utils.AggregateError, excs
+        if exc_infos:
+            raise utils.AggregateError(exc_infos)
