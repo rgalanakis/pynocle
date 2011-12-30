@@ -2,7 +2,6 @@
 
 import nose
 import os
-import sys
 
 def run_on_pynocle(cov=None):
     import _pynoclecover
@@ -33,17 +32,5 @@ def run_on_pynocle(cov=None):
     m2._filesforjump.update(m._filesforjump)
     m2.generate_all(False)
 
-def run_on_ccppipeline():
-    import pynocle
-    dirname = os.path.dirname(__file__)
-    pipedir = os.path.join(dirname, '..', 'pipeline')
-    outdir = os.path.join(pipedir, 'metrics')
-    sys.path.append(pipedir)
-    m = pynocle.Monocle(outdir, rootdir=pipedir, debug=True)
-    m.generate_all()
-
 if __name__ == '__main__':
-    if '--testccp' in sys.argv:
-        run_on_ccppipeline()
-    else:
-        run_on_pynocle()
+    run_on_pynocle()
