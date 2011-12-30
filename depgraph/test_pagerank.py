@@ -2,7 +2,7 @@
 
 import unittest
 
-import pagerank
+import pynocle.depgraph.pagerank as pagerank
 
 class TestPageRank(unittest.TestCase):
     def testOneCircle(self):
