@@ -42,28 +42,32 @@ def run_with_coverage(func, **coveragekwargs):
     _check_coverage()
     return _pynoclecover.run_with_coverage(func, **coveragekwargs)
 
-def ensure_clean_output(outputdir, _ran=False):
+
+def ensure_clean_output(outputdir, _ran=0):
     """rmtree and makedirs outputdir to ensure a clean output directory.
 
     outputdir: The folder to create.
     _ran: For internal use only.
     """
-    #There is a potential race condition where rmtree seems to succeed and makedirs fails so
-    #the directory doesn't exist.  So for the time being, if makedirs fails, we re-invoke the function once.
-    #TODO: Figure out race condition.
+    # There is a potential race condition where rmtree seems to succeed
+    # and makedirs fails so #the directory doesn't exist.
+    # So for the time being, if makedirs fails, we re-invoke the function
+    # 3 times.  I have observed this condition many times in the wild- I
+    # don't want to believe it exists, but it does.
     try:
         shutil.rmtree(outputdir)
     except WindowsError:
         pass
     if os.path.exists(outputdir):
-        raise IOError, '%s was not deleted.' % outputdir
+        raise IOError('%s was not deleted.' % outputdir)
     try:
         os.makedirs(outputdir)
     except WindowsError:
-        if not _ran:
-            ensure_clean_output(outputdir, _ran=True)
+        if _ran < 3:
+            ensure_clean_output(outputdir, _ran=_ran + 1)
         if not os.path.isdir(outputdir):
             raise
+
 
 def _create_dependency_group(codefilenames, dependencygroup):
     """If dependencygroup is provided, returns that, otherwise generates a new DependencyGroup from
@@ -73,6 +77,7 @@ def _create_dependency_group(codefilenames, dependencygroup):
         depb = depgraph.DepBuilder(codefilenames)
         dependencygroup = depgraph.DependencyGroup(depb.dependencies, depb.failed)
     return dependencygroup
+
 
 def _generate_html_jump_str(htmlfilename, paths):
     """Generates the html contents for the jump page."""
