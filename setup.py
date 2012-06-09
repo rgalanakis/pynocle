@@ -2,19 +2,36 @@
 
 from distutils.core import setup
 
-try:
-    import pynocle
-except ImportError:
-    pynocle = None
-
 setup(name="pynocle",
-      version=pynocle.__version__,
-      author=pynocle.__author__,
-      author_email=pynocle.__email__,
-      url="http://code.google.com/p/pynocle/",
-      description="Software metrics for your python code",
-      long_description=open('README.rst').read(),
-      license='GPL',
-      packages=['', 'cyclcompl', 'depgraph', 'inheritance', 'sloc'],
-      install_requires=['numpy']
-     )
+    version="0.2",
+    author="Rob Galanakis",
+    author_email="rob.galanakis@gmail.com",
+    url="http://code.google.com/p/pynocle/",
+    download_url='http://pypi.python.org/pypi/pynocle',
+
+    packages=['pynocle'],
+
+    description="Software metrics for your python code",
+    long_description=open('README.txt').read(),
+
+    license = "MIT",
+    platforms = ['POSIX', 'Windows'],
+
+    install_requires=['numpy'],
+
+    classifiers = [
+        "Programming Language :: Python",
+        "Operating System :: OS Independent",
+        "License :: OSI Approved :: MIT License",
+        "Development Status :: 3 - Alpha",
+
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        'Topic :: Documentation',
+        'Topic :: Scientific/Engineering :: Information Analysis',
+        'Topic :: Software Development',
+        'Topic :: Software Development :: Testing',
+
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+    ]
+)
