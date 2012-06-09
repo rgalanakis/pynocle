@@ -2,6 +2,7 @@
 
 import sys
 
+import _doc
 import pynocle.tableprint as tableprint
 import pynocle.utils as utils
 
@@ -13,14 +14,8 @@ def _fmtperc(i):
 
 
 def _get_infostr(leadingpath):
-    s = """
-Measures physical source lines of code (SLOC), lines of comments,
-and blank lines, in number and percentage of file.
-
-Also measures total line count and as percentage of total codebase lines.
-
-Showing SLOC for files under {0}.
-""".format(leadingpath.replace('\\', '/'))
+    s = _doc.about() + '\nShowing SLOC for files under %s.' % (
+        leadingpath.replace('\\', '/'))
     return s
 
 

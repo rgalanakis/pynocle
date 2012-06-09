@@ -96,55 +96,20 @@ homepage for the source so I can't link anywhere.
 Description of Metrics
 ======================
 
+A generated metrics report will have more information about software metrics,
+and links for additional info.
+
+See the example output for more info, available here:
+
 You can look at any good static analysis tool and wikipedia to get
 overviews of various code metrics:
 
   * http://www.ndepend.com/Metrics.aspx
   * http://www.aivosto.com/project/help/pm-index.html
-  * http://en.wikipedia.org/wiki/Cyclomatic_complexity
-  * http://en.wikipedia.org/wiki/Source_lines_of_code
+  *
+  *
   * http://en.wikipedia.org/wiki/Dependency_graph
   * http://en.wikipedia.org/wiki/Code_coverage
 
-SLOC (Source Lines of Code)
----------------------------
-Useful to see the general size and distribution of code across the codebase.
-The number of bugs in a codebase can be said in general to be proportional
-to its lines of code, but this code metric is most useful in understanding
-the codebase, rather than finding quality issues.
 
-Cyclomatic Complexity
----------------------
-Cyclomatic Complexity measures the number of decisions of piece of code can make
-(flow control such as if/then, try/catch, for, while, break, continue,
-etc.).  Values between 1-9 are considered ideal.  Values between 10-20 are
-considered acceptable depending on the use (they can indicate poor design,
-or inherently tricky areas).  Values higher than 20 should be considered
-unacceptable and must be refactored.  Generally high CC indicates code is
-difficult to understand, far away from polymorphism, and has a high
-liklihood of introducing bugs during bugfixing or maintenance.
 
-Coupling
---------
-Coupling measures how closely bound two modules are.  Afferent coupling (Ca)
-measures how many modules reference a given module.  Efferent coupling
-(Ce) measures how many modules a given module referenecs.  Afferent
-coupling of 0 can indicate dead code, since nothing references it, with
-various exceptions (test module, entry points, dynamic references,
-configuration, etc.).  High efferent coupling means a module is
-very dependent on other modules and has a high liklihood of change.
-
-Instability measures the ratio Ce / (Ca + Ce), so a module that depends
-on nothing is considered fully stable, and a module that depends on
-others entirely is considered entirely unstable.
-
-Coupling/Module Rank
---------------------
-Coupling only tells a part of the story.  Imagine you have a few helper
-classes used by a core library that every other module references.  The
-Ca of those helpers would be low, but they would be very important.
-So we can use the Google PageRank algorithm to determine a weight of
-important of all modules.  The most highly ranked modules should have
-the most thorough testing since the most amount of code is dependent
-upon them.
- 

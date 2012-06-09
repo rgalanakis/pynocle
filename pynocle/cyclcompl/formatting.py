@@ -2,6 +2,7 @@
 
 import sys
 
+import _doc
 import pynocle.tableprint as tableprint
 import pynocle.utils as utils
 
@@ -16,16 +17,9 @@ def _above_threshold(flatstat, threshold):
 
 
 def _get_header_rst(leadingpath, threshold):
-    s = """
-**Cyclomatic Complexity** is a measure of decisions that
-can be made in a procedure.
-
-Values <= 10 are fine, between 11 and 20 should be refactored,
-and values above 20 are usually considered unacceptable
-and should be refactored.
-
-Showing files under {0} with a CC greater than or equal to {1}.
-""".format(leadingpath.replace('\\', '/'), threshold)
+    s = _doc.about()
+    s += '\nShowing files under %s with a CC greater than or equal to %s.' % (
+        leadingpath.replace('\\', '/'), threshold)
     return s
 
 

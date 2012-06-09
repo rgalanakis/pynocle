@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
-import coverage
-import nose
+#import coverage
+#import nose
 import os
+
+os.environ['path'] += os.pathsep + r'C:\Program Files (x86)\Graphviz 2.28\bin'
 
 thisdir = os.path.dirname(__file__)
 outdir = os.path.join(thisdir, 'exampleoutput')

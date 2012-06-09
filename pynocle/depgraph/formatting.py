@@ -2,10 +2,10 @@
 
 import sys
 
+import _doc
 import pagerank
 import pynocle.tableprint as tableprint
 import pynocle.utils as utils
-
 
 
 def _calc_instability(ca, ce):
@@ -19,23 +19,9 @@ def _calc_instability(ca, ce):
 
 
 def _coupling_infostr(leadingpath):
-    s = """
-Report for coupling between modules. Coupling measures how "connected"
-modules are to each other. There are two types of coupling:
-
-**Afferent coupling (Ca)** is the number of modules that use a given module.
-0 can indicate dead code.
-
-**Efferent coupling (Ce)** is the number of modules a given module imports.
-A high value can indicate a brittle module.
-
-In addition, **Instability (I)** is the ratio of **Ce** to total coupling
-(ie, ``I = Ce / (Ce + Ca)``).
-It indicates the module's resilience to change between 0 (completely stable)
-and 1 (unstable).
-
-Showing the coupling between files under {0}.
-""".format(leadingpath.replace('\\', '/'))
+    s = _doc.about_coupling()
+    s += '\nShowing the coupling between files under %s.' % (
+        leadingpath.replace('\\', '/'))
     return s
 
 
@@ -86,13 +72,8 @@ def _fmt_rank(val):
 
 
 def _rank_infostr(leadingpath):
-    s = """
-Google's PageRank algorithm applied to Coupling.
-
-High vaules are more "important" in the same way highly ranked webpages are.
-
-Showing PageRank coupling for {0}.
-""".format(leadingpath.replace('\\', '/'))
+    s = _doc.about_rank()
+    s += '\nShowing PageRank coupling for %s.' % leadingpath.replace('\\', '/')
     return s
 
 
