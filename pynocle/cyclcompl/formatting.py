@@ -50,6 +50,7 @@ class CCGoogleChartFormatter(utils.IReportFormatter):
         self.leading_path = leading_path
 
         self.chart = tableprint.GoogleChartTable(
+            'Cyclomatic Complexity',
             [('Filename', 'string'),
                 ('Type', 'string'),
                 ('Name', 'string'),

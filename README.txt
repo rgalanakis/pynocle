@@ -106,10 +106,7 @@ overviews of various code metrics:
 
   * http://www.ndepend.com/Metrics.aspx
   * http://www.aivosto.com/project/help/pm-index.html
-  *
-  *
-  * http://en.wikipedia.org/wiki/Dependency_graph
-  * http://en.wikipedia.org/wiki/Code_coverage
+
 
 
 

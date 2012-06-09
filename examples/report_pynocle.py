@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-#import coverage
-#import nose
 import os
 
 os.environ['path'] += os.pathsep + r'C:\Program Files (x86)\Graphviz 2.28\bin'
@@ -11,6 +9,7 @@ outdir = os.path.join(thisdir, 'exampleoutput')
 pynocledir = os.path.join(thisdir, '..', 'pynocle')
 
 def _get_coverage():
+    import coverage
     try:
         cov = coverage.coverage()
     except Exception as exc:
@@ -25,7 +24,7 @@ def _get_coverage():
     oldcwd = os.getcwd()
     try:
         os.chdir(pynocledir)
-        nose.run()
+        import pynocle
     finally:
         os.chdir(oldcwd)
     cov.stop()
@@ -33,7 +32,7 @@ def _get_coverage():
 
 
 def run_on_pynocle():
-    cov = None#_get_coverage()
+    cov = _get_coverage()
 
     import pynocle
     m = pynocle.Monocle('Pynocle', outdir, rootdir=pynocledir, coveragedata=cov)
