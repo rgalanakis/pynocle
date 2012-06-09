@@ -9,15 +9,18 @@ setup(name="pynocle",
     url="http://code.google.com/p/pynocle/",
     download_url='http://pypi.python.org/pypi/pynocle',
 
-    packages=['pynocle'],
+    packages=['pynocle',
+              'pynocle.cyclcompl',
+              'pynocle.depgraph',
+              'pynocle.funcinfo',
+              'pynocle.inheritance',
+              'pynocle.sloc'],
 
     description="Software metrics for your python code",
     long_description=open('README.txt').read(),
 
     license = "MIT",
     platforms = ['POSIX', 'Windows'],
-
-    install_requires=['numpy'],
 
     classifiers = [
         "Programming Language :: Python",
