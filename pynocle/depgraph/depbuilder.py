@@ -9,6 +9,7 @@ import sys
 import pynocle._modulefinder as modulefinder
 import pynocle.utils as utils
 
+
 PYTHON_EXE_DIR_FILTER = os.path.dirname(sys.executable) + '*'
 EXCLUDE_MODULES = ('sys', 'time','imp')
 

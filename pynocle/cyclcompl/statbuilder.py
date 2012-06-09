@@ -24,26 +24,9 @@ class Stats(object):
         self.complexity = 1
 
     def __str__(self):
-        return '%s: name=%r, classes=%r, functions=%r, complexity=%r' \
-                % (self.__class__.__name__, self.name, self.classes, self.functions, self.complexity)
-
-    __repr__ = __str__
-
-
-class ClassStats(Stats):
-    """Represents the statistics for a class."""
-    def __str__(self):
-        return 'Stats: name=%r, methods=%r, complexity=%r, inner_class=%r' \
-                % (self.name, self.functions, self.complexity, self.classes)
-
-    __repr__ = __str__
-
-
-class DefStats(Stats):
-    """Represents the statistics for a function or method."""
-    def __str__(self):
-        return 'DefStats: name=%r, complexity=%r' \
-                % (self.name, self.complexity)
+        return '%s(name=%r, classes=%r, functions=%r, complexity=%r)' % (
+            self.__class__.__name__,
+            self.name, self.classes, self.functions, self.complexity)
 
     __repr__ = __str__
 
@@ -94,12 +77,12 @@ class FlatStats(object):
 
 class CCVisitor(ASTVisitor):
     """Encapsulates the cyclomatic complexity counting."""
-    def __init__(self, ast, stats=None, description='<module>'):
+    def __init__(self, ast):
         ASTVisitor.__init__(self)
         if isinstance(ast, basestring):
             ast = compiler.parse(ast)
 
-        self.stats = stats or Stats(description)
+        self.stats = Stats(ast.name)
         for child in ast.getChildNodes():
             compiler.walk(child, self, walker=self)
 
@@ -110,18 +93,14 @@ class CCVisitor(ASTVisitor):
     def visitFunction(self, node):
         if not hasattr(node, 'name'): # lambdas
             node.name = '<lambda>'
-        stats = DefStats(node.name)
-        vis = CCVisitor(node, stats)
-        stats2 = vis.stats
-        self.stats.functions.append(stats2)
+        vis = CCVisitor(node)
+        self.stats.functions.append(vis.stats)
 
     visitLambda = visitFunction
 
     def visitClass(self, node):
-        stats = ClassStats(node.name)
-        vis = CCVisitor(node, stats)
-        stats2 = vis.stats
-        self.stats.classes.append(stats2)
+        vis = CCVisitor(node)
+        self.stats.classes.append(vis.stats)
 
     def visitIf(self, node):
         self.stats.complexity += len(node.tests)
@@ -131,26 +110,30 @@ class CCVisitor(ASTVisitor):
         self.stats.complexity += 1
         self.dispatchChildren(node)
 
-    visitFor = visitGenExprFor = visitGenExprIf = visitListCompFor = visitListCompIf = visitWhile = _visitWith = \
-        __processDecisionPoint
-
+    visitFor = __processDecisionPoint
+    visitGenExprFor = __processDecisionPoint
+    visitGenExprIf = __processDecisionPoint
+    visitListCompFor = __processDecisionPoint
+    visitListCompIf = __processDecisionPoint
+    visitWhile = __processDecisionPoint
+    visitWith = __processDecisionPoint
     visitAnd = __processDecisionPoint
     visitOr = __processDecisionPoint
 
 
-def measure_complexity(codefile_contents, module_name=None):
-    """Calculates complexity for codefile_contents string and returns a FlatStats."""
-    visitor = CCVisitor(codefile_contents, description=module_name)
-    return FlatStats(visitor.stats)
-
 def measure_file_complexity(filename):
     """Returns a FlatStats object for the contents of the file at filename."""
+    modulename = utils.splitpath_root_file_ext(filename)[1]
     ast = compiler.parseFile(filename)
-    return measure_complexity(ast, module_name=utils.splitpath_root_file_ext(filename)[1])
+    ast.name = modulename
+    visitor = CCVisitor(ast)
+    return FlatStats(visitor.stats)
+
 
 def measure_cyclcompl(files):
-    """Returns 2 items: A collection of (filename, FlatStat instance for file) tuples, and a collection of files that
-    failed to parse.
+    """Returns 2 items:
+    A collection of (filename, FlatStat instance for file) tuples,
+    and a collection of files that failed to parse.
     """
     result = []
     failures = []

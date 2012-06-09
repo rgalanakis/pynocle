@@ -41,22 +41,6 @@ class _CouplingFormatter(utils.IReportFormatter):
             rows.append([utils.prettify_path(f, self.leading_path), ca, ce, self._calc_instability(ca, ce)])
         return rows
 
-    
-class CouplingTextFormatter(_CouplingFormatter):
-    def format_report_header(self):
-        self._outstream.write(self.infostr('\n', '\n'))
-        self._outstream.write('\n\n')
-
-    def format_data(self, dependencygroup):
-        def stringify(row):
-            return row[0], str(row[1]), str(row[2]), '%.3f' % row[3]
-        header = 'Filename', 'Ca', 'Ce', 'I'
-        c = tableprint.JUST_C
-        justs = tableprint.JUST_L, c, c, c
-        rows = map(stringify, self.get_rows(dependencygroup))
-        tbl = tableprint.Table(header, rows, just=justs)
-        tbl.write(self._outstream)
-
 
 class CouplingGoogleChartFormatter(_CouplingFormatter):
     def __init__(self, *args, **kwargs):
@@ -110,21 +94,6 @@ class _RankFormatter(utils.IReportFormatter):
         return rowinfos
 
 
-class RankTextFormatter(_RankFormatter):
-
-    def format_report_header(self):
-        self._outstream.write(self.infostr('\n', '\n'))
-        self.outstream().write('\n\n')
-
-    def format_data(self, dependencygroup):
-        header = 'Filename', 'PageRank', 'PageID', 'Outgoing Links'
-        def stringify(row):
-            return row[0], self._fmt_rank(row[1]), str(row[2]), str(row[3])
-        rows = map(stringify, self.create_rows(dependencygroup))
-        tbl = tableprint.Table(header, rows)
-        tbl.write(self._outstream)
-
-
 class RankGoogleChartFormatter(_RankFormatter):
     def __init__(self, *args, **kwargs):
         super(RankGoogleChartFormatter, self).__init__(*args, **kwargs)
@@ -147,9 +116,3 @@ class RankGoogleChartFormatter(_RankFormatter):
             return [row[0], self._js_perc(row[1]), row[2], str(row[3])]
         rows = map(stringify, self.create_rows(dependencygroup))
         self.outstream().write(self.chart.second_part(rows))
-
-coupling_formatter_registry = utils.ExtensionFormatterRegistry({'.txt': CouplingTextFormatter,
-                                                                '.html': CouplingGoogleChartFormatter})
-
-couplingrank_formatter_registry = utils.ExtensionFormatterRegistry({'.txt': RankTextFormatter,
-                                                                '.html': RankGoogleChartFormatter})

@@ -9,8 +9,10 @@ import tempfile
 
 import pynocle.utils as utils
 
+
 def lerp(minval, maxval, term):
     return (maxval - minval) * term + minval
+
 
 def saturate(num, floats=True):
     if hasattr(num, '__iter__'):
@@ -22,13 +24,16 @@ def saturate(num, floats=True):
         return maxval
     return num
 
+
 def nth_percentile(values, n=0.95):
-    """Get's the value in values that is closest to the nth percentile.  For example, nth_percentile([4, 2, 1, 5], .75)
+    """Get's the value in values that is closest to the nth percentile.
+    For example, nth_percentile([4, 2, 1, 5], .75)
     would return 4.
     """
     sorted_vals = sorted(values)
     ind = int(len(sorted_vals) * n)
     return sorted_vals[ind]
+
 
 class IRenderer(object):
     __metaclass__ = abc.ABCMeta
@@ -54,12 +59,14 @@ class IRenderer(object):
         return '[%s]' % ','.join(filter(None, [argstr, kws]))
 
     def get_output_format(self, outputfilename, overrideformat=None):
-        """Returns the file format/type/extension string based on the arguments (use overrideformat if provided,
+        """Returns the file format/type/extension string based on the arguments
+        (use overrideformat if provided,
         otherwise use outputfilename's extension).
         """
         result = overrideformat
         if not result:
-            result = os.path.splitext(outputfilename)[1][1:] #Skip the period on the extension
+            #Skip the period on the extension
+            result = os.path.splitext(outputfilename)[1][1:]
         return result
     
     def render(self, outputfilename, dotpath=None, overrideformat=None, wait=True, moreargs=()):

@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 import compiler
+import compiler.ast
 
 import pynocle.utils as utils
+
 
 class ClassInfo(object):
     def __init__(self, filename, classname, bases):
