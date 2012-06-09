@@ -1,15 +1,20 @@
 #!/usr/bin/env python
-"""Functions for finding modules so pynocle doesn't have to go through python's import machinery.  Ideally it does
-not have to run any code in order to analyze.
+"""Functions for finding modules so pynocle doesn't have to go
+through python's import machinery.
+Ideally it does not have to run any code in order to analyze.
 """
 import imp
 import os
 import sys
 
+_oabs = os.path.abspath
+_ojoin = os.path.join
+
+
 class _ModuleFinder(object):
     def __init__(self, modulename, importing_module_filename):
         self.modulename = modulename
-        self.imp_mod_dir = os.path.dirname(os.path.abspath(importing_module_filename))
+        self.imp_mod_dir = os.path.dirname(_oabs(importing_module_filename))
         self.splitmodulename = modulename.split('.')
 
     def __repr__(self):
@@ -19,7 +24,10 @@ class _ModuleFinder(object):
     __str__ = __repr__
     
     def find_in_sysmodules(self):
-        """Looks for a module in sys.modules that has a matching modulename and a __file__ attr."""
+        """If self.module is in sys.modules, return the value of its
+        __file__ attr if it has it.
+        Otherwise, return None.
+        """
         if self.modulename in sys.modules:
             filename = getattr(sys.modules[self.modulename], '__file__', None)
             if filename:
@@ -27,22 +35,26 @@ class _ModuleFinder(object):
         return None
 
     def find_from_builtins(self):
-        """If modulename has only one component, find a module for it and return its path if its path is equal to its
+        """If modulename has only one component,
+        find a module for it and return its path if its path is equal to its
         name, such as is the case for sys, time, etc.
+
+        If modulename has more than one component, or module cannot be found,
+        return None.
         """
         if len(self.splitmodulename) != 1:
-            return
+            return None
         try:
             path = imp.find_module(self.splitmodulename[0])[1]
-            #if path == self.splitmodulename[0]:
             return path
         except ImportError:
-            pass
-        return None
+            return None
 
     def find_package(self, path):
-        """Returns the filename for the __init__ file if path is the directory of a package, None if path is not a
-        directory or there is no init file."""
+        """Returns the filename for the __init__ file if path is
+        the directory of a package,
+        None if path is not a directory or there is no init file.
+        """
         if not os.path.isdir(path):
             return None
         for suffix in map(lambda suf: suf[0], imp.get_suffixes()):
@@ -99,6 +111,7 @@ class _ModuleFinder(object):
         #isn't available to us, so just return nothing for now...
         return None
         #raise NotImplementedError
+
 
 def get_module_filename(modulename, importing_module_filename=None, stripext=True):
     """Return the filename of the module at modulename.  Tries to emulate the python import logic, without running

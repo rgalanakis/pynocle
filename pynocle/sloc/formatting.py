@@ -5,6 +5,7 @@ import sys
 import pynocle.tableprint as tableprint
 import pynocle.utils as utils
 
+
 class _SlocFormatter(utils.IReportFormatter):
     """Base class for formatters for SLOC info.
 
@@ -55,28 +56,6 @@ class _SlocFormatter(utils.IReportFormatter):
         return rows
 
 
-class SlocTextFormatter(_SlocFormatter):
-    def format_report_header(self):
-        self.out.write(self.infostr('\n', '\n'))
-        self.out.write('\n\n')
-
-    def _stringify(self, row):
-        """Returns a row/list as a list of properly formatted strings."""
-        return [row[0],
-               str(row[1]), self._fmtperc(row[2]),
-               str(row[3]), self._fmtperc(row[4]),
-               str(row[5]), self._fmtperc(row[6]),
-               str(row[7]), self._fmtperc(row[8])]
-
-    def format_data(self, slocgroup):
-        header = 'Filename', 'Code', 'Code%', 'Comment', 'Comment%', 'Blank', 'Blank%', 'Total', 'Total%'
-        c = tableprint.JUST_C
-        justs = tableprint.JUST_L, c, c, c, c, c, c, c, c
-        rows = map(self._stringify, self.create_rows(slocgroup))
-        tbl = tableprint.Table(header, rows, just=justs)
-        tbl.write(self.out)
-
-
 class SlocGoogleChartFormatter(_SlocFormatter):
     def __init__(self, *args, **kwargs):
         super(SlocGoogleChartFormatter, self).__init__(*args, **kwargs)
@@ -115,6 +94,3 @@ class SlocGoogleChartFormatter(_SlocFormatter):
     def format_data(self, slocgroup):
         rows = map(self._stringify, self.create_rows(slocgroup))
         self.outstream().write(self.chart.second_part(rows))
-
-
-formatter_registry = utils.ExtensionFormatterRegistry({'.txt': SlocTextFormatter, '.html': SlocGoogleChartFormatter})

@@ -20,6 +20,7 @@ class SlocInfo(object):
             return self.byinds[item]
         raise AttributeError, str(item) + ' could not be used as an index or key.'
 
+
 class SlocInfoExt(SlocInfo):
     """Simple data wrapper for extended SLOC info that can be accessed by attribute, key, or index.
     Index order is code, comment, blank, codeperc, commentperc, blankperc, total, *kvps
@@ -50,11 +51,13 @@ class SlocInfoExt(SlocInfo):
                            'total':self.total})
         self.bykey.update(kvps)
 
+
 def to_slocinfoext(slocinfo, kvps=()):
     """Converts a SlocInfo to a SlocInfoExt.  Equivalent to
     SlocInfoExt(slocinfo.code, slocinfo.comment, slocinfo.blank, kvps=kvps)
     """
     return SlocInfoExt(slocinfo.code, slocinfo.comment, slocinfo.blank, kvps=kvps)
+
 
 def count_lines(codelines):
     """Returns a SlocInfo for all the lines of code in codelines."""
@@ -68,15 +71,18 @@ def count_lines(codelines):
             codecount += 1
     return SlocInfo(codecount, commentcount, blankcount)
 
+
 def count_file(filename):
     """Returns a SlocInfo for the source code at filename."""
     with open(filename) as f:
         return count_lines(f.xreadlines())
 
+
 def count_files(filenames):
     """Yields SlocInfos for each file in filenames."""
     for f in filenames:
         yield count_file(f)
+
 
 class SlocGroup(object):
     """Stores a dictionary at self.filenamesToSlocInfos where the keys are filenames and each value is a SlocInfoExt.

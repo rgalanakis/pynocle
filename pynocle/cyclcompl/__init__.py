@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-import formatting
-from formatting import DEFAULT_THRESHOLD, formatter_registry
+from formatting import CCGoogleChartFormatter
 
-import statbuilder
 from statbuilder import measure_cyclcompl
-
-

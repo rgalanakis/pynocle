@@ -15,20 +15,22 @@ class PynocleError(Exception):
 
 
 class AggregateError(PynocleError):
-    """Error that holds a group of other errors.  Exceptions should be a
-    collection of sys.exc_infos.  It is expected to raise this error with
-    the first aggregate's traceback.
+    """Error that holds a group of other errors.
+    Exceptions should be a collection of sys.exc_infos (asserts if empty/None).
+    The AggregateError will use the traceback of the first exc_info.
     """
     def __init__(self, exc_infos):
+        assert exc_infos
         self.exc_infos = exc_infos
         formatted = [''.join(traceback.format_exception(*ei))
                      for ei in exc_infos]
         self.formatted_exc_infos = '\n'.join(formatted)
-        PynocleError.__init__(self)
+        ei = self.exc_infos[0]
+        PynocleError.__init__(self, AggregateError, self, ei[2])
 
     def __str__(self):
-        return 'Errors:\n{0}\n{1}{0}'.format('-' * 10,
-                                             self.formatted_exc_infos)
+        return 'Errors:\n{0}\n{1}{0}'.format(
+            '-' * 10, self.formatted_exc_infos)
 
     __repr__ = __str__
 
@@ -47,7 +49,8 @@ class IReportFormatter(object):
     def outstream(self):
         """Returns a file-like object to write to.
 
-        If subclasses provide a _outstream attribute, this method will return that, otherwise override it.
+        If subclasses provide a _outstream attribute,
+        this method will return that, otherwise override this.
         """
         #noinspection PyUnresolvedReferences
         return self._outstream
@@ -55,10 +58,12 @@ class IReportFormatter(object):
 
     @abc.abstractmethod
     def format_report_header(self):
-        """Writes the information that should be at the top of the report to self.outstream()."""
+        """Writes the information that should be at the top
+        of the report to self.outstream()."""
 
     def format_report_footer(self):
-        """Writes the information that should be at the bottom of the report.  Usually a no-op."""
+        """Writes the information that should be at the bottom of the report.
+        Usually a no-op."""
 
     @abc.abstractmethod
     def format_data(self, data):
@@ -66,11 +71,13 @@ class IReportFormatter(object):
 
 
 def write_report(filename, data, formatter_factory):
-    """Opens a stream for the file at filename and writes the header/data/footer using the provided formatter.
+    """Opens a stream for the file at filename and writes the
+    header/data/footer using the provided formatter.
 
-    filename: Filename of the report.
-    data: Data to write into the report.
-    formatter_factory: Callable that takes the filestream at filename and returns an IReportFormatter.
+    :param filename: Filename of the report.
+    :param data: Data to write into the report.
+    :param formatter_factory: Callable that takes the filestream at
+      filename and returns an IReportFormatter.
     """
     with open(filename, 'w') as f:
         fmt = formatter_factory(f)
@@ -79,57 +86,15 @@ def write_report(filename, data, formatter_factory):
         fmt.format_report_footer()
 
 
-class ExtensionFormatterRegistry(object):
-    def __init__(self, mapping=()):
-        self.mapping = dict(mapping)
-
-    def Register(self, ext, value):
-        self.mapping[ext] = value
-
-    def GetFormatter(self, ext, default=None):
-        return self.mapping.get(ext, default)
-
-    def GetFormatterFactory(self, ext, default=None, **kwargs):
-        result = self.GetFormatter(ext, default)
-        if not result:
-            return result
-        return lambda stream: result(stream, **kwargs)
-
-
-class _FindAll:
-    """Helper state class for getting all filenames from a group of files and folders."""
-    def __init__(self, files_and_folders, pattern):
-        self.processed_files = []
-        self.processed_files_set = set()
-        self.pattern = pattern
-        self.findall(map(os.path.abspath, files_and_folders))
-
-    def not_yet_processed(self, filename):
-        return filename not in self.processed_files_set
-
-    def findfiles(self, filenames):
-        """Updates processed_files with new python files in filenames."""
-        if not filenames:
-            return
-        files = fnmatch.filter(filenames, self.pattern)
-        unique = filter(self.not_yet_processed, files)
-        self.processed_files.extend(unique)
-        self.processed_files_set.update(unique)
-
-    def findall(self, files_and_folders):
-        """Counts the lines of code recursively in all files and folders."""
-        self.findfiles(filter(os.path.isfile, files_and_folders))
-        for d in filter(os.path.isdir, files_and_folders):
-            paths = map(lambda x: os.path.join(d, x), os.listdir(d))
-            self.findall(paths)
-
-
-def find_all(files_and_folders, pattern='*.py'):
-    """Given a collection of files and folders, return all the absolute path of files in the collection
-    and recursively under any folders in the collection that fnmatch pattern.
+def walk_recursive(root, pattern='*.py'):
+    """Walks through all files and directories under `root` and yields
+    the full path of any filenames that
+    `fnmatch.fnmatch(<fullpath>, pattern)`.
     """
-    fa = _FindAll(files_and_folders, pattern)
-    return fa.processed_files
+    for root, dirnames, filenames in os.walk(root):
+        for filename in fnmatch.filter(filenames, pattern):
+            yield os.path.join(root, filename)
+
 
 def splitpath_root_file_ext(path):
     """Returns a tuple of path, pure filename, and extension."""
@@ -137,31 +102,39 @@ def splitpath_root_file_ext(path):
     filename, ext = os.path.splitext(tail)
     return head, filename, ext
 
-def flatten(node, getchildren):
-    """Return a generator that walks node and children recursively.
 
-    node: Any node that has children.
-    getchildren: A callable that takes node and returns a collection of children that will be walked recursively.
+def flatten(node, getchildren):
+    """Return a generator that walks node and children recursively
+    (depth-first).
+
+    :param node: Any node that has children.
+    :param getchildren: A callable that takes node and
+      returns a collection of children that will be walked recursively.
     """
     yield node
     for child in getchildren(node):
         for gc in flatten(child, getchildren):
             yield gc
 
+
 def swap_keys_and_values(d):
-    """Returns a new dictionary where keys are d.values() and values are d.keys().  If there are duplicate values,
-    raises a KeyError.
+    """Returns a new dictionary where keys are d.values()
+    and values are d.keys().
+    If there are duplicate values, raises a KeyError.
     """
     result = dict(zip(d.values(), d.keys()))
     if len(d) != len(result):
-        raise KeyError, 'There were duplicate values in argument.  Values: %s' % d.values()
+        raise KeyError('There were duplicate values in argument.  Values: %s' %
+                       d.values())
     return result
 
-def prettify_path(path, leading=None):
-    """If path begins with leading, strip it and remove any new leading slashes.  Also removes the extension and ensures
-    all seps are os.sep.
 
-    leader: If None, cwd.
+def prettify_path(path, leading=None):
+    """If path begins with `leading`,
+    strip it and remove any new leading slashes.
+    Also removes the extension and ensures all seps are os.sep.
+
+    :param leading: If None, cwd.
     """
     leading = (leading or os.getcwd()).replace(os.altsep, os.sep)
     s = os.path.splitext(path.replace(os.altsep, os.sep))[0]

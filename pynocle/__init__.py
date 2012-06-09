@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 """
-pynocle is a module for reporting of code metrics and other inspection/reporting features.
+pynocle is a module for reporting of code metrics and other
+inspection/reporting features.
 
-It is meant to be used as a very simple API, usually as part of the the testing/build process.  Simply
-create a new Monocle object with the directories and files you want to analyze
-(along with coverage data if you have it), and call generate_all.
+It is meant to be used as a very simple API,
+usually as part of the the testing/build process.
+Simply create a new Monocle object with the directories
+and files you want to analyze (along with coverage data if you have it),
+and call generate_all.
 """
 
 import os
@@ -24,10 +27,10 @@ def ensure_clean_output(outputdir, _ran=0):
     _ran: For internal use only.
     """
     # There is a potential race condition where rmtree seems to succeed
-    # and makedirs fails so #the directory doesn't exist.
+    # and makedirs fails so the directory doesn't exist.
     # So for the time being, if makedirs fails, we re-invoke the function
-    # 3 times.  I have observed this condition many times in the wild- I
-    # don't want to believe it exists, but it does.
+    # 3 times.  I have observed this condition many times in the wild-
+    # I don't want to believe it exists, but it does.
     try:
         shutil.rmtree(outputdir)
     except WindowsError:
@@ -44,8 +47,8 @@ def ensure_clean_output(outputdir, _ran=0):
 
 
 def _create_dependency_group(codefilenames, dependencygroup):
-    """If dependencygroup is provided, returns that, otherwise generates a new DependencyGroup from
-    codefilenames.
+    """If dependencygroup is provided, returns that,
+    otherwise generates a new DependencyGroup from codefilenames.
     """
     if not dependencygroup:
         depb = depgraph.DepBuilder(codefilenames)
@@ -82,24 +85,24 @@ def generate_html_jump(filename, *paths):
     with open(filename, 'w') as f:
         f.write(_generate_html_jump_str(filename, sorted(paths)))
 
+
 class Monocle(object):
     """Entry point for all metrics generation.
 
-    outputdir: Directory to write reports.
-    rootdir: The root directory of the python files to search.
-    coveragedata: A coverage.coverage instance.  You can get this from running coverage, or loading a coverage data
-        file.
-    debug: If True, fail early instead of failing after all report generation.
+    :param outputdir: Directory to write reports.
+    :param rootdir: The root directory of the python files to search.
+      If None, use the cwd.
+    :param coveragedata: A coverage.coverage instance.
+      You can get this from running coverage,
+      or loading a coverage data file.
 
-    *_filename/*_dir: File/directory names to output metrics to.  IReportFormatter instances will be chosen
-    per-report based on the filename extension.  In order to override this mapping or provide your own formatter,
-    modify the *_formatter_registry objects in each module.  Better override support will be added in the future.
+    *_filename/*_dir: File/directory names to output metrics to.
     """
-    def __init__(self, outputdir='output',
+    def __init__(self,
+                 outputdir='output',
                  rootdir=None,
                  coveragedata=None,
                  coverhtml_dir='report_covhtml',
-                 coverreport_filename='report_coverage.txt',
                  cyclcompl_filename='report_cyclcompl.html',
                  sloc_filename='report_sloc.html',
                  depgraph_filename='depgraph.png',
@@ -108,15 +111,14 @@ class Monocle(object):
                  htmljump_filename='index.html'):
         if not isinstance(rootdir, basestring):
             raise ValueError, 'Monocle only supports one root directory right now.'
-        rootdir = os.path.abspath(rootdir or os.getcwd())
-        self.filenames = utils.find_all([rootdir])
+        self.rootdir = os.path.abspath(rootdir or os.getcwd())
+        self.filenames = list(utils.walk_recursive(self.rootdir))
 
         self.outputdir = outputdir
         self.coveragedata = coveragedata
 
         join = lambda x: os.path.join(self.outputdir, x)
         self.coverhtml_dir = join(coverhtml_dir)
-        self.coverreport_filename = join(coverreport_filename)
         self.cyclcompl_filename = join(cyclcompl_filename)
         self.sloc_filename = join(sloc_filename)
         self.depgraph_filename = join(depgraph_filename)
@@ -124,45 +126,26 @@ class Monocle(object):
         self.couplingrank_filename = join(couplingrank_filename)
         self.htmljump_filename = join(htmljump_filename)
 
-        kwargs = {'leading_path': rootdir}
-        def gext(s):
-            return os.path.splitext(s)[1]
-        self.cyclcompl_fmtfactory = cyclcompl.formatter_registry.GetFormatterFactory(gext(self.cyclcompl_filename),
-                                                                                     **kwargs)
-        self.sloc_fmtfactory = sloc.formatter_registry.GetFormatterFactory(gext(self.sloc_filename), **kwargs)
-        self.coupling_fmtfactory = depgraph.coupling_formatter_registry.GetFormatterFactory(
-            gext(self.coupling_filename), **kwargs)
-        self.couplingrank_fmtfactory = depgraph.couplingrank_formatter_registry.GetFormatterFactory(
-            gext(self.couplingrank_filename), **kwargs)
-
-        self.depgraph_renderfactory = lambda g: depgraph.DefaultRenderer(g, leading_path=rootdir)
-        
         self._filesforjump = set()
 
     def ensure_clean_output(self):
         ensure_clean_output(self.outputdir)
 
     def generate_cover_html(self):
-        """Outputs a coverage html report from cov into directory.
-
-        cov: An instance of coverage.coverage.
-        directory: The directory all the html files will be output to.  Directory must exist.
-        """
-        #isinstance causes scope problems so use exact type checking here.
+        """Outputs a coverage html report from cov into directory."""
         self.coveragedata.html_report(directory=self.coverhtml_dir)
         self._filesforjump.add(os.path.join(self.coverhtml_dir, 'index.html'))
 
-    def generate_cover_report(self):
-        """Generates a coverage report for cov to filename."""
-        with open(self.coverreport_filename, 'w') as f:
-            self.coveragedata.report(file=f)
-        self._filesforjump.add(self.coverreport_filename)
-
     def generate_cyclomatic_complexity(self):
-        """Generates a cyclomatic complexity report for all files in self.files, output to self.cyclcompl_filename.
+        """Generates a cyclomatic complexity report for all files in self.files,
+        output to self.cyclcompl_filename.
         """
         ccdata, failures = cyclcompl.measure_cyclcompl(self.filenames)
-        utils.write_report(self.cyclcompl_filename, (ccdata, failures), self.cyclcompl_fmtfactory)
+        def makeFormatter(f):
+            return cyclcompl.CCGoogleChartFormatter(
+                f, leading_path=self.rootdir)
+        utils.write_report(
+            self.cyclcompl_filename, (ccdata, failures), makeFormatter)
         self._filesforjump.add(self.cyclcompl_filename)
 
     def generate_sloc(self):
@@ -221,16 +204,16 @@ class Monocle(object):
             except Exception:
                 exc_infos.append(sys.exc_info())
 
-        trydo(self.generate_sloc)
+        #trydo(self.generate_sloc)
         trydo(self.generate_cyclomatic_complexity)
 
-        if self.coveragedata:
-            trydo(self.generate_cover_report)
-            trydo(self.generate_cover_html)
-            
-        depgrp = trydo(self.generate_coupling_report)
-        depgrp = trydo(lambda: self.generate_couplingrank_report(depgrp))
-        depgrp = trydo(lambda: self.generate_dependency_graph(depgrp))
+#        if self.coveragedata:
+#            trydo(self.generate_cover_report)
+#            trydo(self.generate_cover_html)
+#
+#        depgrp = trydo(self.generate_coupling_report)
+#        depgrp = trydo(lambda: self.generate_couplingrank_report(depgrp))
+#        depgrp = trydo(lambda: self.generate_dependency_graph(depgrp))
         trydo(self.generate_html_jump)
          #self.generate_funcinfo_report,
          #self.generate_inheritance_report,
