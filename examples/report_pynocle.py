@@ -36,7 +36,7 @@ def run_on_pynocle():
     cov = None#_get_coverage()
 
     import pynocle
-    m = pynocle.Monocle(outdir, rootdir=pynocledir, coveragedata=cov)
+    m = pynocle.Monocle('Pynocle', outdir, rootdir=pynocledir, coveragedata=cov)
     m.generate_all()
 
 
