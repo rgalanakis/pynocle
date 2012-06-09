@@ -7,12 +7,6 @@ create a new Monocle object with the directories and files you want to analyze
 (along with coverage data if you have it), and call generate_all.
 """
 
-__author__ = "Rob Galanakis"
-__copyright__ = "Copyright 2011, Rob Galanakis"
-__version__ = "0.1.23"
-__email__ = "rob.galanakis@gmail.com"
-__status__ = "Pre-Alpha"
-
 import os
 import shutil
 import sys
@@ -20,7 +14,7 @@ import sys
 import cyclcompl
 import depgraph
 import sloc
-import pynocle.utils as utils
+import utils
 
 
 def ensure_clean_output(outputdir, _ran=0):
