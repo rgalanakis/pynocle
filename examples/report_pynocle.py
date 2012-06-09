@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+
+import coverage
+import nose
+import os
+
+thisdir = os.path.dirname(__file__)
+outdir = os.path.join(thisdir, 'exampleoutput')
+pynocledir = os.path.join(thisdir, '..', 'pynocle')
+
+def _get_coverage():
+    try:
+        cov = coverage.coverage()
+    except Exception as exc:
+        msg = exc.args[0]
+        #Under debugger in pycharm, it uses the wrong coverage module!
+        if msg == "__init__() got an unexpected keyword argument 'data_file'":
+            return None
+        if msg == "global name 'cache_location' is not defined":
+            return None
+        raise
+    cov.start()
+    oldcwd = os.getcwd()
+    try:
+        os.chdir(pynocledir)
+        nose.run()
+    finally:
+        os.chdir(oldcwd)
+    cov.stop()
+    return cov
+
+
+def run_on_pynocle():
+    cov = None#_get_coverage()
+
+    import pynocle
+    m = pynocle.Monocle(outdir, rootdir=pynocledir, coveragedata=cov)
+    m.generate_all()
+
+
+if __name__ == '__main__':
+    run_on_pynocle()
