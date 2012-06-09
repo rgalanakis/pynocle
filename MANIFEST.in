@@ -1,1 +1,1 @@
-include-recursive exampleoutput *.*
+recursive-include exampleoutput *.*
