@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name="pynocle",
-    version="0.2",
+    version="0.2.1",
     author="Rob Galanakis",
     author_email="rob.galanakis@gmail.com",
     url="http://code.google.com/p/pynocle/",
@@ -21,6 +21,8 @@ setup(name="pynocle",
 
     license = "MIT",
     platforms = ['POSIX', 'Windows'],
+
+    install_requries = ['numpy', 'docutils'],
 
     classifiers = [
         "Programming Language :: Python",

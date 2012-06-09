@@ -13,7 +13,7 @@ class TestPageRank(unittest.TestCase):
                 [4],
                 [0]
         ]
-        result = pagerank.pageRank(links, alpha=1.0)
+        result = pagerank.page_rank(links, alpha=1.0)
         self.assertEqual(str(result), '[ 0.2  0.2  0.2  0.2  0.2]')
     def testTwoCircles(self):
         links = [
@@ -23,7 +23,7 @@ class TestPageRank(unittest.TestCase):
                 [4],
                 [0]
         ]
-        result = pagerank.pageRank(links)
+        result = pagerank.page_rank(links)
         self.assertEqual(str(result), '[ 0.2116109   0.12411822  0.2296187   0.22099231  0.21365988]')
     def testDocMatrix(self):
         links = [
@@ -32,7 +32,7 @@ class TestPageRank(unittest.TestCase):
           [3, 2],
           [0],
         ]
-        result = pagerank.pageRank(links)
+        result = pagerank.page_rank(links)
         self.assertEqual(str(result), '[ 0.36723503  0.0375      0.33665007  0.25861487]')
 
 class TestDepsToMatrix(unittest.TestCase):

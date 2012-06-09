@@ -69,13 +69,18 @@ class IRenderer(object):
             result = os.path.splitext(outputfilename)[1][1:]
         return result
     
-    def render(self, outputfilename, dotpath=None, overrideformat=None, wait=True, moreargs=()):
+    def render(self, outputfilename,
+               dotpath=None, overrideformat=None, wait=True, moreargs=()):
         """Renders the dot file at dotpath to outputfilename.
 
-        outputfilename: The name of the image file to be written.  The format will be inferred by the extension.
-        dotpath: The path of the dotfile to use.  If not provided, call self.savedot with a temporary path.
-        overrideformat: If provided, use this instead of inferring the format from outputfilename.
-        moreargs: Additional args to invoke the exe with.
+        outputfilename: The name of the image file to be written.
+        The format will be inferred by the extension.
+
+        :param dotpath: The path of the dotfile to use.
+          If not provided, call self.savedot with a temporary path.
+        :param overrideformat: If provided, use this instead of inferring
+          the format from outputfilename.
+        :param moreargs: Additional args to invoke the exe with.
         """
         if not dotpath:
             dotpath = self.savetempdot()
@@ -83,17 +88,20 @@ class IRenderer(object):
         clargs = [self.dotexe(), '-T' + format, dotpath, '-o', outputfilename]
         clargs.extend(moreargs)
         try:
-            p = subprocess.Popen(clargs, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p = subprocess.Popen(
+                clargs, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except WindowsError as exc:
             if exc.errno == 2:
-                raise utils.MissingDependencyError, 'Could not start %s: %s' % (self.dotexe(), repr(exc))
+                raise utils.MissingDependencyError('Could not start %s: %s' % (
+                    self.dotexe(), repr(exc)))
             raise
         if wait:
             p.communicate()
 
 
 class DefaultRenderer(IRenderer):
-    def __init__(self, dependencygroup, exe='dot', leading_path=None, styler=None):
+    def __init__(self, dependencygroup,
+                 exe='dot', leading_path=None, styler=None):
         self.depgroup = dependencygroup
         self.deps = dependencygroup.dependencies
         self.failedfiles = dependencygroup.failed
@@ -105,11 +113,14 @@ class DefaultRenderer(IRenderer):
         return self.exe
 
     def _is_package(self, fullpath):
-        return os.path.isdir(fullpath) or os.path.splitext(fullpath)[0].endswith('__init__')
+        return (os.path.isdir(fullpath) or
+                os.path.splitext(fullpath)[0].endswith('__init__'))
 
     def _write_edges(self, out):
-        """Writes all edges for all dependencies, and returns two dictionaries where the keys are the nodenames
-        and the values are the full paths.  First dictionary is for packages, second is for modules.
+        """Writes all edges for all dependencies,
+        and returns two dictionaries where the keys are the nodenames
+        and the values are the full paths.
+        First dictionary is for packages, second is for modules.
         """
         pkgs = {}
         modules = {}
@@ -118,9 +129,12 @@ class DefaultRenderer(IRenderer):
             endname = self.styler.nodetext(endpath)
             if self.styler.exclude(startpath) or self.styler.exclude(endpath):
                 continue
-            edgeattrs = self.get_attr_str(weight=self.styler.weight(startname, endname))
-            out.write('    "%s" -> "%s" %s;\n' % (startname, endname, edgeattrs))
-            for fullname, purename in (startpath, startname), (endpath, endname):
+            edgeattrs = self.get_attr_str(
+                weight=self.styler.weight(startname, endname))
+            out.write('    "%s" -> "%s" %s;\n' % (
+                startname, endname, edgeattrs))
+            for fullname, purename in [(startpath, startname),
+                                       (endpath, endname)]:
                 if self._is_package(fullname):
                     pkgs[purename] = fullname
                 else:
@@ -128,12 +142,15 @@ class DefaultRenderer(IRenderer):
         return pkgs, modules
 
     def _write_clusters(self, clusters, out):
-        #subgraph cluster_Computers {label="Computers"; labelloc="b"; Computers_icon};
+        # subgraph cluster_Computers
+        # {label="Computers"; labelloc="b"; Computers_icon};
         for clustername, clusternodes in clusters.items():
             out.write('    subgraph cluster_%s {\n' % clustername)
             out.write('        label="%s";\n' % clustername)
             for kvp in self.styler.clusterstyle(clustername).items():
                 out.write('        %s=%s;\n' % kvp)
+
+            out.write('        "%s";\n' % clustername)
             for node in clusternodes:
                 out.write('        "%s";\n' % node)
             out.write('    }\n')
@@ -145,7 +162,8 @@ class DefaultRenderer(IRenderer):
                 f.write('    %s=%s;\n' % kvp)
             
             pkgs, modules = self._write_edges(f)
-            failed = dict([(self.styler.nodetext(fname), fname) for fname in self.failedfiles])
+            failed = dict((self.styler.nodetext(fname), fname)
+                          for fname in self.failedfiles)
 
             for dictitems, style_func in (
                 (failed.items(), self.styler.failedstyle),
@@ -157,14 +175,16 @@ class DefaultRenderer(IRenderer):
                     stylestr = self.get_attr_str(**style)
                     f.write('    "%s" %s\n' % (purename, stylestr))
 
-            clusters = self.styler.create_clusters(failed.keys() + pkgs.keys() + modules.keys())
+            allkeys = failed.keys() + pkgs.keys() + modules.keys()
+            clusters = self.styler.create_clusters(allkeys)
             if clusters:
                 self._write_clusters(clusters, f)
             f.write('}')
 
 
 def name_to_color(name):
-    """Converts name into an rgb color based on its md5 hash.  Copied from http://www.tarind.com/depgraph2dot.py.
+    """Converts name into an rgb color based on its md5 hash.
+    Copied from http://www.tarind.com/depgraph2dot.py.
     Don't try to understand this code...
     """
     n = hashlib.md5(name).digest()
@@ -178,7 +198,8 @@ def name_to_color(name):
 class DefaultStyler(object):
     """Graph styling for dot rendering.
 
-    All dot colors can be found here: http://www.graphviz.org/doc/info/colors.html#brewer
+    All dot colors can be found here:
+      http://www.graphviz.org/doc/info/colors.html#brewer
     """
 
     def __init__(self, **kwargs):
@@ -187,9 +208,11 @@ class DefaultStyler(object):
         self.leading_path = kwargs.get('leading_path') or os.getcwd()
 
     def create_clusters(self, nodenames):
-        """Return a dictionary of {package name, (modules)), where package name will be the cluster name (and is
-        also normally the package name), and modules are the names of all nodes included in the package (including
-        the __init__ files, usually).
+        """Return a dictionary of {package name, (modules)),
+        where package name will be the cluster name
+        (and is also normally the package name),
+        and modules are the names of all nodes included in the package
+        (including the __init__ files, usually).
 
         Will also nest clusters for packages nested within other packages.
 
@@ -210,33 +233,37 @@ class DefaultStyler(object):
         return result
 
     def _calc_outline_col(self, ca, maxca):
-        """Should go from black to bright red as ca approaches maxca."""
+        """Should go from black to bright red as `ca` approaches `maxca`."""
         redchan = lerp(0x00, 0xff, float(ca) / maxca)
         return '#%02x0000' % redchan
 
     def _calc_fill_col(self, ce, maxce):
-        """Should go from green to red as ce approaches maxce."""
+        """Should go from green to red as `ce` approaches `maxce`."""
         ratio = float(ce) / maxce
         redchan = lerp(0x00, 0xff, ratio)
         greenchan = lerp(0xff, 0x00, ratio)
         return '#%02x%02x00' % (redchan, greenchan)
 
     def _calc_node_colors(self, depgroup, depnode):
-        """Returns a tuple of (outline color, fill color).  Outline color will go from black at zero Ca to red at
-        1 Ca.  Fill color will go from a green at 0 Ce to reddish at 1 Ce.
+        """Returns a tuple of (outline color, fill color).
+        Outline color will go from black at zero Ca to red at 1 Ca.
+        Fill color will go from a green at 0 Ce to reddish at 1 Ce.
         """
         try:
             ca = depgroup.depnode_to_ca[depnode]
             ce = depgroup.depnode_to_ce[depnode]
         except KeyError:
             return None
-        outlcol = self._calc_outline_col(ca, nth_percentile(depgroup.depnode_to_ca.values()))
-        fillcol = self._calc_fill_col(ce, nth_percentile(depgroup.depnode_to_ce.values()))
+        outlcol = self._calc_outline_col(
+            ca, nth_percentile(depgroup.depnode_to_ca.values()))
+        fillcol = self._calc_fill_col(
+            ce, nth_percentile(depgroup.depnode_to_ce.values()))
         return '"%s"' % outlcol, '"%s"' % fillcol
 
     def nodetext(self, s):
         """Prettifies s for rendering on the node.
-        Escape s and remove some junk (cwd, drive, ext) so that it can be used as a proper nodename.
+        Escape s and remove some junk (cwd, drive, ext)
+        so that it can be used as a proper nodename.
         """
         #First look for __init__ and move it down to the dir if it is
         s2 = s
@@ -244,7 +271,9 @@ class DefaultStyler(object):
         if s2.endswith('__init__'):
             s2 = s2[:-9] #-9 is len of __init__ and preceding path sep
         s2 = utils.prettify_path(s2, self.leading_path)
-        if not s2: #We've removed the whole path, grab the last dir from the leadingpath that removed it
+        if not s2:
+            # We've removed the whole path,
+            # grab the last dir from the leadingpath that removed it
             s2 = self.leading_path.replace(os.altsep, os.sep).split(os.sep)[-1]
         else:
             s2 = os.path.splitdrive(s2)[1]
@@ -252,23 +281,27 @@ class DefaultStyler(object):
         return s2.strip('.')
 
     def weight(self, a, b):
-        """Return the weight of the dependency from a to b. Higher weights usually have shorter straighter edges.
-        Should return a value between self.weight_normal and self.weight_heaviest.
+        """Return the weight of the dependency from a to b.
+        Higher weights usually have shorter straighter edges.
+        Should return a value between self.weight_normal and
+        self.weight_heaviest.
 
         If module b starts with an underscore, assume a high weight.
         If module a starts with module b or vice versa, assume a 
         """
         if b.split('.')[-1].startswith('_'):
-            # A module that starts with an underscore. You need a special reason to
-            # import these (for example random imports _random), so draw them close
-            # together
+            # A module that starts with an underscore.
+            # You need a special reason to import these
+            # (for example random imports _random),
+            # so draw them close together
             return self.weight_heaviest
         if a.startswith(b) or b.startswith(a):
             return lerp(self.weight_normal, self.weight_heaviest, .5)
         return self.weight_normal
 
     def graphsettings(self):
-        """Returns a dictionary of top-level graph settings (ranksep, 'node', concentrate, etc.')."""
+        """Returns a dictionary of top-level graph settings
+        (ranksep, 'node', concentrate, etc.')."""
         return {'ranksep':'1.0', 'concentrate':'true', 'compound':'true',
                 'node':'[style=filled,fontname=Arial,fontsize=10]'}
 
@@ -277,9 +310,14 @@ class DefaultStyler(object):
         return os.path.basename(path).startswith('test')
 
     def failedstyle(self, depgroup, depnode):
-        """Return a dictionary of keys and values that will be used to style the nodes of failed parses."""
-        return {'shape': 'polygon', 'sides': 8, 'fillcolor':'red', 'color': 'red',
-                'fontcolor':'white', 'peripheries': 2}
+        """Return a dictionary of keys and values that will be used
+        to style the nodes of failed parses."""
+        return {'shape': 'polygon',
+                'sides': 8,
+                'fillcolor':'red',
+                'color': 'red',
+                'fontcolor':'white',
+                'peripheries': 2}
 
     def packagestyle(self, depgroup, depnode):
         outline, fill = self._calc_node_colors(depgroup, depnode)

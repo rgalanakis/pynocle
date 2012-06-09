@@ -15,18 +15,18 @@ def _above_threshold(flatstat, threshold):
     return flatstat[2] >= threshold #ind 2 is cc amount
 
 
-def _infostr(newline='<br />'):
-    """Returns the informational string about CC."""
-    return ('Cyclomatic Complexity is a measure of decisions that can be '
-            'made in a procedure.{0}'
-            'Values <= 10 are fine, between 11 and 20 should be refactored, '
-            'and values above 20 are usually '
-            'considered unacceptable and should be refactored.').format(
-        newline)
+def _get_header_rst(leadingpath, threshold):
+    s = """
+**Cyclomatic Complexity** is a measure of decisions that
+can be made in a procedure.
 
+Values <= 10 are fine, between 11 and 20 should be refactored,
+and values above 20 are usually considered unacceptable
+and should be refactored.
 
-def _showingstr(threshold):
-    return 'Showing items with a CC greater than or equal to %s.' % threshold
+Showing files under {0} with a CC greater than or equal to {1}.
+""".format(leadingpath.replace('\\', '/'), threshold)
+    return s
 
 
 def _validate_threshold(threshold):
@@ -65,11 +65,9 @@ class CCGoogleChartFormatter(utils.IReportFormatter):
         self.outstream().write(self.chart.first_part())
 
     def format_report_footer(self):
-        firstp = '<p>%s</p>\n<p>%s</p>\n<p>%s</p>' % (
-            _infostr(),
-            _showingstr(self.threshold),
-            'Files under "%s".' % self.leading_path)
-        self.outstream().write(self.chart.last_part(abovetable=firstp))
+        rst = _get_header_rst(self.leading_path, self.threshold)
+        html = utils.rst_to_html(rst)
+        self.outstream().write(self.chart.last_part(abovetable=html))
 
     def format_data(self, files_stats_failures):
         """Formats the output of measure_cyclcompl

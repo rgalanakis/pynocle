@@ -45,6 +45,7 @@ Dependencies
 ============
 
  * Python 2.6 or higher
+ * The docutils module.
  * For coverage support, requires the coverage module:
    http://pypi.python.org/pypi/coverage
  * For dependency graph generation support, requires GraphViz's
@@ -77,7 +78,7 @@ Fork the Hg repository at http://code.google.com/p/pynocle/
 License and Contributions
 =========================
 
-See LICENSE.txt for more info.
+Pynocle is released under the MIT license.
 
 Copyright 2011 Robert Galanakis, rob.galanakis@gmail.com.
 
@@ -106,7 +107,7 @@ overviews of various code metrics:
   * http://en.wikipedia.org/wiki/Code_coverage
 
 SLOC (Source Lines of Code)
---------------------------_
+---------------------------
 Useful to see the general size and distribution of code across the codebase.
 The number of bugs in a codebase can be said in general to be proportional
 to its lines of code, but this code metric is most useful in understanding
@@ -114,7 +115,7 @@ the codebase, rather than finding quality issues.
 
 Cyclomatic Complexity
 ---------------------
-CC measures the number of decisions of piece of code can make
+Cyclomatic Complexity measures the number of decisions of piece of code can make
 (flow control such as if/then, try/catch, for, while, break, continue,
 etc.).  Values between 1-9 are considered ideal.  Values between 10-20 are
 considered acceptable depending on the use (they can indicate poor design,

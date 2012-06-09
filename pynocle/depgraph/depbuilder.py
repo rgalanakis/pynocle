@@ -10,11 +10,16 @@ import pynocle._modulefinder as modulefinder
 import pynocle.utils as utils
 
 
-PYTHON_EXE_DIR_FILTER = os.path.dirname(sys.executable) + '*'
+_python_stdlib_filter = os.path.dirname(sys.executable) + '*'
+_pycharm_filter = '*JetBrains\PyCharm *'
+EXCLUDE_PATHS = _python_stdlib_filter, _pycharm_filter
+
 EXCLUDE_MODULES = ('sys', 'time','imp')
 
+
 class Dependency(object):
-    """Data object that represents a single dependency with a startpoint and endpoint."""
+    """Data object that represents a single dependency with a
+    startpoint and endpoint."""
     def __init__(self, startpt, endpt):
         self.startpt = startpt
         self.endpt = endpt
@@ -71,17 +76,22 @@ class DependencyGroup(object):
 
 
 class DepBuilder:
-    """Builds dependencies between modules, starting from all modules in filenames.  Dependencies are available
-    as a list of Dependency instances as DepBuilder.dependencies.  Modules that could not be parsed are available as
-    DepBuilder.failed.
+    """Builds dependencies between modules,
+    starting from all modules in filenames.
+    Dependencies are available as a list of `Dependency`
+    instances as `self.dependencies`.
+    Modules that could not be parsed are available as `self.failed`.
 
-    exclude_paths: Collection of fnmatch patterns.  Any path that matches any pattern will not be considered for
-        dependencies.
-    exclude_modules: Any modules that match one of the strings in this collection will not be considered for
-        dependencies.  This is necessary because some modules do not have filenames.
+    :param exclude_paths: Collection of fnmatch patterns.
+      Any path that matches any pattern will not be considered for dependencies.
+    :param exclude_modules: Any modules that match one of the strings
+      in this collection will not be considered for dependencies.
+      This is necessary because some modules do not have filenames.
     """
-    def __init__(self, filenames, exclude_paths=(PYTHON_EXE_DIR_FILTER,), exclude_modules=EXCLUDE_MODULES):
-        exclude_paths += (r'C:\Program Files (x86)\JetBrains\PyCharm *',)
+    def __init__(self,
+                 filenames,
+                 exclude_paths=EXCLUDE_PATHS,
+                 exclude_modules=EXCLUDE_MODULES):
         self._processed = set()
         self.dependencies = []
         self.failed = []
@@ -89,11 +99,13 @@ class DepBuilder:
         self.exclude_modules = set(exclude_modules)
         self.modulefinder_cache = modulefinder.ModuleFinderCache()
         for fn in filenames:
-            self.process_file(fn)
+            self._process_file(fn)
 
-    def is_excluded(self, path):
-        """Check whether the given path is an excluded module.  Excluded modules will be cached in
-        self.excluded_modules so they don't have to be re-checked.  If path evaluates to False, it is excluded.
+    def _is_excluded(self, path):
+        """Check whether the given path is an excluded module.
+        Excluded modules will be cached in self.excluded_modules so
+        they don't have to be re-checked.
+        If path evaluates to False, it is excluded.
         """
         if not path:
             return True
@@ -113,21 +125,24 @@ class DepBuilder:
         """Return an extensionless path for filename."""
         return os.path.splitext(filename)[0]
 
-    def is_importnode(self, node):
+    def _is_importnode(self, node):
         """Return true if node is a compiler.ast.Import."""
         return isinstance(node, compiler.ast.Import)
 
-    def get_all_importnodes(self, filename):
-        """Compiles an AST for filename and returns all import nodes inside of it.  If no file for filename exists,
-        or ot is an unparseable file (pyd, pyc), return an empty list.  If the file cannot be parsed, append
-        to self.failed and return an empty list.
+    def _get_all_importnodes(self, filename):
+        """Compiles an AST for filename and returns all import nodes
+        inside of it.
+        If no file for filename exists, or it is an unparseable file (pyd, pyc),
+        return an empty list.
+        If the file cannot be parsed,
+        append to self.failed and return an empty list.
         """
         #We can only read py files right now
         if filename.endswith('.pyd'):
             return []
-        if filename.endswith('.pyc'):
+        if filename.endswith('.pyc') or filename.endswith('.pyo'):
             filename = filename[:-1]
-        if not os.path.splitext(filename)[1]: #Has no ext whatsoever
+        elif not os.path.splitext(filename)[1]: #Has no ext whatsoever
             filename += '.py'
         if not os.path.exists(filename):
             return []
@@ -136,24 +151,27 @@ class DepBuilder:
         except SyntaxError:
             self.failed.append(self._extless(filename))
             return []
-        importnodes = filter(self.is_importnode, utils.flatten(astnode, lambda node: node.getChildNodes()))
+        importnodes = filter(self._is_importnode, utils.flatten(astnode, lambda node: node.getChildNodes()))
         return importnodes
 
-    def process_file(self, filename):
-        """Process the file at filename.  Adds it to processed, and finds dependencies for all import nodes."""
+    def _process_file(self, filename):
+        """Process the file at filename.
+        Adds it to processed,
+        and finds dependencies for all import nodes."""
         filename = os.path.abspath(filename)
         extless_filename = self._extless(filename)
-        if extless_filename in self._processed or self.is_excluded(extless_filename):
+        if (extless_filename in self._processed or
+            self._is_excluded(extless_filename)):
             return
         self._processed.add(extless_filename)
-        impnodes = self.get_all_importnodes(filename)
+        impnodes = self._get_all_importnodes(filename)
         for node in impnodes:
             imported_module = node.names[0][0]
             imported_modulefilename = self.modulefinder_cache.get_module_filename(imported_module, filename)
             #We can get back 'sys' as a filename so check if it's excluded before we get the abspath
-            if imported_modulefilename and not self.is_excluded(imported_modulefilename):
+            if imported_modulefilename and not self._is_excluded(imported_modulefilename):
                 imported_modulefilename = os.path.abspath(imported_modulefilename)
                 extless_imported_modulefilename = self._extless(imported_modulefilename)
-                if not self.is_excluded(extless_imported_modulefilename):
+                if not self._is_excluded(extless_imported_modulefilename):
                     self.dependencies.append(Dependency(extless_filename, extless_imported_modulefilename))
-                self.process_file(imported_modulefilename)
+                self._process_file(imported_modulefilename)
