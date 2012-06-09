@@ -1,0 +1,57 @@
+
+<html>
+  <head>
+    <title>Cyclomatic Complexity</title>
+    <link rel="stylesheet" type="text/css" href="pynocle.css" media="screen" />
+    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+    <script type='text/javascript'>
+      google.load('visualization', '1', {packages:['table']});
+      google.setOnLoadCallback(drawTable);
+      function drawTable() {
+        var data = new google.visualization.DataTable();
+        
+        data.addColumn('string', 'Filename');
+        data.addColumn('string', 'Type');
+        data.addColumn('string', 'Name');
+        data.addColumn('number', 'CC');
+
+        data.addRow(['_modulefinder', 'Method', '_ModuleFinder.get_module_filename', 10]);
+
+        data.addRow(['depgraph\\depbuilder', 'Method', 'DepBuilder._is_excluded', 7]);
+
+        data.addRow(['depgraph\\depbuilder', 'Method', 'DepBuilder._get_all_importnodes', 6]);
+
+        data.addRow(['depgraph\\depbuilder', 'Method', 'DepBuilder._process_file', 7]);
+
+        data.addRow(['depgraph\\pagerank', 'Function', '_transposeLinkMatrix', 7]);
+
+        data.addRow(['depgraph\\pagerank', 'Function', '_pageRankGenerator', 9]);
+
+        data.addRow(['depgraph\\rendering', 'Method', 'DefaultRenderer._write_edges', 6]);
+
+        data.addRow(['depgraph\\rendering', 'Method', 'DefaultRenderer.savedot', 7]);
+
+        var table = new google.visualization.Table(document.getElementById('table_div'));
+        table.draw(data, {showRowNumber: true});
+      }
+    </script>
+  </head>
+
+  <body>
+    <h1>Cyclomatic Complexity</h1>
+<p>Cyclomatic Complexity measures the number of decisions of piece of code can make
+(flow control such as if/then, try/catch, for, while, break, continue,
+etc.).  Values between 1-9 are considered ideal.  Values between 10-20 are
+considered acceptable depending on the use (they can indicate poor design,
+or inherently tricky areas).  Values higher than 20 should be considered
+unacceptable and must be refactored.
+Generally, high CC indicates code is difficult to understand,
+far away from polymorphism, and has a high
+liklihood of introducing bugs during bugfixing or maintenance.</p>
+<p>Values &lt;= 10 are fine, between 11 and 20 should be refactored,
+and values above 20 are usually considered unacceptable
+and should be refactored.</p>
+<p>For more info, see <a name="the Wikipedia article on cyclomatic complexity" href="http://en.wikipedia.org/wiki/Cyclomatic_complexity">the Wikipedia article on cyclomatic complexity</a><target ids="the-wikipedia-article-on-cyclomatic-complexity" names="the\ wikipedia\ article\ on\ cyclomatic\ complexity" href="http://en.wikipedia.org/wiki/Cyclomatic_complexity" />.</p>
+<p>Showing files under C:/PythonDev/pynocle/pynocle with a CC greater than or equal to 6.</p><div id='table_div'></div>
+  </body>
+</html>

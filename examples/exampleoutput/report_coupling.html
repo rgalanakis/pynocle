@@ -1,0 +1,84 @@
+
+<html>
+  <head>
+    <title>Coupling</title>
+    <link rel="stylesheet" type="text/css" href="pynocle.css" media="screen" />
+    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+    <script type='text/javascript'>
+      google.load('visualization', '1', {packages:['table']});
+      google.setOnLoadCallback(drawTable);
+      function drawTable() {
+        var data = new google.visualization.DataTable();
+        
+        data.addColumn('string', 'Filename');
+        data.addColumn('number', 'Afferent Coupling (Ca)');
+        data.addColumn('number', 'Efferent Coupling (Ce)');
+        data.addColumn('number', 'Instability (I)');
+
+        data.addRow(['__init__', 0, 4, {'f': '1.000', 'v': 1.0}]);
+
+        data.addRow(['_modulefinder', 1, 0, {'f': '0.000', 'v': 0.0}]);
+
+        data.addRow(['cyclcompl\\__init__', 1, 0, {'f': '0.000', 'v': 0.0}]);
+
+        data.addRow(['cyclcompl\\_doc', 1, 0, {'f': '0.000', 'v': 0.0}]);
+
+        data.addRow(['cyclcompl\\formatting', 0, 3, {'f': '1.000', 'v': 1.0}]);
+
+        data.addRow(['cyclcompl\\statbuilder', 0, 1, {'f': '1.000', 'v': 1.0}]);
+
+        data.addRow(['depgraph\\__init__', 1, 0, {'f': '0.000', 'v': 0.0}]);
+
+        data.addRow(['depgraph\\_doc', 1, 0, {'f': '0.000', 'v': 0.0}]);
+
+        data.addRow(['depgraph\\depbuilder', 0, 2, {'f': '1.000', 'v': 1.0}]);
+
+        data.addRow(['depgraph\\formatting', 0, 4, {'f': '1.000', 'v': 1.0}]);
+
+        data.addRow(['depgraph\\pagerank', 2, 1, {'f': '0.333', 'v': 0.3333333333333333}]);
+
+        data.addRow(['depgraph\\rendering', 0, 1, {'f': '1.000', 'v': 1.0}]);
+
+        data.addRow(['depgraph\\test_pagerank', 0, 1, {'f': '1.000', 'v': 1.0}]);
+
+        data.addRow(['funcinfo\\__init__', 0, 1, {'f': '1.000', 'v': 1.0}]);
+
+        data.addRow(['inheritance\\__init__', 0, 1, {'f': '1.000', 'v': 1.0}]);
+
+        data.addRow(['sloc\\__init__', 1, 0, {'f': '0.000', 'v': 0.0}]);
+
+        data.addRow(['sloc\\_doc', 1, 0, {'f': '0.000', 'v': 0.0}]);
+
+        data.addRow(['sloc\\formatting', 0, 3, {'f': '1.000', 'v': 1.0}]);
+
+        data.addRow(['tableprint', 3, 0, {'f': '0.000', 'v': 0.0}]);
+
+        data.addRow(['test_modulefinder', 0, 0, {'f': '0.000', 'v': 0}]);
+
+        data.addRow(['test_utils', 0, 1, {'f': '1.000', 'v': 1.0}]);
+
+        data.addRow(['utils', 11, 0, {'f': '0.000', 'v': 0.0}]);
+
+        var table = new google.visualization.Table(document.getElementById('table_div'));
+        table.draw(data, {showRowNumber: true});
+      }
+    </script>
+  </head>
+
+  <body>
+    <h1>Coupling</h1>
+<p>Coupling measures how closely bound two modules are.  Afferent coupling (Ca)
+measures how many modules a a given module.  Efferent coupling
+(Ce) measures how many modules a given module referenecs.  Afferent
+coupling of 0 can indicate dead code, since nothing as it,
+with various exceptions (test module, entry points, dynamic as,
+configuration, etc.).  High efferent coupling means a module is
+very dependent on other modules and has a high liklihood of change.</p>
+<p>Instability measures the ratio Ce / (Ca + Ce), so a module that depends
+on nothing is considered fully stable (it would not change if something
+else changes), and a module that depends highly on others is considered
+unstable (high liklihood of changing if another module changes).</p>
+<p>For more info about coupling, see <a name="the Wikipedia article on coupling" href="http://en.wikipedia.org/wiki/Coupling_(computer_programming)">the Wikipedia article on coupling</a><target ids="the-wikipedia-article-on-coupling" names="the\ wikipedia\ article\ on\ coupling" href="http://en.wikipedia.org/wiki/Coupling_(computer_programming)" />.</p>
+<p>Showing the coupling between files under C:/PythonDev/pynocle/pynocle.</p><div id='table_div'></div>
+  </body>
+</html>
