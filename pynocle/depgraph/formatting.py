@@ -47,7 +47,7 @@ class CouplingGoogleChartFormatter(utils.IReportFormatter):
             ('Afferent Coupling (Ca)', 'number'),
             ('Efferent Coupling (Ce)', 'number'),
             ('Instability (I)', 'number')]
-        self.chart = tableprint.GoogleChartTable(cols)
+        self.chart = tableprint.GoogleChartTable('Coupling', cols)
 
     def format_report_header(self):
         self.outstream().write(self.chart.first_part())
@@ -100,7 +100,7 @@ class RankGoogleChartFormatter(utils.IReportFormatter):
             ('PageRank', 'number'),
             ('PageID', 'number'),
             ('Outgoing Links', 'string')]
-        self.chart = tableprint.GoogleChartTable(cols)
+        self.chart = tableprint.GoogleChartTable('Coupling PageRank', cols)
 
     def format_report_header(self):
         self.outstream().write(self.chart.first_part())

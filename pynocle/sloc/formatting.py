@@ -67,7 +67,7 @@ class SlocGoogleChartFormatter(utils.IReportFormatter):
                 ('Blank%', 'number'),
                 ('Total', 'number'),
                 ('Total%', 'number')]
-        self.chart = tableprint.GoogleChartTable(cols)
+        self.chart = tableprint.GoogleChartTable('SLOC', cols)
 
     def format_report_header(self):
         self.outstream().write(self.chart.first_part())

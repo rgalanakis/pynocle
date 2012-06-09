@@ -19,6 +19,9 @@ import depgraph
 import sloc
 import utils
 
+#  * http://en.wikipedia.org/wiki/Dependency_graph
+#  * http://en.wikipedia.org/wiki/Code_coverage
+
 
 def ensure_clean_output(outputdir, _ran=0):
     """rmtree and makedirs outputdir to ensure a clean output directory.
@@ -53,41 +56,67 @@ def _create_dependency_group(codefilenames):
     return dependencygroup
 
 
-def generate_html_jump(htmlfilename, projectname, jumppaths):
+def generate_html_jump(htmlfilename, projectname, css_filename, jumpinfos):
     """Generates an html file at filename that contains links
     to all items in paths.
 
     :param htmlfilename: Filename of the resultant file.
-    :param jumppaths: Paths to all files the resultant file should
+    :param projectname: The name of the project metrics were generated for.
+    :param css_filename: The path the css file for the reports.
+    :param jumpinfos: Paths to all files the resultant file should
       display links to.
     """
-    jumppaths = sorted(jumppaths)
+    jumppaths = sorted(jumpinfos, key=lambda jump: jump[0])
+    htmldir = os.path.dirname(os.path.abspath(htmlfilename))
+    shutil.copy(css_filename, os.path.join(htmldir, 'pynocle.css'))
+
     def getJumpsHtml():
-        row = '<p><a href="{0}">{0}</a></p>'
-        absdir = os.path.dirname(os.path.abspath(htmlfilename)) + os.sep
-        def hrefpath(p):
-            absp = os.path.abspath(p)
-            relp = absp.replace(absdir, '')
-            return relp
-        return '\n'.join([row.format(hrefpath(p)) for p in jumppaths])
+        rowtemplate = '<p><a href="{0}">{1}</a></p>'
+        htmldirrepl = htmldir + os.sep
+        def jumphtml(jumpinfo):
+            reportpath, reportname = jumpinfo
+            relpath = os.path.abspath(reportpath).replace(htmldirrepl, '')
+            rowhtml = rowtemplate.format(relpath, reportname)
+            return rowhtml
+        return '\n'.join(map(jumphtml, jumpinfos))
 
     datestr = datetime.date.today().strftime('%b %d, %Y')
     jumpshtml = getJumpsHtml()
+
+    def getLinksHtml():
+        links = ['http://www.ndepend.com/Metrics.aspx',
+                 'http://www.aivosto.com/project/help/pm-index.html']
+        rowstrs = ['<li><a href="{0}">{0}</a></li>'.format(a) for a in links]
+        html = """
+<p>For an overview of metrics (and why things like pynocle
+are important), check out the following pages:
+  <ul>
+    %s
+  </ul>
+</p>
+""" % ('\n'.join(rowstrs))
+        return html
+    linkshtml = getLinksHtml()
 
     with open(htmlfilename, 'w') as f:
         fullhtml = """
     <html>
       <head>
         <title>%(projectname)s Project Metrics (by pynocle)</title>
+        <link rel="stylesheet" type="text/css" href="pynocle.css" media="screen" />
       </head>
       <body>
         <h1>Metrics for %(projectname)s</h1>
         <p>The following reports have been generated for the project %(projectname)s by pynocle.<br />
         View reports for details, and information about what report is and suggested actions.</p>
     %(jumpshtml)s
+    %(linkshtml)s
+    <br />
+    <div class="footer">
     <p>Metrics generated on %(datestr)s<br />
     <a href="http://code.google.com/p/pynocle/">Pynocle</a> copyright
     <a href="http://robg3d.com">Rob Galanakis</a> 2012</p>
+    </div>
       </body>
     </html>
     """ % locals()
@@ -103,23 +132,14 @@ class Monocle(object):
     :param coveragedata: A coverage.coverage instance.
       You can get this from running coverage,
       or loading a coverage data file.
-
-    *_filename/*_dir: File/directory names to output metrics to.
+    :param css_filename: The path to the css file. Uses default.css if None.
     """
     def __init__(self,
                  projectname,
-                 outputdir='output',
+                 outputdir,
                  rootdir=None,
                  coveragedata=None,
-                 coverhtml_dir='report_covhtml',
-                 cyclcompl_filename='report_cyclcompl.html',
-                 sloc_filename='report_sloc.html',
-                 depgraph_filename='depgraph.png',
-                 coupling_filename='report_coupling.html',
-                 couplingrank_filename='report_couplingrank.html',
-                 htmljump_filename='index.html'):
-        if not isinstance(rootdir, basestring):
-            raise ValueError, 'Monocle only supports one root directory right now.'
+                 css_filename=None):
         self.rootdir = os.path.abspath(rootdir or os.getcwd())
         self.filenames = list(utils.walk_recursive(self.rootdir))
 
@@ -128,15 +148,20 @@ class Monocle(object):
         self.coveragedata = coveragedata
 
         join = lambda x: os.path.join(self.outputdir, x)
-        self.coverhtml_dir = join(coverhtml_dir)
-        self.cyclcompl_filename = join(cyclcompl_filename)
-        self.sloc_filename = join(sloc_filename)
-        self.depgraph_filename = join(depgraph_filename)
-        self.coupling_filename = join(coupling_filename)
-        self.couplingrank_filename = join(couplingrank_filename)
-        self.htmljump_filename = join(htmljump_filename)
+        self.coverhtml_dir = join('report_covhtml')
+        self.cyclcompl_filename = join('report_cyclcompl.html')
+        self.sloc_filename = join('report_sloc.html')
+        self.depgraph_filename = join('depgraph.png')
+        self.coupling_filename = join('report_coupling.html')
+        self.couplingrank_filename = join('report_couplingrank.html')
+        self.htmljump_filename = join('index.html')
 
-        self._filesforjump = set()
+        if css_filename is None:
+            css_filename = os.path.join(
+                os.path.dirname(__file__), 'default.css')
+        self.css_filename = css_filename
+
+        self._filesforjump = {}
 
     def ensure_clean_output(self):
         ensure_clean_output(self.outputdir)
@@ -144,7 +169,8 @@ class Monocle(object):
     def generate_cover_html(self):
         """Outputs a coverage html report from cov into directory."""
         self.coveragedata.html_report(directory=self.coverhtml_dir)
-        self._filesforjump.add(os.path.join(self.coverhtml_dir, 'index.html'))
+        p = os.path.join(self.coverhtml_dir, 'index.html')
+        self._filesforjump[p] = p, 'Report: Coverage'
 
     def generate_cyclomatic_complexity(self):
         """Generates a cyclomatic complexity report for all files in self.files,
@@ -154,9 +180,9 @@ class Monocle(object):
         def makeFormatter(f):
             return cyclcompl.CCGoogleChartFormatter(
                 f, leading_path=self.rootdir)
-        utils.write_report(
-            self.cyclcompl_filename, (ccdata, failures), makeFormatter)
-        self._filesforjump.add(self.cyclcompl_filename)
+        p = self.cyclcompl_filename
+        utils.write_report(p, (ccdata, failures), makeFormatter)
+        self._filesforjump[p] = p, 'Report: Cyclomatic Complexity'
 
     def generate_sloc(self):
         """Generates a Source Lines of Code report for all files in self.files,
@@ -165,17 +191,18 @@ class Monocle(object):
         slocgrp = sloc.SlocGroup(self.filenames)
         def makeSlocFmt(f):
             return sloc.SlocGoogleChartFormatter(f, self.rootdir)
-        utils.write_report(self.sloc_filename, slocgrp, makeSlocFmt)
-        self._filesforjump.add(self.sloc_filename)
+        p = self.sloc_filename
+        utils.write_report(p, slocgrp, makeSlocFmt)
+        self._filesforjump[p] = p, 'Report: SLOC'
 
     def generate_dependency_graph(self, depgrp):
         """Generates a dependency graph image to self.depgraph_filename
         for the files in self.files.
         """
         renderer = depgraph.DefaultRenderer(depgrp, leading_path=self.rootdir)
-        renderer.render(self.depgraph_filename)
-        self._filesforjump.add(self.depgraph_filename)
-        return depgrp
+        p = self.depgraph_filename
+        renderer.render(p)
+        self._filesforjump[p] = p, 'Report: Dependency Graph'
 
     def generate_coupling_report(self, depgrp):
         """Generates a report for Afferent and Efferent Coupling between
@@ -184,8 +211,9 @@ class Monocle(object):
         """
         def factory(f):
             return depgraph.CouplingGoogleChartFormatter(f, self.rootdir)
-        utils.write_report(self.coupling_filename, depgrp, factory)
-        self._filesforjump.add(self.coupling_filename)
+        p = self.coupling_filename
+        utils.write_report(p, depgrp, factory)
+        self._filesforjump[p] = p, 'Report: Coupling'
 
     def generate_couplingrank_report(self, depgrp):
         """Generates a PageRank report for all code in self.filenames to
@@ -193,24 +221,22 @@ class Monocle(object):
         """
         def factory(f):
             return depgraph.RankGoogleChartFormatter(f, self.rootdir)
-        utils.write_report(self.couplingrank_filename, depgrp, factory)
-        self._filesforjump.add(self.couplingrank_filename)
+        p = self.couplingrank_filename
+        utils.write_report(p, depgrp, factory)
+        self._filesforjump[p] = p, 'Report: Coupling PageRank'
 
     def generate_html_jump(self):
         """Generates an html page that links to any generated reports."""
         return generate_html_jump(
             self.htmljump_filename,
             self.projectname,
-            self._filesforjump)
+            self.css_filename,
+            self._filesforjump.values())
 
     def generate_all(self, cleanoutput=True):
         """Run all report generation functions.
 
         If coveragedata is not set, skip the coverage functions.
-
-        If not self.debug, raises an AggregateError after all functions run
-            if any function raises (so metrics will
-            be generated for any function that succeeds).
 
         :param cleanoutput: If True, run ensure_clean_output to clear
           the output directory.
@@ -233,7 +259,7 @@ class Monocle(object):
         depgrp = _create_dependency_group(self.filenames)
         trydo(lambda: self.generate_coupling_report(depgrp))
         trydo(lambda: self.generate_couplingrank_report(depgrp))
-        #trydo(lambda: self.generate_dependency_graph(depgrp))
+        trydo(lambda: self.generate_dependency_graph(depgrp))
         trydo(self.generate_html_jump)
         #self.generate_funcinfo_report,
         #self.generate_inheritance_report,
