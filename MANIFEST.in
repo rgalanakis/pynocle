@@ -1,1 +1,1 @@
-recursive-include exampleoutput *.*
+include examples/report_pynocle.py
