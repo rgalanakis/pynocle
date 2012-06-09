@@ -1,7 +1,3 @@
-**pynocle, software metrics for python**
-Rob Galanakis rob.galanakis@gmail.com
-http://www.robg3d.com
-
 ========
 Overview
 ========
@@ -73,6 +69,8 @@ bugs, or want to help!
 
 Fork the Hg repository at http://code.google.com/p/pynocle/
 
+My personal site is at http://www.robg3d.com
+
 
 =========================
 License and Contributions
@@ -100,13 +98,10 @@ A generated metrics report will have more information about software metrics,
 and links for additional info.
 
 See the example output for more info, available here:
+http://pynocle.googlecode.com/hg/examples/exampleoutput/index.html
 
 You can look at any good static analysis tool and wikipedia to get
 overviews of various code metrics:
 
   * http://www.ndepend.com/Metrics.aspx
   * http://www.aivosto.com/project/help/pm-index.html
-
-
-
-
