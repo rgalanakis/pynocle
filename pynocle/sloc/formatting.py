@@ -6,59 +6,63 @@ import pynocle.tableprint as tableprint
 import pynocle.utils as utils
 
 
-class _SlocFormatter(utils.IReportFormatter):
-    """Base class for formatters for SLOC info.
+def _fmtperc(i):
+    """Format number i as a percentage, to one decimal place."""
+    perc = '%.1f%%' % (i * 100)
+    return perc
 
-    out: The stream to write the report to.
-    leading_path: The path to strip off from filenames in the report.
+
+def _get_infostr(leadingpath):
+    s = """
+Measures physical source lines of code (SLOC), lines of comments,
+and blank lines, in number and percentage of file.
+
+Also measures total line count and as percentage of total codebase lines.
+
+Showing SLOC for files under {0}.
+""".format(leadingpath.replace('\\', '/'))
+    return s
+
+
+def _get_totals_row(slocgroup):
+    """Returns the row for TOTALS."""
+    totallines = slocgroup.totallines
+    def average(key):
+        total = totallines(key)
+        return total / len(slocgroup.filenamesToSlocInfos)
+    return ['TOTALS',
+             totallines('code'), average('codeperc'),
+             totallines('comment'), average('commentperc'),
+             totallines('blank'), average('blankperc'),
+             totallines('total'), totallines('totalperc')]
+
+
+def _create_rows(slocgroup, leading_path):
+    """Returns a list of rows."""
+    rows = []
+    sortedbyfilename = sorted(
+        slocgroup.filenamesToSlocInfos.items(),
+        key=lambda kvp: kvp[0])
+    for filename, d in sortedbyfilename:
+        row = [utils.prettify_path(filename, leading_path),
+               d['code'], d['codeperc'],
+               d['comment'], d['commentperc'],
+               d['blank'], d['blankperc'],
+               d['total'], d['totalperc']]
+        rows.append(row)
+    rows.append(_get_totals_row(slocgroup))
+    return rows
+
+
+class SlocGoogleChartFormatter(utils.IReportFormatter):
+    """Google chart formatter for sloc info.
+
+    :param out: The stream to write the report to.
+    :param leading_path: The path to strip off from filenames in the report.
     """
     def __init__(self, out=sys.stdout, leading_path=None):
-        self.out = out
+        self._outstream = out
         self.leading_path = leading_path
-
-    def outstream(self):
-        return self.out
-
-    def _fmtperc(self, i):
-        """Format number i as a percentage, to one decimal place."""
-        perc = '%.1f%%' % (i * 100)
-        return perc
-
-    def infostr(self, linebreak='', newline='<br />'):
-        return ('Measures physical source lines of code (SLOC), lines of comments, and blank lines, in{0}'
-            'number and percentage of file.{1}'
-            'Also measures total line count and as percentage of total codebase lines.').format(linebreak, newline)
-
-    def _get_totals_row(self, slocgroup):
-        """Returns the row for TOTALS."""
-        totallines = slocgroup.totallines
-        def average(key):
-            total = totallines(key)
-            return total / len(slocgroup.filenamesToSlocInfos)
-        return ['TOTALS',
-                 totallines('code'), average('codeperc'),
-                 totallines('comment'), average('commentperc'),
-                 totallines('blank'), average('blankperc'),
-                 totallines('total'), totallines('totalperc')]
-
-    def create_rows(self, slocgroup):
-        """Returns a list of rows.  The caller may need to call _stringify on them for display."""
-        rows = []
-        sortedbyfilename = sorted(slocgroup.filenamesToSlocInfos.items(), key=lambda kvp: kvp[0])
-        for filename, d in sortedbyfilename:
-            row = [utils.prettify_path(filename, self.leading_path),
-                   d['code'], d['codeperc'],
-                   d['comment'], d['commentperc'],
-                   d['blank'], d['blankperc'],
-                   d['total'], d['totalperc']]
-            rows.append(row)
-        rows.append(self._get_totals_row(slocgroup))
-        return rows
-
-
-class SlocGoogleChartFormatter(_SlocFormatter):
-    def __init__(self, *args, **kwargs):
-        super(SlocGoogleChartFormatter, self).__init__(*args, **kwargs)
         cols = [('Filename', 'string'),
                 ('Code', 'number'),
                 ('Code%', 'number'),
@@ -74,12 +78,12 @@ class SlocGoogleChartFormatter(_SlocFormatter):
         self.outstream().write(self.chart.first_part())
 
     def format_report_footer(self):
-        abovepart = '<p>%s</p>' % self.infostr()
-        self.outstream().write(self.chart.last_part(abovetable=abovepart))
+        s = utils.rst_to_html(_get_infostr(self.leading_path))
+        self.outstream().write(self.chart.last_part(abovetable=s))
 
     def _js_perc(self, value):
         """Return a dict for JS for formatting value as a percent."""
-        s = self._fmtperc(value)
+        s = _fmtperc(value)
         return {'v': value, 'f': s}
         #{v: new Date(1999,0,1), f: 'January First, Nineteen ninety-nine'}
 
@@ -92,5 +96,5 @@ class SlocGoogleChartFormatter(_SlocFormatter):
                row[7], self._js_perc(row[8])]
 
     def format_data(self, slocgroup):
-        rows = map(self._stringify, self.create_rows(slocgroup))
+        rows = map(self._stringify, _create_rows(slocgroup, self.leading_path))
         self.outstream().write(self.chart.second_part(rows))

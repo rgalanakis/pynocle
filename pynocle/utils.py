@@ -4,6 +4,7 @@ Utilities for pynocle project.
 """
 
 import abc
+import xml.etree.ElementTree as ElementTree
 import fnmatch
 import os
 import traceback
@@ -141,3 +142,13 @@ def prettify_path(path, leading=None):
     if s.startswith(leading):
         s = s.replace(leading, '')
     return s.strip(os.sep)
+
+
+def rst_to_html(rststr):
+    from docutils.core import publish_string
+    html = publish_string(rststr, writer_name='xml')
+    el = ElementTree.fromstring(html)
+    allparas = map(ElementTree.tostring, el)
+    s = '\n'.join(allparas)
+    s = s.replace('paragraph', 'p')
+    return s

@@ -46,13 +46,10 @@ def ensure_clean_output(outputdir, _ran=0):
             raise
 
 
-def _create_dependency_group(codefilenames, dependencygroup):
-    """If dependencygroup is provided, returns that,
-    otherwise generates a new DependencyGroup from codefilenames.
-    """
-    if not dependencygroup:
-        depb = depgraph.DepBuilder(codefilenames)
-        dependencygroup = depgraph.DependencyGroup(depb.dependencies, depb.failed)
+def _create_dependency_group(codefilenames):
+    """Generates a new DependencyGroup from codefilenames."""
+    depb = depgraph.DepBuilder(codefilenames)
+    dependencygroup = depgraph.DependencyGroup(depb.dependencies, depb.failed)
     return dependencygroup
 
 
@@ -149,39 +146,42 @@ class Monocle(object):
         self._filesforjump.add(self.cyclcompl_filename)
 
     def generate_sloc(self):
-        """Generates a Source Lines of Code report for all files in self.files, output to self.sloc_filename.
+        """Generates a Source Lines of Code report for all files in self.files,
+        output to self.sloc_filename.
         """
         slocgrp = sloc.SlocGroup(self.filenames)
-        utils.write_report(self.sloc_filename, slocgrp, self.sloc_fmtfactory)
+        def makeSlocFmt(f):
+            return sloc.SlocGoogleChartFormatter(f, self.rootdir)
+        utils.write_report(self.sloc_filename, slocgrp, makeSlocFmt)
         self._filesforjump.add(self.sloc_filename)
 
-    def generate_dependency_graph(self, _depgrp=None):
-        """Generates a dependency graph image to self.depgraph_filename for the files in self.files.  Returns an
-        instance of DependencyGroup.
+    def generate_dependency_graph(self, depgrp):
+        """Generates a dependency graph image to self.depgraph_filename
+        for the files in self.files.
         """
-        depgrp = _create_dependency_group(self.filenames, _depgrp)
-        renderer = self.depgraph_renderfactory(depgrp)
+        renderer = depgraph.DefaultRenderer(depgrp, leading_path=self.rootdir)
         renderer.render(self.depgraph_filename)
         self._filesforjump.add(self.depgraph_filename)
         return depgrp
 
-    def generate_coupling_report(self, _depgrp=None):
-        """Generates a report for Afferent and Efferent Coupling between all modules in self.filenames, saved to
-        self.coupling_filename.  Returns an instance of DependencyGroup.
+    def generate_coupling_report(self, depgrp):
+        """Generates a report for Afferent and Efferent Coupling between
+        all modules in self.filenames,
+        saved to self.coupling_filename
         """
-        depgrp = _create_dependency_group(self.filenames, _depgrp)
-        utils.write_report(self.coupling_filename, depgrp, self.coupling_fmtfactory)
+        def factory(f):
+            return depgraph.CouplingGoogleChartFormatter(f, self.rootdir)
+        utils.write_report(self.coupling_filename, depgrp, factory)
         self._filesforjump.add(self.coupling_filename)
-        return depgrp
 
-    def generate_couplingrank_report(self, _depgrp=None):
-        """Generates a PageRank report for all code in self.filenames to self.couplingrank_filename.  Returns an
-        instance of DependencyGroup.
+    def generate_couplingrank_report(self, depgrp):
+        """Generates a PageRank report for all code in self.filenames to
+        self.couplingrank_filename.
         """
-        depgrp = _create_dependency_group(self.filenames, _depgrp)
-        utils.write_report(self.couplingrank_filename, depgrp, self.couplingrank_fmtfactory)
+        def factory(f):
+            return depgraph.RankGoogleChartFormatter(f, self.rootdir)
+        utils.write_report(self.couplingrank_filename, depgrp, factory)
         self._filesforjump.add(self.couplingrank_filename)
-        return depgrp
 
     def generate_html_jump(self):
         """Generates an html page that links to any generated reports."""
@@ -191,9 +191,13 @@ class Monocle(object):
         """Run all report generation functions.
 
         If coveragedata is not set, skip the coverage functions.
-        If not self.debug, raises an AggregateError after all functions run if any function raises (so metrics will
+
+        If not self.debug, raises an AggregateError after all functions run
+            if any function raises (so metrics will
             be generated for any function that succeeds).
-        cleanoutput: If True, run ensure_clean_output to clear the output directory.
+
+        :param cleanoutput: If True, run ensure_clean_output to clear
+          the output directory.
         """
         if cleanoutput:
             self.ensure_clean_output()
@@ -204,18 +208,18 @@ class Monocle(object):
             except Exception:
                 exc_infos.append(sys.exc_info())
 
-        #trydo(self.generate_sloc)
+        trydo(self.generate_sloc)
         trydo(self.generate_cyclomatic_complexity)
 
-#        if self.coveragedata:
-#            trydo(self.generate_cover_report)
-#            trydo(self.generate_cover_html)
-#
-#        depgrp = trydo(self.generate_coupling_report)
-#        depgrp = trydo(lambda: self.generate_couplingrank_report(depgrp))
-#        depgrp = trydo(lambda: self.generate_dependency_graph(depgrp))
+        if self.coveragedata:
+            trydo(self.generate_cover_html)
+
+        depgrp = _create_dependency_group(self.filenames)
+        trydo(lambda: self.generate_coupling_report(depgrp))
+        trydo(lambda: self.generate_couplingrank_report(depgrp))
+        trydo(lambda: self.generate_dependency_graph(depgrp))
         trydo(self.generate_html_jump)
-         #self.generate_funcinfo_report,
-         #self.generate_inheritance_report,
+        #self.generate_funcinfo_report,
+        #self.generate_inheritance_report,
         if exc_infos:
             raise utils.AggregateError(exc_infos)
