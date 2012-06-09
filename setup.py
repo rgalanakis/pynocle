@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name="pynocle",
-    version="0.2.1",
+    version="0.3",
     author="Rob Galanakis",
     author_email="rob.galanakis@gmail.com",
     url="http://code.google.com/p/pynocle/",
