@@ -20,6 +20,7 @@ import sloc
 import utils
 
 
+
 def ensure_clean_output(outputdir, _ran=0):
     """rmtree and makedirs outputdir to ensure a clean output directory.
 
@@ -217,7 +218,7 @@ class Monocle(object):
         depgrp = _create_dependency_group(self.filenames)
         trydo(lambda: self.generate_coupling_report(depgrp))
         trydo(lambda: self.generate_couplingrank_report(depgrp))
-        trydo(lambda: self.generate_dependency_graph(depgrp))
+        #trydo(lambda: self.generate_dependency_graph(depgrp))
         trydo(self.generate_html_jump)
         #self.generate_funcinfo_report,
         #self.generate_inheritance_report,

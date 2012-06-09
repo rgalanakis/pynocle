@@ -151,4 +151,7 @@ def rst_to_html(rststr):
     allparas = map(ElementTree.tostring, el)
     s = '\n'.join(allparas)
     s = s.replace('paragraph', 'p')
+    s = s.replace('title', 'h2')
+    s = s.replace('reference', 'a')
+    s = s.replace('refuri', 'href')
     return s
