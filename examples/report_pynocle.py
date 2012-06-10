@@ -8,7 +8,5 @@ if __name__ == '__main__':
     pynocledir = os.path.join(thisdir, '..', 'pynocle')
 
     import report_project
-    def runtests():
-        report_project.nose_dir(pynocledir)
-    report_project.run_project('Pynocle', pynocledir, outdir, runtests)
-
+    runtests = report_project.run_nose(pynocledir)
+    report_project.report_project('Pynocle', pynocledir, outdir, runtests)
