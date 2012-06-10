@@ -28,18 +28,20 @@ def _get_coverage(projectname, docoverwork, regencover):
     return cov
 
 
-def nose_dir(cwd):
-    import nose
-    old = os.getcwd()
-    try:
-        os.chdir(cwd)
-        nose.run()
-    finally:
-        os.chdir(old)
+def run_nose(cwd):
+    def inner():
+        import nose
+        old = os.getcwd()
+        try:
+            os.chdir(cwd)
+            nose.run()
+        finally:
+            os.chdir(old)
+    return inner
 
 
-def run_project(projectname, rootdir, outdir,
-                docoverwork=None, regencover=True):
+def report_project(projectname, rootdir, outdir,
+                   docoverwork=None, regencover=True):
     """Generates a pynocle report for a project.
 
     :param projectname: The name of the project.
