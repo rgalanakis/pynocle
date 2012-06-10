@@ -5,9 +5,9 @@ Coupling
 --------
 
 Coupling measures how closely bound two modules are.  Afferent coupling (Ca)
-measures how many modules reference a given module.  Efferent coupling
-(Ce) measures how many modules a given module referenecs.  Afferent
-coupling of 0 can indicate dead code, since nothing references it,
+measures how many modules reference a given module imports.
+Efferent coupling (Ce) measures how many modules a given module references.
+Afferent coupling of 0 can indicate dead code, since nothing references it,
 with various exceptions (test module, entry points, dynamic references,
 configuration, etc.).  High efferent coupling means a module is
 very dependent on other modules and has a high liklihood of change.
