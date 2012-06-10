@@ -234,14 +234,19 @@ class DefaultStyler(object):
 
     def _calc_outline_col(self, ca, maxca):
         """Should go from black to bright red as `ca` approaches `maxca`."""
-        redchan = lerp(0x00, 0xff, float(ca) / maxca)
+        redchan = 0x00
+        if maxca: # If maxca is 0 we'd get an error, just use black if so.
+            redchan = lerp(0x00, 0xff, float(ca) / maxca)
         return '#%02x0000' % redchan
 
     def _calc_fill_col(self, ce, maxce):
         """Should go from green to red as `ce` approaches `maxce`."""
-        ratio = float(ce) / maxce
-        redchan = lerp(0x00, 0xff, ratio)
-        greenchan = lerp(0xff, 0x00, ratio)
+        redchan, greenchan = 0x00, 0xff
+        # If maxce is 0, we'd get an error, so just use green.
+        if maxce:
+            ratio = float(ce) / maxce
+            redchan = lerp(0x00, 0xff, ratio)
+            greenchan = lerp(0xff, 0x00, ratio)
         return '#%02x%02x00' % (redchan, greenchan)
 
     def _calc_node_colors(self, depgroup, depnode):
