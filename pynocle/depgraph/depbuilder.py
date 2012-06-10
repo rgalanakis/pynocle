@@ -3,6 +3,7 @@
 import compiler
 import compiler.ast
 import fnmatch
+import itertools
 import os
 import sys
 
@@ -125,15 +126,22 @@ class DepBuilder:
         """Return an extensionless path for filename."""
         return os.path.splitext(filename)[0]
 
-    def _is_importnode(self, node):
-        """Return true if node is a compiler.ast.Import."""
-        return isinstance(node, compiler.ast.Import)
+    def _extract_modulename(self, node):
+        """If node is a From/Import node, return the module's name,
+        otherwise return None."""
+        if isinstance(node, compiler.ast.Import):
+            return node.names[0][0]
+        if isinstance(node, compiler.ast.From):
+            return node.modname
+        return None
 
-    def _get_all_importnodes(self, filename):
-        """Compiles an AST for filename and returns all import nodes
-        inside of it.
+    def _get_all_imported_modulenames(self, filename):
+        """Compiles an AST for filename and returns the module names
+        for all modules imported by.
+
         If no file for filename exists, or it is an unparseable file (pyd, pyc),
         return an empty list.
+
         If the file cannot be parsed,
         append to self.failed and return an empty list.
         """
@@ -151,8 +159,10 @@ class DepBuilder:
         except SyntaxError:
             self.failed.append(self._extless(filename))
             return []
-        importnodes = filter(self._is_importnode, utils.flatten(astnode, lambda node: node.getChildNodes()))
-        return importnodes
+        allnodes = utils.flatten(astnode, lambda node: node.getChildNodes())
+        names = itertools.imap(self._extract_modulename, allnodes)
+        names = itertools.ifilter(None, names)
+        return names
 
     def _process_file(self, filename):
         """Process the file at filename.
@@ -164,10 +174,9 @@ class DepBuilder:
             self._is_excluded(extless_filename)):
             return
         self._processed.add(extless_filename)
-        impnodes = self._get_all_importnodes(filename)
-        for node in impnodes:
-            imported_module = node.names[0][0]
-            imported_modulefilename = self.modulefinder_cache.get_module_filename(imported_module, filename)
+        importednames = self._get_all_imported_modulenames(filename)
+        for impmodname in importednames:
+            imported_modulefilename = self.modulefinder_cache.get_module_filename(impmodname, filename)
             #We can get back 'sys' as a filename so check if it's excluded before we get the abspath
             if imported_modulefilename and not self._is_excluded(imported_modulefilename):
                 imported_modulefilename = os.path.abspath(imported_modulefilename)
