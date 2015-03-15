@@ -8,12 +8,13 @@ pynocle.Monocle object, and call generate_all to generate all supported
 metrics!  In the future, there will be much more configuration available.
 
 Currently supported metrics include:
-    * cyclomatic complexity
-    * lines of code (source, comment, blank, total)
-    * test coverage
-    * dependency graphing
-    * coupling measurement
-    * module ranking
+
+  * cyclomatic complexity
+  * lines of code (source, comment, blank, total)
+  * test coverage
+  * dependency graphing
+  * coupling measurement
+  * module ranking
     
 In the future, additional metrics will be supported.  For more information
 about what metrics mean what, see the Description of Metrics section below.
@@ -23,12 +24,12 @@ Usage
 =====
 
 pynocle is meant to be used as a simple API from your own python code.
-Simply import pynocle, create a Monocle instance, and
-the generate_all method.  That's it!
+Simply `import pynocle`, create a `Monocle` instance, and
+the `generate_all` method.  That's it!
 
 To generate coverage, you can pass a parameterless function (like nose.run)
-into pynocle.run_with_coverage.  Pass any coverage.coverage instance
-into Monocle.coverdata in order to generate coverage reports.
+into `pynocle.run_with_coverage`.  Pass any `coverage.coverage` instance
+into `Monocle.coverdata` in order to generate coverage reports.
 
 The internal API's are more complex and flexible and we'll be working
 on exposing that configuration as time goes by.
@@ -40,20 +41,20 @@ and its individual modules may be added later.
 Dependencies
 ============
 
- * Python 2.6 or higher
- * The docutils module.
- * For coverage support, requires the coverage module:
+  * Python 2.6 or higher
+  * The docutils module.
+  * For coverage support, requires the coverage module:
    http://pypi.python.org/pypi/coverage
- * For dependency graph generation support, requires GraphViz's
+  * For dependency graph generation support, requires GraphViz's
    free software: http://www.graphviz.org/
- * For page ranking algorithm, requires numpy.
+  * For page ranking algorithm, requires numpy.
 
 
 ============
 Installation
 ============
 
-Run setup.py to install pynocle and python dependencies.
+Run `setup.py` to install pynocle and python dependencies.
 
 Make sure you have GraphViz's 'dot' in your application path to use
 dependency graph visualization features.  This will be configurable
@@ -67,7 +68,7 @@ Support
 Please email rob.galanakis@gmail.com if you have any questions,
 bugs, or want to help!
 
-Fork the Hg repository at http://code.google.com/p/pynocle/
+Fork the repository at https://github.com/rgalanakis/pynocle
 
 My personal site is at http://www.robg3d.com
 
@@ -98,7 +99,7 @@ A generated metrics report will have more information about software metrics,
 and links for additional info.
 
 See the example output for more info, available here:
-http://pynocle.googlecode.com/hg/examples/exampleoutput/index.html
+https://github.com/rgalanakis/pynocle/tree/master/examples/exampleoutput/index.html
 
 You can look at any good static analysis tool and wikipedia to get
 overviews of various code metrics:
